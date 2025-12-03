@@ -1,0 +1,3 @@
+REGRAS_DEFAULT = {
+    'regras': {}
+}

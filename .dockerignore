@@ -1,0 +1,8 @@
+.dockerignore
+# .devcontainer
+.vscode
+files
+jjsystem
+jjlocal
+venv
+.env

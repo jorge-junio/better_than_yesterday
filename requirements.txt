@@ -1,0 +1,36 @@
+# System
+# --extra-index-url https://pypi.fury.io/a6iGQvpTobgDnNgmNFMN/fdoliveira/
+--extra-index-url https://gitlab+deploy-token-245700:spb3Lzt5Pp4wAGHXAXEt@gitlab.com/api/v4/projects/21574659/packages/pypi/simple
+
+jjsystem>=1.0.0
+jjlocal>=1.0.0
+
+Flask-Cors==3.0.10
+psycopg2-binary==2.9.9
+cryptography==39.0.0
+
+lxml==4.9.0
+nfelib==1.2.0
+openpyxl==3.0.7
+
+# as duas extensões abaixo são usadas para gerar pdf
+pyhtml2pdf==0.0.7
+
+# usado para pegar a descricao por extenso de um número
+num2words==0.5.13
+
+# usado para ler os dados de pdf como uma tabela
+tabula-py==2.9.3
+numpy==1.24.4
+
+# usado para ler o texto das páginas do PDF, dando mais precisão aos dados
+pdfplumber==0.11.4
+
+# usado para gerar qrcode do pix de cobrança
+crcmod==1.7
+# pillow==11.1.0
+# pixqrcodegen==0.9.1
+qrcode==7.4.2
+
+# precisa instalar o java via terminal na máquina
+# sudo apt-get install default-jre

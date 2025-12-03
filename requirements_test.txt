@@ -1,0 +1,15 @@
+# Base requirements
+-r requirements.txt
+
+# Tests
+
+flake8
+pytest
+pytest-flask
+
+# gabbi
+# fixtures
+# requests
+# testtools>=1.4.0
+# flask-webtest
+# sphinx

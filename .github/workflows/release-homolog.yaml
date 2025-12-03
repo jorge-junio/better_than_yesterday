@@ -1,0 +1,35 @@
+# GITHUB ACTIONS
+name: release-homolog
+
+on:
+  workflow_dispatch
+
+# env:
+#   IMAGE_NAME: ghtoken_product_demo
+
+jobs:
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    # if: "$GITHUB_REF_NAME" == "develop"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build image
+        run: |
+          docker build -t ghcr.io/$GITHUB_REPOSITORY:latest --target homolog .
+          docker build -t ghcr.io/$GITHUB_REPOSITORY:latest-worker --target worker-homolog .
+
+      - name: Log in to registry
+        # This is where you will update the personal access token to GITHUB_TOKEN
+        run: echo "${{ secrets.DEPLOY_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Push image
+        run: |
+          docker push ghcr.io/$GITHUB_REPOSITORY:latest
+          docker push ghcr.io/$GITHUB_REPOSITORY:latest-worker
