@@ -1,3 +1,0 @@
-REGRAS_DEFAULT = {
-    'regras': {}
-}

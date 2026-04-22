@@ -1,14 +1,1 @@
-# System
---extra-index-url https://pypi.fury.io/a6iGQvpTobgDnNgmNFMN/fdoliveira/
-jjlocal
-jjsystem
-flask-cors
-sparkpost
-psycopg2-binary
-pika
-Pillow
-
-# These dependencies are not being installed with jjsystem
-# TODO(samueldmq): recheck on this
-flask_sqlalchemy
-apscheduler
+flake8==7.3.0
