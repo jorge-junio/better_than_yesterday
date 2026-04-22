@@ -74,6 +74,7 @@ BTY - Agenda do Dia
             <tr>
                 <th>Título</th>
                 <th>Horário</th>
+                <th>Tempo estimado</th>
                 <th>Origem</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -89,6 +90,7 @@ BTY - Agenda do Dia
                     {% endif %}
                 </td>
                 <td>{{ task.scheduled_time|default:'-' }}</td>
+                <td>{{ task.estimated_time|default:'-' }}</td>
                 <td>
                     {% if task.source_type == 'recurrent' %}
                         Recorrente
@@ -134,7 +136,7 @@ BTY - Agenda do Dia
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="text-center">Nenhuma tarefa encontrada para esta data.</td>
+                <td colspan="6" class="text-center">Nenhuma tarefa encontrada para esta data.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -9,6 +9,7 @@ class TaskForm(forms.ModelForm):
         fields = [
             'title',
             'description',
+            'estimated_time',
             'scheduled_date',
             'scheduled_time',
             'is_completed',
@@ -16,6 +17,9 @@ class TaskForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'estimated_time': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'HH:MM:SS'}
+            ),
             'scheduled_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'scheduled_time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'is_completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -23,6 +27,7 @@ class TaskForm(forms.ModelForm):
         labels = {
             'title': 'Título',
             'description': 'Descrição',
+            'estimated_time': 'Tempo estimado',
             'scheduled_date': 'Data',
             'scheduled_time': 'Horário',
             'is_completed': 'Concluída',

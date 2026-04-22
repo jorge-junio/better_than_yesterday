@@ -21,6 +21,7 @@ class RecurringTask(models.Model):
 
     name = models.CharField(max_length=500, verbose_name='nome')
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
+    estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
     recurrence_type = models.CharField(
         max_length=20,
         choices=RecurrenceType.choices,

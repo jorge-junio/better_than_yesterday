@@ -9,6 +9,7 @@ class Task(models.Model):
 
     title = models.CharField(max_length=500, verbose_name='título')
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
+    estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
     scheduled_date = models.DateField(verbose_name='data')
     scheduled_time = models.TimeField(null=True, blank=True, verbose_name='horário')
     source_type = models.CharField(

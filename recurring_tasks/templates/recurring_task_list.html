@@ -50,6 +50,7 @@ SGN - Tarefas recorrentes
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
+                <th>Tempo estimado</th>
                 <th>Tipo</th>
                 <th>Resumo</th>
                 <th>Status</th>
@@ -61,6 +62,7 @@ SGN - Tarefas recorrentes
             <tr>
                 <td>{{ recurring_task.id }}</td>
                 <td>{{ recurring_task.name }}</td>
+                <td>{{ recurring_task.estimated_time|default:'-' }}</td>
                 <td>{{ recurring_task.get_recurrence_type_display }}</td>
                 <td>
                     {% if recurring_task.recurrence_type == 'weekdays' %}
@@ -100,7 +102,7 @@ SGN - Tarefas recorrentes
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
+                <td colspan="7" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
             </tr>
             {% endfor %}
         </tbody>

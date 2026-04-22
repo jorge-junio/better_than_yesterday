@@ -22,6 +22,7 @@ def ensure_tasks_for_date(target_date):
             defaults={
                 'title': recurring_task.name,
                 'description': recurring_task.description,
+                'estimated_time': recurring_task.estimated_time,
                 'source_type': Task.SourceType.RECURRENT,
             },
         )

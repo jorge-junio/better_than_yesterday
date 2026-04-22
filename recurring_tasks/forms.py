@@ -22,6 +22,7 @@ class RecurringTaskForm(forms.ModelForm):
         fields = [
             'name',
             'description',
+            'estimated_time',
             'recurrence_type',
             'weekdays',
             'start_date',
@@ -32,6 +33,9 @@ class RecurringTaskForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'estimated_time': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'HH:MM:SS'}
+            ),
             'recurrence_type': forms.Select(attrs={'class': 'form-select'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -40,6 +44,7 @@ class RecurringTaskForm(forms.ModelForm):
         labels = {
             'name': 'Nome',
             'description': 'Descrição',
+            'estimated_time': 'Tempo estimado',
             'recurrence_type': 'Tipo de recorrência',
             'start_date': 'Data inicial',
             'end_date': 'Data final',

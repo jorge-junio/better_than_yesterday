@@ -16,6 +16,9 @@ SGN - Tarefas recorrentes
                 <dt class="col-sm-3">Tipo</dt>
                 <dd class="col-sm-9">{{ object.get_recurrence_type_display }}</dd>
 
+                <dt class="col-sm-3">Tempo estimado</dt>
+                <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
+
                 <dt class="col-sm-3">Dias da semana</dt>
                 <dd class="col-sm-9">{{ object.weekday_labels|join:', ' }}</dd>
 

@@ -19,6 +19,9 @@ BTY - Detalhe da Tarefa
                 <dt class="col-sm-3">Horário</dt>
                 <dd class="col-sm-9">{{ object.scheduled_time|default:'-' }}</dd>
 
+                <dt class="col-sm-3">Tempo estimado</dt>
+                <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
+
                 <dt class="col-sm-3">Origem</dt>
                 <dd class="col-sm-9">{{ object.get_source_type_display }}</dd>
 
