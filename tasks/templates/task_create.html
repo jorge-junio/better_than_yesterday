@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+BTY - Nova Tarefa
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3 class="display-6">Cadastrar Tarefa</h3>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+    <a href="{% url 'task_list' %}" class="btn btn-secondary mt-3">Voltar para a agenda</a>
+</div>
+
+{% endblock %}

@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
 
 {% block title %}
-SGN - Marcas
+SGN - Tarefas recorrentes
 {% endblock %}
 
 {% block content %}
 
 <div class="container mt-4">
-    <h3 class="display-6">Editar Marca</h3>
+    <h3 class="display-6">Editar Tarefa Recorrente</h3>
     <div class="card">
         <div class="card-body">
             <form method="post" class="form">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Salvar Marca</button>
+                <button type="submit" class="btn btn-primary">Salvar Tarefa Recorrente</button>
             </form>
         </div>
     </div>
-    <a href="{% url 'brand_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para a lista de marcas</a>
+    <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para a lista</a>
 </div>
 
 {% endblock %}

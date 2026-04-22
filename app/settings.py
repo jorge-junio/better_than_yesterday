@@ -23,6 +23,10 @@ TENANT_APPS = [
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.sessions',
+
+    'progress',
+    'recurring_tasks',
+    'tasks',
 ]
 
 SHARED_APPS = [

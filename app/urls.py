@@ -11,14 +11,7 @@ urlpatterns = [
 
     path('', views.home, name="home"),
 
-    path('', include('brands.urls')),
-    path('', include('categories.urls')),
-    path('', include('customers.urls')),
-    path('', include('inflows.urls')),
-    path('', include('outflows.urls')),
-    path('', include('payables.urls')),
-    path('', include('products.urls')),
-    path('', include('receivables.urls')),
-    path('', include('sales.urls')),
-    path('', include('suppliers.urls')),
+    path('', include('progress.urls')),
+    path('', include('tasks.urls')),
+    path('', include('recurring_tasks.urls')),
 ]

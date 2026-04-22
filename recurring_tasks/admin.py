@@ -1,3 +1,11 @@
 from django.contrib import admin
 
-# Register your models here.
+from . import models
+
+
+@admin.register(models.RecurringTask)
+class RecurringTaskAdmin(admin.ModelAdmin):
+    list_display = ('name', 'recurrence_type', 'is_active', 'created_at')
+    list_filter = ('recurrence_type', 'is_active')
+    search_fields = ('name', 'description')
+    ordering = ('name',)

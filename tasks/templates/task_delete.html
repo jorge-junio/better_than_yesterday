@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+BTY - Excluir Tarefa
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3 class="display-6">Excluir Tarefa</h3>
+    <div class="card">
+        <div class="card-body">
+            <p>Tem certeza que deseja excluir a tarefa <strong>{{ object.title }}</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </form>
+            <a href="{% url 'task_list' %}" class="btn btn-secondary mt-3">Cancelar</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

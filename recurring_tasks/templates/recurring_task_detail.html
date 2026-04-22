@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+SGN - Tarefas recorrentes
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3 class="display-6">Detalhes da Tarefa Recorrente</h3>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ object.name }}</h3>
+            <p class="card-text">{{ object.description }}</p>
+            <dl class="row">
+                <dt class="col-sm-3">Tipo</dt>
+                <dd class="col-sm-9">{{ object.get_recurrence_type_display }}</dd>
+
+                <dt class="col-sm-3">Dias da semana</dt>
+                <dd class="col-sm-9">{{ object.weekday_labels|join:', ' }}</dd>
+
+                <dt class="col-sm-3">Intervalo</dt>
+                <dd class="col-sm-9">{{ object.start_date }} até {{ object.end_date }}</dd>
+
+                <dt class="col-sm-3">Datas específicas</dt>
+                <dd class="col-sm-9">{{ object.specific_dates|join:', ' }}</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">{% if object.is_active %}Ativa{% else %}Inativa{% endif %}</dd>
+            </dl>
+        </div>
+    </div>
+    <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary mt-3">Voltar para a lista</a>
+</div>
+
+{% endblock %}
