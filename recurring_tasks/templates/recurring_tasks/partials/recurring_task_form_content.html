@@ -3,7 +3,7 @@
     <h3 class="display-6">{{ page_heading }}</h3>
     <div class="card">
         <div class="card-body">
-            <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-target="#page-content" hx-swap="innerHTML">
+            <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-target="#page-content" hx-swap="innerHTML" id="recurring-task-form">
                 {% csrf_token %}
                 {% if form.non_field_errors %}
                     <div class="alert alert-danger">
@@ -12,16 +12,82 @@
                 {% endif %}
 
                 {% for field in form %}
-                    <div class="mb-3">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                    {% if field.name == 'recurrence_type' %}
+                        <div class="mb-3">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% elif field.name == 'weekdays' %}
+                        <div class="mb-3 d-none" data-recurrence-section="weekdays">
+                            {{ field.label_tag }}
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-weekday-action="select-all">
+                                    Selecionar todos os dias
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-weekday-action="clear-all">
+                                    Limpar seleção
+                                </button>
+                            </div>
+                            <div id="weekday-checkboxes">
+                                {{ field }}
+                            </div>
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% elif field.name == 'start_date' %}
+                        <div class="mb-3 d-none" data-recurrence-section="date_range">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    {{ form.start_date.label_tag }}
+                                    {{ form.start_date }}
+                                    {% for error in form.start_date.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.end_date.label_tag }}
+                                    {{ form.end_date }}
+                                    {% for error in form.end_date.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% elif field.name == 'end_date' %}
+                        {# Renderizado junto com start_date #}
+                    {% elif field.name == 'specific_dates' %}
+                        <div class="mb-3 d-none" data-recurrence-section="specific_dates">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 {% endfor %}
 
                 <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
@@ -33,3 +99,54 @@
     </div>
 </div>
 </div>
+
+<script>
+  (function () {
+    const form = document.getElementById('recurring-task-form');
+    if (!form) {
+      return;
+    }
+
+    const recurrenceTypeField = form.querySelector('[name="recurrence_type"]');
+    const sections = {
+      weekdays: form.querySelector('[data-recurrence-section="weekdays"]'),
+      date_range: form.querySelector('[data-recurrence-section="date_range"]'),
+      specific_dates: form.querySelector('[data-recurrence-section="specific_dates"]'),
+    };
+
+    const getWeekdayCheckboxes = function () {
+      return form.querySelectorAll('#weekday-checkboxes input[type="checkbox"]');
+    };
+
+    const setSectionVisibility = function (selectedType) {
+      Object.entries(sections).forEach(function ([key, section]) {
+        if (!section) {
+          return;
+        }
+
+        section.classList.toggle('d-none', key !== selectedType);
+      });
+    };
+
+    if (recurrenceTypeField) {
+      setSectionVisibility(recurrenceTypeField.value);
+      recurrenceTypeField.addEventListener('change', function () {
+        setSectionVisibility(recurrenceTypeField.value);
+      });
+    }
+
+    form.addEventListener('click', function (event) {
+      const action = event.target && event.target.dataset ? event.target.dataset.weekdayAction : null;
+      if (!action) {
+        return;
+      }
+
+      const checkboxes = getWeekdayCheckboxes();
+      const shouldCheck = action === 'select-all';
+
+      checkboxes.forEach(function (checkbox) {
+        checkbox.checked = shouldCheck;
+      });
+    });
+  })();
+</script>
