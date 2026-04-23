@@ -68,6 +68,7 @@
                 <th>Título</th>
                 <th>Horário</th>
                 <th>Tempo estimado</th>
+                <th>Tempo gasto</th>
                 <th>Origem</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -78,7 +79,7 @@
                 {% include 'tasks/partials/task_row.html' %}
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center">Nenhuma tarefa encontrada para esta data.</td>
+                <td colspan="7" class="text-center">Nenhuma tarefa encontrada para esta data.</td>
             </tr>
             {% endfor %}
         </tbody>

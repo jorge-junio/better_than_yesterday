@@ -59,3 +59,22 @@ class Task(models.Model):
     @property
     def is_pending(self):
         return not self.is_completed
+
+    @property
+    def time_spent(self):
+        if not self.started_in or not self.finished_in:
+            return None
+        return self.finished_in - self.started_in
+
+    @property
+    def time_spent_display(self):
+        duration = self.time_spent
+        if duration is None:
+            return '-'
+
+        total_seconds = int(duration.total_seconds())
+        sign = '-' if total_seconds < 0 else ''
+        total_seconds = abs(total_seconds)
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f'{sign}{hours:02d}:{minutes:02d}:{seconds:02d}'

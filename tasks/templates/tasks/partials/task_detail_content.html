@@ -15,6 +15,9 @@
                 <dt class="col-sm-3">Tempo estimado</dt>
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
 
+                <dt class="col-sm-3">Tempo gasto</dt>
+                <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
+
                 <dt class="col-sm-3">Iniciada em</dt>
                 <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
 

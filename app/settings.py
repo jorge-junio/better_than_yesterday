@@ -49,7 +49,7 @@ TENANT_DOMAIN_MODEL = "tenants.Domain"
 # qual é o name que definimos para a rota de login
 LOGIN_URL = 'login'
 # para onde o django deve nos redirecionar ao fazer o login
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/tasks/today/'
 # para onde o django deve nos redirecionar ao fazer o logout
 LOGOUT_REDIRECT_URL = '/login'
 
@@ -125,13 +125,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Recife'
 
 USE_I18N = True
 
 USE_TZ = True
 
-USE_L10N = False  # Desativa a localização automática de formatos
+# USE_L10N = False  # Desativa a localização automática de formatos
 DATE_FORMAT = 'Y-m-d'
 
 

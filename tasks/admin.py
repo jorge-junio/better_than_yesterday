@@ -13,6 +13,7 @@ class TaskAdmin(admin.ModelAdmin):
         'source_type',
         'started_in',
         'finished_in',
+        'time_spent_display',
         'is_completed',
     )
     list_filter = ('scheduled_date', 'source_type', 'is_completed')
