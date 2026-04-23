@@ -61,7 +61,7 @@ class RecurringTaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['weekdays'].initial = self.instance.weekdays
-            self.fields['specific_dates'].initial = '\n'.join(self.instance.specific_dates)
+            self.initial['specific_dates'] = '\n'.join(self.instance.specific_dates)
 
     def clean_weekdays(self):
         weekdays = self.cleaned_data.get('weekdays') or []
@@ -69,6 +69,7 @@ class RecurringTaskForm(forms.ModelForm):
 
     def clean_specific_dates(self):
         raw_value = self.cleaned_data.get('specific_dates') or ''
+        raw_value = raw_value.replace('[', '').replace(']', '')
         if not raw_value.strip():
             return []
 

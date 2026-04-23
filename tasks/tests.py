@@ -2,9 +2,11 @@ from datetime import date
 from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase
 from django.utils import timezone
 
+from app.utils import htmx_redirect
 from recurring_tasks.models import RecurringTask
 
 from .models import Task
@@ -141,3 +143,12 @@ class TaskCreateViewTests(SimpleTestCase):
         view.request = request
 
         self.assertEqual(view.get_initial()['description'], 'Comprar leite')
+
+
+class HtmxRedirectTests(SimpleTestCase):
+    def test_htmx_redirect_uses_success_status_and_header(self):
+        response = htmx_redirect('/recurring-tasks/list/')
+
+        self.assertIsInstance(response, HttpResponse)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.headers['HX-Redirect'], '/recurring-tasks/list/')
