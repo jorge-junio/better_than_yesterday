@@ -10,6 +10,11 @@ class PossibleTaskModelTests(SimpleTestCase):
 
         self.assertEqual(str(task), 'Organizar estação')
 
+    def test_defaults_to_low_priority(self):
+        task = PossibleTask(title='Organizar estação', description='Organizar mesa de trabalho')
+
+        self.assertEqual(task.priority, PossibleTask.Priority.LOW)
+
 
 class PossibleTaskUrlTests(SimpleTestCase):
     def test_list_urls_exist(self):

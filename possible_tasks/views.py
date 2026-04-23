@@ -17,6 +17,9 @@ class PossibleTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin
     paginate_by = 20
     permission_required = 'possible_tasks.view_possibletask'
 
+    def get_queryset(self):
+        return super().get_queryset().order_by('-priority', 'title')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['create_task_base_url'] = reverse('task_create')
