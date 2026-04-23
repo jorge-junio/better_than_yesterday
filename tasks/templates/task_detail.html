@@ -1,36 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}
-BTY - Detalhe da Tarefa
-{% endblock %}
+{% block title %}BTY - Detalhe da Tarefa{% endblock %}
 
 {% block content %}
-
-<div class="container mt-4">
-    <h3 class="display-6">Detalhes da Tarefa</h3>
-    <div class="card">
-        <div class="card-body">
-            <h3 class="card-title">{{ object.title }}</h3>
-            <p class="card-text">{{ object.description }}</p>
-            <dl class="row">
-                <dt class="col-sm-3">Data</dt>
-                <dd class="col-sm-9">{{ object.scheduled_date }}</dd>
-
-                <dt class="col-sm-3">Horário</dt>
-                <dd class="col-sm-9">{{ object.scheduled_time|default:'-' }}</dd>
-
-                <dt class="col-sm-3">Tempo estimado</dt>
-                <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
-
-                <dt class="col-sm-3">Origem</dt>
-                <dd class="col-sm-9">{{ object.get_source_type_display }}</dd>
-
-                <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">{% if object.is_completed %}Concluída{% else %}Pendente{% endif %}</dd>
-            </dl>
-        </div>
-    </div>
-    <a href="{% url 'task_list' %}" class="btn btn-secondary mt-3">Voltar para a agenda</a>
-</div>
-
+{% include 'tasks/partials/task_detail_content.html' %}
 {% endblock %}

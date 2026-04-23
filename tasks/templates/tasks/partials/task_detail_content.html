@@ -1,0 +1,41 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Detalhes da Tarefa</h3>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ object.title }}</h3>
+            <p class="card-text">{{ object.description }}</p>
+            <dl class="row">
+                <dt class="col-sm-3">Data</dt>
+                <dd class="col-sm-9">{{ object.scheduled_date }}</dd>
+
+                <dt class="col-sm-3">Horário</dt>
+                <dd class="col-sm-9">{{ object.scheduled_time|default:'-' }}</dd>
+
+                <dt class="col-sm-3">Tempo estimado</dt>
+                <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
+
+                <dt class="col-sm-3">Iniciada em</dt>
+                <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
+
+                <dt class="col-sm-3">Finalizada em</dt>
+                <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
+
+                <dt class="col-sm-3">Origem</dt>
+                <dd class="col-sm-9">{{ object.get_source_type_display }}</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">{% if object.is_completed %}Concluída{% else %}Pendente{% endif %}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            Voltar para a agenda
+        </a>
+        <a href="{% url 'task_update' object.id %}" class="btn btn-warning" hx-get="{% url 'task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            Editar
+        </a>
+    </div>
+</div>
+</div>

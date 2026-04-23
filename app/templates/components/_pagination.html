@@ -3,12 +3,12 @@
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1">
+            <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page=1" hx-get="?{% if query_string %}{{ query_string }}&{% endif %}page=1" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                 Primeira
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+            <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}" hx-get="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                 Anterior
             </a>
         </li>
@@ -18,13 +18,13 @@
         {% if page_number <= page_obj.number|add:3 and page_number >= page_obj.number|add:-3 %}
             {% if page_obj.number == page_number %}
             <li class="page-item active">
-                <a class="page-link" href="?page={{ page_number }}">
+                <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_number }}" hx-get="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                     {{ page_number }}
                 </a>
             </li>
             {% else %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_number }}">
+                <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_number }}" hx-get="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                     {{ page_number }}
                 </a>
             </li>
@@ -34,12 +34,12 @@
 
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}" hx-get="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                     Próxima
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.paginator.num_pages }}" hx-get="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.paginator.num_pages }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                     Última
                 </a>
             </li>

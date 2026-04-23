@@ -33,11 +33,30 @@ def ensure_tasks_for_date(target_date):
 
 
 @transaction.atomic
+def start_task(task):
+    now = timezone.now()
+    if task.started_in is None:
+        task.started_in = now
+        task.save(update_fields=['started_in', 'updated_at'])
+    return task
+
+
+@transaction.atomic
 def complete_task(task):
+    started_now = False
+    if task.started_in is None:
+        task.started_in = timezone.now()
+        started_now = True
+
     if not task.is_completed:
+        now = timezone.now()
         task.is_completed = True
-        task.completed_at = timezone.now()
-        task.save(update_fields=['is_completed', 'completed_at', 'updated_at'])
+        task.completed_at = now
+        task.finished_in = now
+        update_fields = ['is_completed', 'completed_at', 'finished_in', 'updated_at']
+        if started_now:
+            update_fields.append('started_in')
+        task.save(update_fields=update_fields)
     return task
 
 
@@ -55,3 +74,108 @@ def postpone_task(task, days=1):
     task.scheduled_date = task.scheduled_date + timedelta(days=days)
     task.save(update_fields=['scheduled_date', 'updated_at'])
     return task
+
+
+def get_completion_streak(reference_date=None, lookback_days=60):
+    reference_date = reference_date or timezone.localdate()
+    streak = 0
+
+    for offset in range(0, lookback_days):
+        current_date = reference_date - timedelta(days=offset)
+        day_tasks = Task.objects.filter(scheduled_date=current_date)
+        total = day_tasks.count()
+
+        if not total:
+            if offset == 0:
+                continue
+            break
+
+        completed = day_tasks.filter(is_completed=True).count()
+        if completed != total:
+            break
+
+        streak += 1
+
+    return streak
+
+
+def get_today_mission_context(reference_date=None):
+    reference_date = reference_date or timezone.localdate()
+    ensure_tasks_for_date(reference_date)
+
+    all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task')
+    pending_tasks = all_tasks.filter(is_completed=False)
+    total_tasks = all_tasks.count()
+    completed_tasks = all_tasks.filter(is_completed=True).count()
+    pending_count = total_tasks - completed_tasks
+    completion_rate = int((completed_tasks / total_tasks) * 100) if total_tasks else 0
+
+    streak_days = get_completion_streak(reference_date=reference_date)
+    lifetime_completed = Task.objects.filter(is_completed=True).count()
+    total_xp = lifetime_completed * 15
+    level = max(total_xp // 100 + 1, 1)
+    xp_in_level = total_xp % 100
+    xp_to_next_level = 100 - xp_in_level if xp_in_level else 100
+    mission_complete = total_tasks > 0 and pending_count == 0
+
+    badges = []
+    if mission_complete:
+        badges.append({
+            'label': 'Missão concluída',
+            'variant': 'success',
+            'description': 'Você fechou todas as tarefas do dia.',
+        })
+    if streak_days >= 3:
+        badges.append({
+            'label': 'Sequência 3+',
+            'variant': 'info',
+            'description': 'Três dias seguidos com a agenda em dia.',
+        })
+    if streak_days >= 7:
+        badges.append({
+            'label': 'Sequência 7+',
+            'variant': 'warning',
+            'description': 'Uma semana de consistência.',
+        })
+    if completed_tasks >= 5:
+        badges.append({
+            'label': 'Ritmo forte',
+            'variant': 'primary',
+            'description': 'Cinco conclusões no dia são sinal de tração.',
+        })
+    if not badges:
+        badges.append({
+            'label': 'Primeiro passo',
+            'variant': 'secondary',
+            'description': 'Conclua uma tarefa para desbloquear seu primeiro selo.',
+        })
+
+    if level >= 6:
+        rank_name = 'Lenda do foco'
+    elif level >= 4:
+        rank_name = 'Veterano disciplinado'
+    elif level >= 3:
+        rank_name = 'Ritmo constante'
+    elif level >= 2:
+        rank_name = 'Em evolução'
+    else:
+        rank_name = 'Recruta'
+
+    return {
+        'reference_date': reference_date,
+        'all_tasks': all_tasks,
+        'pending_tasks': pending_tasks,
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks,
+        'pending_count': pending_count,
+        'completion_rate': completion_rate,
+        'streak_days': streak_days,
+        'total_xp': total_xp,
+        'level': level,
+        'xp_in_level': xp_in_level,
+        'xp_to_next_level': xp_to_next_level,
+        'rank_name': rank_name,
+        'mission_complete': mission_complete,
+        'badges': badges,
+        'today_xp': completed_tasks * 15,
+    }

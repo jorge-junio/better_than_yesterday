@@ -1,0 +1,38 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Detalhes da Tarefa Recorrente</h3>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ object.name }}</h3>
+            <p class="card-text">{{ object.description }}</p>
+            <dl class="row">
+                <dt class="col-sm-3">Tipo</dt>
+                <dd class="col-sm-9">{{ object.get_recurrence_type_display }}</dd>
+
+                <dt class="col-sm-3">Tempo estimado</dt>
+                <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
+
+                <dt class="col-sm-3">Dias da semana</dt>
+                <dd class="col-sm-9">{{ object.weekday_labels|join:', ' }}</dd>
+
+                <dt class="col-sm-3">Intervalo</dt>
+                <dd class="col-sm-9">{{ object.start_date }} até {{ object.end_date }}</dd>
+
+                <dt class="col-sm-3">Datas específicas</dt>
+                <dd class="col-sm-9">{{ object.specific_dates|join:', ' }}</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">{% if object.is_active %}Ativa{% else %}Inativa{% endif %}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            Voltar para a lista
+        </a>
+        <a href="{% url 'recurring_task_update' object.id %}" class="btn btn-warning" hx-get="{% url 'recurring_task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            Editar
+        </a>
+    </div>
+</div>
+</div>

@@ -7,12 +7,12 @@ from django.utils import timezone
 class DashboardFilterForm(forms.Form):
     start_date = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        widget=forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
         label='Data inicial',
     )
     end_date = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        widget=forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
         label='Data final',
     )
 

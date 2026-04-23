@@ -2,10 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
 from . import forms, services
+from app.utils import HtmxTemplateMixin, PageTitleMixin
 
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class DashboardView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, TemplateView):
     template_name = 'progress/dashboard.html'
+    htmx_template_name = 'progress/partials/dashboard_content.html'
+    page_title = 'BTY - Dashboard'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

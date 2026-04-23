@@ -27,7 +27,9 @@ class Task(models.Model):
         verbose_name='tarefa recorrente',
     )
     is_completed = models.BooleanField(default=False, verbose_name='concluída')
+    started_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='iniciada em')
     completed_at = models.DateTimeField(null=True, blank=True, verbose_name='concluída em')
+    finished_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='finalizada em')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

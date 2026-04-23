@@ -1,0 +1,19 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Deletar Tarefa Recorrente</h3>
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text">Tem certeza que deseja excluir a tarefa recorrente <strong>{{ object.name }}</strong>?</p>
+
+            <form method="post" action="{% url 'recurring_task_delete' object.id %}" hx-post="{% url 'recurring_task_delete' object.id %}" hx-target="#page-content" hx-swap="innerHTML">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger mt-3">Deletar</button>
+            </form>
+
+            <a href="{{ cancel_url }}" class="btn btn-secondary mt-3" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                Cancelar e voltar para a lista
+            </a>
+        </div>
+    </div>
+</div>
+</div>
