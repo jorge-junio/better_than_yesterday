@@ -1,0 +1,44 @@
+<div data-page-title="{{ page_title }}">
+<div class="row mb-3">
+    <div class="col-lg-8">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #1f2937 0%, #2563eb 55%, #14b8a6 100%);">
+            <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
+                <i class="bi bi-list-task"></i>
+            </div>
+            <div class="position-relative">
+                <div class="text-uppercase small fw-semibold opacity-75 mb-2">Execução por projeto</div>
+                <h1 class="display-6 mb-2">Tarefas de projeto</h1>
+                <p class="mb-0 opacity-75">Organize o trabalho de cada projeto com prioridade, progresso e status.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if perms.project_tasks.add_projecttask %}
+    <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
+        <a href="{% url 'project_task_create' %}" class="btn btn-success" hx-get="{% url 'project_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <i class="bi bi-plus"></i> Nova tarefa de projeto
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if project_tasks %}
+        <div class="vstack gap-3">
+            {% for project_task in project_tasks %}
+                {% include 'project_tasks/partials/project_task_row.html' %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="display-3 mb-3 text-muted"><i class="bi bi-list-task"></i></div>
+            <h4 class="mb-2">Nenhuma tarefa de projeto ainda</h4>
+            <p class="text-muted mb-0">Cadastre a primeira tarefa vinculada a um projeto.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'components/_pagination.html' %}
+</div>

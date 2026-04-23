@@ -1,0 +1,15 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Excluir Tarefa de Projeto</h3>
+    <div class="card border-danger">
+        <div class="card-body">
+            <p class="mb-0">Tem certeza que deseja excluir a tarefa <strong>{{ object.title }}</strong>?</p>
+            <form method="post" action="{% url 'project_task_delete' object.id %}" hx-post="{% url 'project_task_delete' object.id %}" hx-target="#page-content" hx-swap="innerHTML" class="mt-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Excluir</button>
+                <a href="{{ cancel_url }}" class="btn btn-secondary mt-3 ms-2" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+</div>

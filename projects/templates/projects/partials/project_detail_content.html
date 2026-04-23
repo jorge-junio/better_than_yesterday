@@ -1,0 +1,26 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Detalhes do Projeto</h3>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ object.title }}</h3>
+            <p class="card-text">{{ object.description }}</p>
+            <dl class="row">
+                <dt class="col-sm-3">Tarefas vinculadas</dt>
+                <dd class="col-sm-9">{{ project_tasks_count }}</dd>
+
+                <dt class="col-sm-3">Criado em</dt>
+                <dd class="col-sm-9">{{ object.created_at|date:'d/m/Y H:i' }}</dd>
+
+                <dt class="col-sm-3">Atualizado em</dt>
+                <dd class="col-sm-9">{{ object.updated_at|date:'d/m/Y H:i' }}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'project_list' %}" class="btn btn-secondary" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
+        <a href="{% url 'project_task_create' %}?project={{ object.id }}" class="btn btn-success" hx-get="{% url 'project_task_create' %}?project={{ object.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Nova tarefa do projeto</a>
+        <a href="{% url 'project_update' object.id %}" class="btn btn-warning" hx-get="{% url 'project_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Editar</a>
+    </div>
+</div>
+</div>

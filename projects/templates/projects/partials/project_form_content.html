@@ -1,0 +1,31 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">{{ page_heading }}</h3>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-target="#page-content" hx-swap="innerHTML">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                <a href="{{ cancel_url }}" class="btn btn-secondary ms-2" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+</div>

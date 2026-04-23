@@ -1,0 +1,31 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Detalhes da Tarefa de Projeto</h3>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ object.title }}</h3>
+            <p class="card-text">{{ object.description }}</p>
+            <dl class="row">
+                <dt class="col-sm-3">Projeto</dt>
+                <dd class="col-sm-9">{{ object.project.title }}</dd>
+
+                <dt class="col-sm-3">Prioridade</dt>
+                <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">{{ object.get_status_display }}</dd>
+
+                <dt class="col-sm-3">Conclusão</dt>
+                <dd class="col-sm-9">{{ object.completion_percentage }}%</dd>
+
+                <dt class="col-sm-3">Concluída em</dt>
+                <dd class="col-sm-9">{{ object.completed_at|date:'d/m/Y H:i'|default:'-' }}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'project_task_list' %}" class="btn btn-secondary" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
+        <a href="{% url 'project_task_update' object.id %}" class="btn btn-warning" hx-get="{% url 'project_task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Editar</a>
+    </div>
+</div>
+</div>

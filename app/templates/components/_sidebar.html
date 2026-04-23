@@ -7,12 +7,6 @@
       </button>
       <div class="collapse d-sm-block" id="menuCollapse">
         <ul class="nav flex-column align-items-start" id="menu">
-          <li>
-            <a href="{% url 'dashboard' %}" class="nav-link px-0 align-middle" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-              <i class="bi bi-speedometer2 fs-4"></i>
-              <span class="ms-1">Dashboard</span>
-            </a>
-          </li>
           {% if perms.tasks.view_task %}
             <li>
               <a href="{% url 'task_today' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
@@ -21,11 +15,33 @@
               </a>
             </li>
           {% endif %}
+          <li>
+            <a href="{% url 'dashboard' %}" class="nav-link px-0 align-middle" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-speedometer2 fs-4"></i>
+              <span class="ms-1">Dashboard</span>
+            </a>
+          </li>
           {% if perms.tasks.view_task %}
             <li>
               <a href="{% url 'task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-bag fs-4"></i>
+                <i class="bi bi-clipboard-check fs-4"></i>
                 <span class="ms-1">Tarefas</span>
+              </a>
+            </li>
+          {% endif %}
+          {% if perms.projects.view_project %}
+            <li>
+              <a href="{% url 'project_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <i class="bi bi-kanban fs-4"></i>
+                <span class="ms-1">Projetos</span>
+              </a>
+            </li>
+          {% endif %}
+          {% if perms.project_tasks.view_projecttask %}
+            <li>
+              <a href="{% url 'project_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <i class="bi bi-list-task fs-4"></i>
+                <span class="ms-1">Tarefas de projeto</span>
               </a>
             </li>
           {% endif %}
@@ -40,7 +56,7 @@
           {% if perms.recurring_tasks.view_recurringtask %}
             <li>
               <a href="{% url 'recurring_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-bag fs-4"></i>
+                <i class="bi bi-arrow-repeat fs-4"></i>
                 <span class="ms-1">Tarefas recorrentes</span>
               </a>
             </li>

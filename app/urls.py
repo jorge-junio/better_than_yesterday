@@ -12,6 +12,8 @@ urlpatterns = [
     path('', views.home, name="home"),
 
     path('', include('progress.urls')),
+    path('', include('projects.urls')),
+    path('', include('project_tasks.urls')),
     path('', include('possible_tasks.urls')),
     path('', include('tasks.urls')),
     path('', include('recurring_tasks.urls')),
