@@ -10,6 +10,7 @@
             {% else %}
                 <span class="badge text-bg-secondary">Tarefa</span>
             {% endif %}
+            <span class="badge text-bg-dark">{{ task.get_priority_display }}</span>
         </div>
     </td>
     <td>{{ task.scheduled_time|default:'-' }}</td>

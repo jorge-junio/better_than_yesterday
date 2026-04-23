@@ -1,0 +1,91 @@
+<div data-page-title="{{ page_title }}">
+<div class="row mb-3">
+    <div class="col-lg-8">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #111827 0%, #4f46e5 55%, #0f766e 100%);">
+            <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
+                <i class="bi bi-lightbulb-fill"></i>
+            </div>
+            <div class="position-relative">
+                <div class="text-uppercase small fw-semibold opacity-75 mb-2">Backlog de ideias</div>
+                <h1 class="display-6 mb-2">Possíveis tarefas</h1>
+                <p class="mb-0 opacity-75">Registre o que você pretende fazer e transforme em tarefa ou tarefa recorrente quando fizer sentido.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if perms.possible_tasks.add_possibletask %}
+    <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
+        <a href="{% url 'possible_task_create' %}" class="btn btn-success" hx-get="{% url 'possible_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <i class="bi bi-plus"></i> Nova possível tarefa
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if possible_tasks %}
+        <div class="vstack gap-3">
+            {% for possible_task in possible_tasks %}
+            <div class="p-3 rounded-4 border bg-body-tertiary">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge text-bg-dark">Ideia</span>
+                            <span class="badge text-bg-secondary">{{ possible_task.created_at|date:'d/m/Y H:i' }}</span>
+                        </div>
+                        <h4 class="h5 mb-2" style="max-width: 78ch; overflow-wrap: anywhere;">{{ possible_task.title }}</h4>
+                        <button
+                            class="btn btn-outline-light btn-sm mb-2"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#possible-task-description-{{ possible_task.id }}"
+                            aria-expanded="false"
+                            aria-controls="possible-task-description-{{ possible_task.id }}"
+                        >
+                            <i class="bi bi-chevron-down me-1"></i>Expandir descrição
+                        </button>
+                        <div class="collapse" id="possible-task-description-{{ possible_task.id }}">
+                            <div class="pt-2">
+                                <p class="mb-0 text-body-secondary">{{ possible_task.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 align-items-start">
+                        {% if perms.tasks.add_task %}
+                        <a href="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-primary btn-sm" hx-get="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-arrow-right-circle me-1"></i>Virar tarefa
+                        </a>
+                        {% endif %}
+                        {% if perms.recurring_tasks.add_recurringtask %}
+                        <a href="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-outline-info btn-sm" hx-get="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-arrow-repeat me-1"></i>Virar recorrente
+                        </a>
+                        {% endif %}
+                        {% if perms.possible_tasks.change_possibletask %}
+                        <a href="{% url 'possible_task_update' possible_task.id %}" class="btn btn-warning btn-sm" hx-get="{% url 'possible_task_update' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        {% endif %}
+                        {% if perms.possible_tasks.delete_possibletask %}
+                        <a href="{% url 'possible_task_delete' possible_task.id %}" class="btn btn-danger btn-sm" hx-get="{% url 'possible_task_delete' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="display-3 mb-3 text-muted"><i class="bi bi-lightbulb"></i></div>
+            <h4 class="mb-2">Nenhuma possível tarefa ainda</h4>
+            <p class="text-muted mb-0">Adicione uma ideia para transformar depois em tarefa ou recorrência.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'components/_pagination.html' %}
+</div>

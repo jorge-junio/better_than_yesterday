@@ -25,6 +25,7 @@ def ensure_tasks_for_date(target_date):
                 'description': recurring_task.description,
                 'estimated_time': recurring_task.estimated_time,
                 'task_type': recurring_task.task_type,
+                'priority': recurring_task.priority,
                 'source_type': Task.SourceType.RECURRENT,
             },
         )
@@ -97,6 +98,14 @@ def postpone_task(task, days=1):
     return task
 
 
+def get_today_mission_ordering():
+    return (
+        F('started_in').desc(nulls_last=True),
+        F('priority').desc(nulls_last=True),
+        'title',
+    )
+
+
 def get_completion_streak(reference_date=None, lookback_days=60):
     reference_date = reference_date or timezone.localdate()
     streak = 0
@@ -127,11 +136,7 @@ def get_today_mission_context(reference_date=None):
     all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task')
     active_tasks = all_tasks.filter(skipped_in__isnull=True)
     skipped_tasks = all_tasks.filter(skipped_in__isnull=False)
-    pending_tasks = active_tasks.filter(is_completed=False).order_by(
-        F('started_in').desc(nulls_last=True),
-        'scheduled_time',
-        'title',
-    )
+    pending_tasks = active_tasks.filter(is_completed=False).order_by(*get_today_mission_ordering())
     total_tasks = active_tasks.count()
     completed_tasks = active_tasks.filter(is_completed=True).count()
     skipped_count = skipped_tasks.count()

@@ -7,6 +7,11 @@ class Task(models.Model):
         TASK = 'task', 'Tarefa'
         OBJECTIVE = 'objective', 'Objetivo'
 
+    class Priority(models.IntegerChoices):
+        LOW = 1, 'Baixa'
+        MEDIUM = 2, 'Média'
+        HIGH = 3, 'Alta'
+
     class SourceType(models.TextChoices):
         MANUAL = 'manual', 'Manual'
         RECURRENT = 'recurrent', 'Recorrente'
@@ -21,6 +26,11 @@ class Task(models.Model):
         choices=TaskType.choices,
         default=TaskType.TASK,
         verbose_name='tipo',
+    )
+    priority = models.PositiveSmallIntegerField(
+        choices=Priority.choices,
+        default=Priority.LOW,
+        verbose_name='prioridade',
     )
     source_type = models.CharField(
         max_length=20,

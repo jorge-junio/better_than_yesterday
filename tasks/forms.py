@@ -13,6 +13,7 @@ class TaskForm(forms.ModelForm):
             'scheduled_date',
             'scheduled_time',
             'task_type',
+            'priority',
             'is_completed',
         ]
         widgets = {
@@ -24,6 +25,7 @@ class TaskForm(forms.ModelForm):
             'scheduled_date': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
             'scheduled_time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'task_type': forms.Select(attrs={'class': 'form-select'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
             'is_completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
@@ -33,6 +35,7 @@ class TaskForm(forms.ModelForm):
             'scheduled_date': 'Data',
             'scheduled_time': 'Horário',
             'task_type': 'Tipo',
+            'priority': 'Prioridade',
             'is_completed': 'Concluída',
         }
 

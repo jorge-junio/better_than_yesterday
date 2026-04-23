@@ -29,6 +29,14 @@
               </a>
             </li>
           {% endif %}
+          {% if perms.possible_tasks.view_possibletask %}
+            <li>
+              <a href="{% url 'possible_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <i class="bi bi-lightbulb fs-4"></i>
+                <span class="ms-1">Possíveis tarefas</span>
+              </a>
+            </li>
+          {% endif %}
           {% if perms.recurring_tasks.view_recurringtask %}
             <li>
               <a href="{% url 'recurring_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">

@@ -1,6 +1,7 @@
 <tr id="recurring-task-row-{{ recurring_task.id }}">
     <td>{{ recurring_task.id }}</td>
     <td>{{ recurring_task.name }}</td>
+    <td><span class="badge text-bg-dark">{{ recurring_task.get_priority_display }}</span></td>
     <td>{{ recurring_task.estimated_time|default:'-' }}</td>
     <td>{{ recurring_task.get_recurrence_type_display }}</td>
     <td>

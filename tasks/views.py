@@ -95,6 +95,7 @@ class TaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
     def get_initial(self):
         initial = super().get_initial()
         initial['scheduled_date'] = timezone.localdate()
+        initial['description'] = self.request.GET.get('description', '')
         return initial
 
     def form_valid(self, form):

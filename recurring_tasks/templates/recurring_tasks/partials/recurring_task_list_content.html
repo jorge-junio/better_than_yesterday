@@ -46,6 +46,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
+                <th>Prioridade</th>
                 <th>Tempo estimado</th>
                 <th>Tipo</th>
                 <th>Resumo</th>
@@ -58,7 +59,7 @@
                 {% include 'recurring_tasks/partials/recurring_task_row.html' %}
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
+                <td colspan="8" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
             </tr>
             {% endfor %}
         </tbody>

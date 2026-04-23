@@ -24,6 +24,7 @@ class RecurringTaskForm(forms.ModelForm):
             'description',
             'estimated_time',
             'task_type',
+            'priority',
             'recurrence_type',
             'weekdays',
             'start_date',
@@ -38,6 +39,7 @@ class RecurringTaskForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'HH:MM:SS'}
             ),
             'task_type': forms.Select(attrs={'class': 'form-select'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
             'recurrence_type': forms.Select(attrs={'class': 'form-select'}),
             'start_date': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
@@ -48,6 +50,7 @@ class RecurringTaskForm(forms.ModelForm):
             'description': 'Descrição',
             'estimated_time': 'Tempo estimado',
             'task_type': 'Tipo',
+            'priority': 'Prioridade',
             'recurrence_type': 'Tipo de recorrência',
             'start_date': 'Data inicial',
             'end_date': 'Data final',

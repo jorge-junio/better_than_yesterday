@@ -56,6 +56,11 @@ class RecurringTaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMi
         context['cancel_url'] = reverse_lazy('recurring_task_list')
         return context
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['description'] = self.request.GET.get('description', '')
+        return initial
+
     def form_valid(self, form):
         response = super().form_valid(form)
         if is_htmx_request(self.request):

@@ -2,11 +2,18 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from .services import sync_generated_tasks_from_recurring_task
+
 
 class RecurringTask(models.Model):
     class TaskType(models.TextChoices):
         TASK = 'task', 'Tarefa'
         OBJECTIVE = 'objective', 'Objetivo'
+
+    class Priority(models.IntegerChoices):
+        LOW = 1, 'Baixa'
+        MEDIUM = 2, 'Média'
+        HIGH = 3, 'Alta'
 
     class RecurrenceType(models.TextChoices):
         WEEKDAYS = 'weekdays', 'Dias da semana'
@@ -31,6 +38,11 @@ class RecurringTask(models.Model):
         choices=TaskType.choices,
         default=TaskType.TASK,
         verbose_name='tipo',
+    )
+    priority = models.PositiveSmallIntegerField(
+        choices=Priority.choices,
+        default=Priority.LOW,
+        verbose_name='prioridade',
     )
     recurrence_type = models.CharField(
         max_length=20,
@@ -135,3 +147,7 @@ class RecurringTask(models.Model):
             return date.isoformat() in self.specific_dates
 
         return False
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        sync_generated_tasks_from_recurring_task(self)

@@ -1,0 +1,11 @@
+<div class="p-3 rounded-4 border bg-body-tertiary">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge text-bg-dark">Ideia</span>
+                <span class="badge text-bg-secondary">{{ possible_task.created_at|date:'Y-m-d H:i' }}</span>
+            </div>
+            <p class="mb-0">{{ possible_task.description }}</p>
+        </div>
+    </div>
+</div>

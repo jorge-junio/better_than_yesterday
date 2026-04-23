@@ -2,13 +2,14 @@ from datetime import date
 from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.utils import timezone
 
 from recurring_tasks.models import RecurringTask
 
 from .models import Task
-from .services import complete_task, ensure_tasks_for_date, skip_task_for_today, start_task
+from .views import TaskCreateView
+from .services import complete_task, ensure_tasks_for_date, get_today_mission_ordering, skip_task_for_today, start_task
 
 
 class TaskModelTests(SimpleTestCase):
@@ -20,6 +21,7 @@ class TaskModelTests(SimpleTestCase):
 
         self.assertTrue(task.is_pending)
         self.assertEqual(task.task_type, Task.TaskType.TASK)
+        self.assertEqual(task.priority, Task.Priority.LOW)
 
     def test_recurrent_task_requires_recurring_origin(self):
         task = Task(
@@ -122,3 +124,20 @@ class RecurrenceGenerationTests(SimpleTestCase):
         self.assertTrue(hasattr(recurring_task, 'occurs_on'))
         self.assertTrue(callable(ensure_tasks_for_date))
         self.assertEqual(recurring_task.task_type, RecurringTask.TaskType.TASK)
+
+    def test_today_mission_orders_by_started_priority_title(self):
+        ordering = get_today_mission_ordering()
+
+        self.assertEqual(len(ordering), 3)
+        self.assertEqual(str(ordering[0]), 'OrderBy(F(started_in), descending=True)')
+        self.assertEqual(str(ordering[1]), 'OrderBy(F(priority), descending=True)')
+        self.assertEqual(ordering[2], 'title')
+
+
+class TaskCreateViewTests(SimpleTestCase):
+    def test_prefills_description_from_querystring(self):
+        request = RequestFactory().get('/tasks/create/?description=Comprar+leite')
+        view = TaskCreateView()
+        view.request = request
+
+        self.assertEqual(view.get_initial()['description'], 'Comprar leite')

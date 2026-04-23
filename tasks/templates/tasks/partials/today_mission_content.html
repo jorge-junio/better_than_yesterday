@@ -96,6 +96,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <span class="badge text-bg-dark">+15 XP</span>
+                                            <span class="badge text-bg-secondary">{{ task.get_priority_display }}</span>
                                             {% if task.source_type == 'recurrent' %}
                                                 <span class="badge text-bg-secondary">Recorrente</span>
                                             {% else %}
