@@ -40,3 +40,12 @@ class RecurringTaskModelTests(SimpleTestCase):
         self.assertEqual(task.specific_dates, ['2026-04-22', '2026-04-24'])
         self.assertTrue(task.occurs_on(date(2026, 4, 24)))
         self.assertFalse(task.occurs_on(date(2026, 4, 23)))
+
+    def test_defaults_to_task_type(self):
+        task = RecurringTask(
+            name='Academia',
+            recurrence_type=RecurringTask.RecurrenceType.WEEKDAYS,
+            weekdays=['mon'],
+        )
+
+        self.assertEqual(task.task_type, RecurringTask.TaskType.TASK)

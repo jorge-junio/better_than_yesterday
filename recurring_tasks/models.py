@@ -4,6 +4,10 @@ from django.utils import timezone
 
 
 class RecurringTask(models.Model):
+    class TaskType(models.TextChoices):
+        TASK = 'task', 'Tarefa'
+        OBJECTIVE = 'objective', 'Objetivo'
+
     class RecurrenceType(models.TextChoices):
         WEEKDAYS = 'weekdays', 'Dias da semana'
         DATE_RANGE = 'date_range', 'Intervalo de datas'
@@ -22,6 +26,12 @@ class RecurringTask(models.Model):
     name = models.CharField(max_length=500, verbose_name='nome')
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
     estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
+    task_type = models.CharField(
+        max_length=20,
+        choices=TaskType.choices,
+        default=TaskType.TASK,
+        verbose_name='tipo',
+    )
     recurrence_type = models.CharField(
         max_length=20,
         choices=RecurrenceType.choices,
@@ -51,6 +61,9 @@ class RecurringTask(models.Model):
 
     def clean(self):
         super().clean()
+
+        if self.task_type not in dict(self.TaskType.choices):
+            raise ValidationError({'task_type': 'Tipo de tarefa inválido.'})
 
         if self.recurrence_type == self.RecurrenceType.WEEKDAYS:
             if not self.weekdays:

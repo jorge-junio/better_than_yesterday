@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from recurring_tasks.models import RecurringTask
@@ -23,6 +24,7 @@ def ensure_tasks_for_date(target_date):
                 'title': recurring_task.name,
                 'description': recurring_task.description,
                 'estimated_time': recurring_task.estimated_time,
+                'task_type': recurring_task.task_type,
                 'source_type': Task.SourceType.RECURRENT,
             },
         )
@@ -34,6 +36,9 @@ def ensure_tasks_for_date(target_date):
 
 @transaction.atomic
 def start_task(task):
+    if task.task_type == task.TaskType.OBJECTIVE:
+        return task
+
     now = timezone.now()
     if task.started_in is None:
         task.started_in = now
@@ -44,7 +49,11 @@ def start_task(task):
 @transaction.atomic
 def complete_task(task):
     started_now = False
-    if task.started_in is None:
+    if task.is_skipped:
+        task.skipped_in = None
+    if task.task_type == task.TaskType.OBJECTIVE:
+        task.started_in = None
+    elif task.started_in is None:
         task.started_in = timezone.now()
         started_now = True
 
@@ -54,8 +63,12 @@ def complete_task(task):
         task.completed_at = now
         task.finished_in = now
         update_fields = ['is_completed', 'completed_at', 'finished_in', 'updated_at']
-        if started_now:
+        if task.task_type == task.TaskType.OBJECTIVE and task.started_in is None:
             update_fields.append('started_in')
+        elif started_now:
+            update_fields.append('started_in')
+        if task.skipped_in is None:
+            update_fields.append('skipped_in')
         task.save(update_fields=update_fields)
     return task
 
@@ -66,6 +79,14 @@ def reopen_task(task):
         task.is_completed = False
         task.completed_at = None
         task.save(update_fields=['is_completed', 'completed_at', 'updated_at'])
+    return task
+
+
+@transaction.atomic
+def skip_task_for_today(task):
+    if not task.is_completed and task.skipped_in is None:
+        task.skipped_in = timezone.now()
+        task.save(update_fields=['skipped_in', 'updated_at'])
     return task
 
 
@@ -104,9 +125,16 @@ def get_today_mission_context(reference_date=None):
     ensure_tasks_for_date(reference_date)
 
     all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task')
-    pending_tasks = all_tasks.filter(is_completed=False)
-    total_tasks = all_tasks.count()
-    completed_tasks = all_tasks.filter(is_completed=True).count()
+    active_tasks = all_tasks.filter(skipped_in__isnull=True)
+    skipped_tasks = all_tasks.filter(skipped_in__isnull=False)
+    pending_tasks = active_tasks.filter(is_completed=False).order_by(
+        F('started_in').desc(nulls_last=True),
+        'scheduled_time',
+        'title',
+    )
+    total_tasks = active_tasks.count()
+    completed_tasks = active_tasks.filter(is_completed=True).count()
+    skipped_count = skipped_tasks.count()
     pending_count = total_tasks - completed_tasks
     completion_rate = int((completed_tasks / total_tasks) * 100) if total_tasks else 0
 
@@ -116,7 +144,7 @@ def get_today_mission_context(reference_date=None):
     level = max(total_xp // 100 + 1, 1)
     xp_in_level = total_xp % 100
     xp_to_next_level = 100 - xp_in_level if xp_in_level else 100
-    mission_complete = total_tasks > 0 and pending_count == 0
+    mission_complete = pending_count == 0
 
     badges = []
     if mission_complete:
@@ -168,6 +196,7 @@ def get_today_mission_context(reference_date=None):
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks,
         'pending_count': pending_count,
+        'skipped_count': skipped_count,
         'completion_rate': completion_rate,
         'streak_days': streak_days,
         'total_xp': total_xp,

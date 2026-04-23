@@ -4,6 +4,13 @@
         {% if task.description %}
         <div class="text-muted small">{{ task.description }}</div>
         {% endif %}
+        <div class="mt-1">
+            {% if task.task_type == 'objective' %}
+                <span class="badge text-bg-info">Objetivo</span>
+            {% else %}
+                <span class="badge text-bg-secondary">Tarefa</span>
+            {% endif %}
+        </div>
     </td>
     <td>{{ task.scheduled_time|default:'-' }}</td>
     <td>{{ task.estimated_time|default:'-' }}</td>
@@ -18,6 +25,8 @@
     <td>
         {% if task.is_completed %}
             <span class="badge text-bg-success">Concluída</span>
+        {% elif task.is_skipped %}
+            <span class="badge text-bg-secondary">Ignorada hoje</span>
         {% else %}
             <span class="badge text-bg-warning">Pendente</span>
         {% endif %}

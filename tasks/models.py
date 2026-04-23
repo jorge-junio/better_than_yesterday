@@ -3,6 +3,10 @@ from django.db import models
 
 
 class Task(models.Model):
+    class TaskType(models.TextChoices):
+        TASK = 'task', 'Tarefa'
+        OBJECTIVE = 'objective', 'Objetivo'
+
     class SourceType(models.TextChoices):
         MANUAL = 'manual', 'Manual'
         RECURRENT = 'recurrent', 'Recorrente'
@@ -12,6 +16,12 @@ class Task(models.Model):
     estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
     scheduled_date = models.DateField(verbose_name='data')
     scheduled_time = models.TimeField(null=True, blank=True, verbose_name='horário')
+    task_type = models.CharField(
+        max_length=20,
+        choices=TaskType.choices,
+        default=TaskType.TASK,
+        verbose_name='tipo',
+    )
     source_type = models.CharField(
         max_length=20,
         choices=SourceType.choices,
@@ -30,6 +40,7 @@ class Task(models.Model):
     started_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='iniciada em')
     completed_at = models.DateTimeField(null=True, blank=True, verbose_name='concluída em')
     finished_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='finalizada em')
+    skipped_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='ignorada em')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -56,9 +67,16 @@ class Task(models.Model):
         if self.recurring_task and self.source_type != self.SourceType.RECURRENT:
             self.source_type = self.SourceType.RECURRENT
 
+        if self.task_type not in dict(self.TaskType.choices):
+            raise ValidationError({'task_type': 'Tipo de tarefa inválido.'})
+
     @property
     def is_pending(self):
-        return not self.is_completed
+        return not self.is_completed and self.skipped_in is None
+
+    @property
+    def is_skipped(self):
+        return self.skipped_in is not None
 
     @property
     def time_spent(self):

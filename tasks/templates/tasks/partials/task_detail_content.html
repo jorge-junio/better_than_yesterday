@@ -6,6 +6,9 @@
             <h3 class="card-title">{{ object.title }}</h3>
             <p class="card-text">{{ object.description }}</p>
             <dl class="row">
+                <dt class="col-sm-3">Tipo</dt>
+                <dd class="col-sm-9">{{ object.get_task_type_display }}</dd>
+
                 <dt class="col-sm-3">Data</dt>
                 <dd class="col-sm-9">{{ object.scheduled_date }}</dd>
 
@@ -15,11 +18,15 @@
                 <dt class="col-sm-3">Tempo estimado</dt>
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
 
+                {% if object.task_type == 'task' %}
                 <dt class="col-sm-3">Tempo gasto</dt>
                 <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
+                {% endif %}
 
+                {% if object.task_type == 'task' %}
                 <dt class="col-sm-3">Iniciada em</dt>
                 <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
+                {% endif %}
 
                 <dt class="col-sm-3">Finalizada em</dt>
                 <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>

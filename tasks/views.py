@@ -223,3 +223,19 @@ class TaskTodayStartView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return render(request, 'tasks/partials/today_mission_content.html', context)
 
         return redirect(reverse_lazy('task_today'))
+
+
+class TaskTodaySkipView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'tasks.change_task'
+
+    def post(self, request, pk):
+        reference_date = timezone.localdate()
+        task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
+        services.skip_task_for_today(task)
+
+        if is_htmx_request(request):
+            context = services.get_today_mission_context(reference_date=reference_date)
+            context['page_title'] = 'BTY - Missão do Dia'
+            return render(request, 'tasks/partials/today_mission_content.html', context)
+
+        return redirect(reverse_lazy('task_today'))

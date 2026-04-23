@@ -2,7 +2,7 @@
 FROM python:3.12-alpine
 
 # qual diretório vamos usar
-WORKDIR /sgn
+WORKDIR /app
 
 # melhora os logs
 ENV PYTHONDONTWRITEBYTECODE 1

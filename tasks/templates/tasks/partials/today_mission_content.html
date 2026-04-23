@@ -112,9 +112,11 @@
                                             <span><i class="bi bi-hourglass-split me-1"></i>{{ task.estimated_time|default:'-' }}</span>
                                         </div>
                                         <div class="d-flex flex-wrap gap-2 small text-muted mt-2">
-                                            <span><i class="bi bi-play-circle me-1"></i>Iniciada: {{ task.started_in|default:'-' }}</span>
+                                            {% if task.task_type == 'task' %}
+                                                <span><i class="bi bi-play-circle me-1"></i>Iniciada: {{ task.started_in|default:'-' }}</span>
+                                                <span><i class="bi bi-stopwatch me-1"></i>Tempo gasto: {{ task.time_spent_display }}</span>
+                                            {% endif %}
                                             <span><i class="bi bi-check2-circle me-1"></i>Finalizada: {{ task.finished_in|default:'-' }}</span>
-                                            <span><i class="bi bi-stopwatch me-1"></i>Tempo gasto: {{ task.time_spent_display }}</span>
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2 align-items-start">
@@ -122,18 +124,26 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         {% if perms.tasks.change_task %}
-                                            {% if not task.started_in %}
+                                            {% if task.task_type == 'task' and not task.started_in %}
                                             <form method="post" action="{% url 'task_today_start' task.id %}" hx-post="{% url 'task_today_start' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="bi bi-play-fill me-1"></i>Iniciar missão
+                                                    <i class="bi bi-play-fill me-1"></i>Iniciar tarefa
                                                 </button>
                                             </form>
                                             {% elif not task.finished_in %}
                                             <form method="post" action="{% url 'task_today_complete' task.id %}" hx-post="{% url 'task_today_complete' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="bi bi-check2-circle me-1"></i>Concluir missão
+                                                    <i class="bi bi-check2-circle me-1"></i>Concluir {% if task.task_type == 'objective' %}objetivo{% else %}tarefa{% endif %}
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                            {% if not task.finished_in %}
+                                            <form method="post" action="{% url 'task_today_skip' task.id %}" hx-post="{% url 'task_today_skip' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    <i class="bi bi-x-circle me-1"></i>Não vou cumprir hoje
                                                 </button>
                                             </form>
                                             {% endif %}
@@ -148,7 +158,13 @@
                     <div class="text-center py-5">
                         <div class="display-3 mb-3 text-success"><i class="bi bi-stars"></i></div>
                         <h4 class="mb-2">Missão concluída</h4>
-                        <p class="text-muted mb-0">Você já fechou todas as tarefas de hoje. Volte amanhã para a próxima rodada de XP.</p>
+                        <p class="text-muted mb-0">
+                            {% if skipped_count %}
+                                Você já concluiu ou ignorou todas as tarefas de hoje. Volte amanhã para a próxima rodada de XP.
+                            {% else %}
+                                Você já fechou todas as tarefas de hoje. Volte amanhã para a próxima rodada de XP.
+                            {% endif %}
+                        </p>
                     </div>
                 {% endif %}
             </div>
