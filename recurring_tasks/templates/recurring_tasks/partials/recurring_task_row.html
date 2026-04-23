@@ -10,7 +10,7 @@
         {% elif recurring_task.recurrence_type == 'date_range' %}
             {{ recurring_task.start_date }} até {{ recurring_task.end_date }}
         {% else %}
-            {{ recurring_task.specific_dates|join:', ' }}
+            {{ recurring_task.specific_dates_display|join:', ' }}
         {% endif %}
     </td>
     <td>

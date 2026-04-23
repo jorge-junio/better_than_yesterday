@@ -77,7 +77,28 @@ class RecurringTaskFormTests(SimpleTestCase):
 
         form = RecurringTaskForm(instance=recurring_task)
 
-        self.assertEqual(form.initial['specific_dates'], '2027-01-01\n2027-01-02')
+        self.assertEqual(form.initial['specific_dates'], '01/01/2027\n02/01/2027')
+
+    def test_specific_dates_accepts_brazilian_date_format(self):
+        form = RecurringTaskForm(
+            data={
+                'name': 'Revisão',
+                'description': '',
+                'estimated_time': '',
+                'task_type': RecurringTask.TaskType.TASK,
+                'priority': RecurringTask.Priority.LOW,
+                'recurrence_type': RecurringTask.RecurrenceType.SPECIFIC_DATES,
+                'specific_dates': '01/01/2027\n02/01/2027',
+                'is_active': 'on',
+            }
+        )
+
+        form.cleaned_data = {'specific_dates': '01/01/2027\n02/01/2027'}
+
+        self.assertEqual(
+            form.clean_specific_dates(),
+            ['2027-01-01', '2027-01-02'],
+        )
 
 
 class RecurringTaskUpdateViewTests(SimpleTestCase):

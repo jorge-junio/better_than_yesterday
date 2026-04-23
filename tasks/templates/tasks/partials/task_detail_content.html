@@ -19,17 +19,21 @@
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
 
                 {% if object.task_type == 'task' %}
-                <dt class="col-sm-3">Tempo gasto</dt>
-                <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
+                    <dt class="col-sm-3">Iniciada em</dt>
+                    <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
+
+                    <dt class="col-sm-3">Tempo gasto</dt>
+                    <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
+
+                    <dt class="col-sm-3">Finalizada em</dt>
+                    <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
+                {% else %}
+                    <dt class="col-sm-3">Concluída em</dt>
+                    <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
                 {% endif %}
 
-                {% if object.task_type == 'task' %}
-                <dt class="col-sm-3">Iniciada em</dt>
-                <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
-                {% endif %}
-
-                <dt class="col-sm-3">Finalizada em</dt>
-                <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
+                <dt class="col-sm-3">Prioridade</dt>
+                <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
 
                 <dt class="col-sm-3">Origem</dt>
                 <dd class="col-sm-9">{{ object.get_source_type_display }}</dd>
@@ -37,6 +41,16 @@
                 <dt class="col-sm-3">Status</dt>
                 <dd class="col-sm-9">{% if object.is_completed %}Concluída{% else %}Pendente{% endif %}</dd>
             </dl>
+
+            {% if object.task_type == 'task' %}
+                <div class="alert alert-info mb-0">
+                    Esta tarefa usa início e conclusão. O tempo gasto é calculado a partir do início e do fim.
+                </div>
+            {% else %}
+                <div class="alert alert-warning mb-0">
+                    Este objetivo não usa início. A conclusão é registrada diretamente no final.
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">

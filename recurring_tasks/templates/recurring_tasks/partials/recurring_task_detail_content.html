@@ -9,21 +9,36 @@
                 <dt class="col-sm-3">Tipo</dt>
                 <dd class="col-sm-9">{{ object.get_recurrence_type_display }}</dd>
 
+                <dt class="col-sm-3">Categoria</dt>
+                <dd class="col-sm-9">{{ object.get_task_type_display }}</dd>
+
                 <dt class="col-sm-3">Tempo estimado</dt>
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
 
-                <dt class="col-sm-3">Dias da semana</dt>
-                <dd class="col-sm-9">{{ object.weekday_labels|join:', ' }}</dd>
-
-                <dt class="col-sm-3">Intervalo</dt>
-                <dd class="col-sm-9">{{ object.start_date }} até {{ object.end_date }}</dd>
-
-                <dt class="col-sm-3">Datas específicas</dt>
-                <dd class="col-sm-9">{{ object.specific_dates|join:', ' }}</dd>
+                {% if object.recurrence_type == 'weekdays' %}
+                    <dt class="col-sm-3">Dias da semana</dt>
+                    <dd class="col-sm-9">{{ object.weekday_labels|join:', ' }}</dd>
+                {% elif object.recurrence_type == 'date_range' %}
+                    <dt class="col-sm-3">Intervalo</dt>
+                    <dd class="col-sm-9">{{ object.start_date }} até {{ object.end_date }}</dd>
+                {% elif object.recurrence_type == 'specific_dates' %}
+                    <dt class="col-sm-3">Datas específicas</dt>
+                    <dd class="col-sm-9">{{ object.specific_dates_display|join:', ' }}</dd>
+                {% endif %}
 
                 <dt class="col-sm-3">Status</dt>
                 <dd class="col-sm-9">{% if object.is_active %}Ativa{% else %}Inativa{% endif %}</dd>
             </dl>
+
+            {% if object.task_type == 'task' %}
+                <div class="alert alert-info mb-0">
+                    As tarefas geradas desta recorrência terão início e conclusão.
+                </div>
+            {% else %}
+                <div class="alert alert-warning mb-0">
+                    Os objetivos gerados desta recorrência não têm início: só a conclusão será registrada.
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">

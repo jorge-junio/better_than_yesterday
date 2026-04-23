@@ -14,7 +14,7 @@ class RecurringTaskForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         label='Datas específicas',
-        help_text='Informe uma data por linha no formato YYYY-MM-DD.',
+        help_text='Informe uma data por linha no formato DD/MM/YYYY.',
     )
 
     class Meta:
@@ -61,7 +61,7 @@ class RecurringTaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['weekdays'].initial = self.instance.weekdays
-            self.initial['specific_dates'] = '\n'.join(self.instance.specific_dates)
+            self.initial['specific_dates'] = '\n'.join(self.instance.specific_dates_display)
 
     def clean_weekdays(self):
         weekdays = self.cleaned_data.get('weekdays') or []
@@ -78,10 +78,12 @@ class RecurringTaskForm(forms.ModelForm):
             candidate = line.strip()
             if candidate:
                 try:
-                    forms.DateField(input_formats=['%Y-%m-%d']).clean(candidate)
+                    parsed_date = forms.DateField(
+                        input_formats=['%d/%m/%Y', '%Y-%m-%d'],
+                    ).clean(candidate)
                 except forms.ValidationError as exc:
                     raise forms.ValidationError(f'Data inválida: {candidate}') from exc
-                dates.append(candidate)
+                dates.append(parsed_date.isoformat())
 
         return dates
 

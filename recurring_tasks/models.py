@@ -125,6 +125,10 @@ class RecurringTask(models.Model):
                 dates.append(timezone.datetime.strptime(raw_value, '%Y-%m-%d').date())
         return dates
 
+    @property
+    def specific_dates_display(self):
+        return [date.strftime('%d/%m/%Y') for date in self.specific_dates_as_dates]
+
     def occurs_on(self, date):
         if self.recurrence_type == self.RecurrenceType.WEEKDAYS:
             weekday_map = {
