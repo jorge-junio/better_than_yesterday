@@ -1,10 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.utils.dateparse import parse_duration
 from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
@@ -12,6 +11,27 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, T
 from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx_redirect, is_htmx_request
 
 from . import forms, models, services
+
+
+def parse_time_spent_parts(post_data):
+    values = {}
+    for key in ('hours', 'minutes', 'seconds'):
+        raw_value = (post_data.get(f'time_spent_{key}') or '0').strip()
+        try:
+            parsed_value = int(raw_value)
+        except ValueError:
+            return None, 'Use apenas números inteiros nos campos de tempo.'
+
+        if parsed_value < 0:
+            return None, 'Os campos de tempo não podem ser negativos.'
+
+        values[key] = parsed_value
+
+    return timedelta(
+        hours=values['hours'],
+        minutes=values['minutes'],
+        seconds=values['seconds'],
+    ), None
 
 
 class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -201,31 +221,18 @@ class TaskTodayCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, pk):
         reference_date = timezone.localdate()
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
-        allow_without_time = (request.POST.get('allow_without_time') or '').strip() in {'1', 'true', 'True', 'on'}
-        raw_time_spent = (request.POST.get('time_spent') or '').strip()
-        if not raw_time_spent and not allow_without_time:
+        parsed_time_spent, error_message = parse_time_spent_parts(request.POST)
+        if error_message:
             context = services.get_today_mission_context(reference_date=reference_date)
             context['page_title'] = 'BTY - Missão do Dia'
-            context['message_error'] = 'Informe o tempo gasto para concluir a tarefa.'
+            context['message_error'] = error_message
             if is_htmx_request(request):
                 return render(request, 'tasks/partials/today_mission_content.html', context)
             return redirect(reverse_lazy('task_today'))
 
-        parsed_time_spent = None
-        if raw_time_spent:
-            parsed_time_spent = parse_duration(raw_time_spent)
-            if parsed_time_spent is None:
-                context = services.get_today_mission_context(reference_date=reference_date)
-                context['page_title'] = 'BTY - Missão do Dia'
-                context['message_error'] = 'Use o formato HH:MM:SS para o tempo gasto.'
-                if is_htmx_request(request):
-                    return render(request, 'tasks/partials/today_mission_content.html', context)
-                return redirect(reverse_lazy('task_today'))
-
         services.complete_task(
             task,
             time_spent=parsed_time_spent,
-            record_time_spent=bool(parsed_time_spent),
         )
 
         if is_htmx_request(request):

@@ -11,8 +11,9 @@ from app.utils import htmx_redirect
 from recurring_tasks.models import RecurringTask
 
 from .models import Task
-from .views import TaskCreateView, TaskTodayCompleteView
+from .views import TaskCreateView, TaskTodayCompleteView, parse_time_spent_parts
 from .services import complete_task, ensure_tasks_for_date, get_today_mission_ordering, reopen_task, skip_task_for_today, start_task
+from .templatetags.task_extras import duration_part
 
 
 class TaskModelTests(SimpleTestCase):
@@ -156,29 +157,28 @@ class TaskModelTests(SimpleTestCase):
         self.assertIsNone(task.time_spent)
         save_mock.assert_called_once()
 
-    def test_today_complete_requires_time_spent(self):
-        request = RequestFactory().post('/tasks/today/1/complete/', data={}, HTTP_HX_REQUEST='true')
-        request.user = SimpleNamespace(is_authenticated=True, has_perms=lambda perms: True)
-        view = TaskTodayCompleteView.as_view()
+    def test_parse_time_spent_parts_defaults_to_zero(self):
+        duration, error = parse_time_spent_parts({})
 
-        with patch('tasks.views.get_object_or_404') as get_object_mock, patch('tasks.views.services.get_today_mission_context') as context_mock:
-            get_object_mock.return_value = Task(
-                title='Treino',
-                scheduled_date=date(2026, 4, 22),
-            )
-            context_mock.return_value = {'page_title': 'BTY - Missão do Dia'}
+        self.assertIsNone(error)
+        self.assertEqual(duration, timedelta(0))
 
-            response = view(request, pk=1)
+    def test_duration_part_splits_timedelta(self):
+        value = timedelta(hours=2, minutes=5, seconds=9)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Informe o tempo gasto para concluir a tarefa.', response.content.decode())
-        get_object_mock.assert_called_once()
-        context_mock.assert_called_once()
+        self.assertEqual(duration_part(value, 'hours'), 2)
+        self.assertEqual(duration_part(value, 'minutes'), 5)
+        self.assertEqual(duration_part(value, 'seconds'), 9)
+        self.assertEqual(duration_part(None, 'hours'), 0)
 
-    def test_today_complete_allows_skip_time_with_flag(self):
+    def test_today_complete_converts_time_parts(self):
         request = RequestFactory().post(
             '/tasks/today/1/complete/',
-            data={'allow_without_time': '1'},
+            data={
+                'time_spent_hours': '1',
+                'time_spent_minutes': '30',
+                'time_spent_seconds': '15',
+            },
             HTTP_HX_REQUEST='true',
         )
         request.user = SimpleNamespace(is_authenticated=True, has_perms=lambda perms: True)
@@ -189,16 +189,18 @@ class TaskModelTests(SimpleTestCase):
             scheduled_date=date(2026, 4, 22),
         )
 
-        with patch('tasks.views.get_object_or_404', return_value=task), patch('tasks.views.services.complete_task') as complete_mock, patch('tasks.views.services.get_today_mission_context') as context_mock:
+        with patch('tasks.views.get_object_or_404', return_value=task) as get_object_mock, patch('tasks.views.services.complete_task') as complete_mock, patch('tasks.views.services.get_today_mission_context') as context_mock:
             context_mock.return_value = {'page_title': 'BTY - Missão do Dia'}
 
             response = view(request, pk=1)
 
         self.assertEqual(response.status_code, 200)
+        get_object_mock.assert_called_once()
+        context_mock.assert_called_once()
         complete_mock.assert_called_once()
         kwargs = complete_mock.call_args.kwargs
-        self.assertIsNone(kwargs['time_spent'])
-        self.assertFalse(kwargs['record_time_spent'])
+        self.assertEqual(kwargs['time_spent'], timedelta(hours=1, minutes=30, seconds=15))
+        self.assertNotIn('record_time_spent', kwargs)
 
 
 class RecurrenceGenerationTests(SimpleTestCase):

@@ -81,32 +81,44 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p class="mb-3 text-muted small">Informe o tempo gasto em formato <strong>HH:MM:SS</strong>. Se marcar a opção abaixo, a tarefa poderá ser concluída sem tempo.</p>
-                                            <div class="form-check mb-3">
-                                                <input
-                                                    class="form-check-input"
-                                                    type="checkbox"
-                                                    id="allowWithoutTime-{{ task.id }}"
-                                                    name="allow_without_time"
-                                                    value="1"
-                                                    onchange="document.getElementById('timeSpent-{{ task.id }}').required = !this.checked;"
-                                                >
-                                                <label class="form-check-label" for="allowWithoutTime-{{ task.id }}">
-                                                    Concluir sem informar o tempo
-                                                </label>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="timeSpent-{{ task.id }}" class="form-label">Tempo gasto</label>
-                                                <input
-                                                    type="text"
-                                                    class="form-control"
-                                                    id="timeSpent-{{ task.id }}"
-                                                    name="time_spent"
-                                                    placeholder="HH:MM:SS"
-                                                    value="{{ task.estimated_time|duration_hms }}"
-                                                    required
-                                                >
-                                                <div class="form-text">Se houver tempo estimado cadastrado, ele vem preenchido automaticamente.</div>
+                                            <p class="mb-3 text-muted small">Informe o tempo gasto nos campos abaixo. Se houver tempo estimado, ele preenche os campos automaticamente; caso contrário, tudo abre com <strong>0</strong>.</p>
+                                            <div class="row g-3">
+                                                <div class="col-4">
+                                                    <label for="timeSpentHours-{{ task.id }}" class="form-label">Horas</label>
+                                                    <input
+                                                        type="number"
+                                                        class="form-control"
+                                                        id="timeSpentHours-{{ task.id }}"
+                                                        name="time_spent_hours"
+                                                        min="0"
+                                                        step="1"
+                                                        value="{{ task.estimated_time|duration_part:'hours' }}"
+                                                    >
+                                                </div>
+                                                <div class="col-4">
+                                                    <label for="timeSpentMinutes-{{ task.id }}" class="form-label">Minutos</label>
+                                                    <input
+                                                        type="number"
+                                                        class="form-control"
+                                                        id="timeSpentMinutes-{{ task.id }}"
+                                                        name="time_spent_minutes"
+                                                        min="0"
+                                                        step="1"
+                                                        value="{{ task.estimated_time|duration_part:'minutes' }}"
+                                                    >
+                                                </div>
+                                                <div class="col-4">
+                                                    <label for="timeSpentSeconds-{{ task.id }}" class="form-label">Segundos</label>
+                                                    <input
+                                                        type="number"
+                                                        class="form-control"
+                                                        id="timeSpentSeconds-{{ task.id }}"
+                                                        name="time_spent_seconds"
+                                                        min="0"
+                                                        step="1"
+                                                        value="{{ task.estimated_time|duration_part:'seconds' }}"
+                                                    >
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
