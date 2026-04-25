@@ -15,7 +15,7 @@
 
     {% if perms.project_tasks.add_projecttask %}
     <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
-        <a href="{% url 'project_task_create' %}" class="btn btn-success" hx-get="{% url 'project_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'project_task_create' %}" class="btn btn-success" title="Nova tarefa de projeto" hx-get="{% url 'project_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-plus"></i> Nova tarefa de projeto
         </a>
     </div>

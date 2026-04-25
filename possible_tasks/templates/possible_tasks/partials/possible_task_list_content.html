@@ -15,7 +15,7 @@
 
     {% if perms.possible_tasks.add_possibletask %}
     <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
-        <a href="{% url 'possible_task_create' %}" class="btn btn-success" hx-get="{% url 'possible_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'possible_task_create' %}" class="btn btn-success" title="Nova possível tarefa" hx-get="{% url 'possible_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-plus"></i> Nova possível tarefa
         </a>
     </div>
@@ -65,6 +65,7 @@
                                     btn-success
                                 {% endif %}"
                             type="button"
+                            title="Expandir ou recolher descrição"
                             data-bs-toggle="collapse"
                             data-bs-target="#possible-task-description-{{ possible_task.id }}"
                             aria-expanded="false"
@@ -80,22 +81,22 @@
                     </div>
                     <div class="d-flex flex-wrap gap-2 align-items-start">
                         {% if perms.tasks.add_task %}
-                        <a href="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-primary btn-sm" hx-get="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-primary btn-sm" title="Virar tarefa" hx-get="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-arrow-right-circle me-1"></i>Virar tarefa
                         </a>
                         {% endif %}
                         {% if perms.recurring_tasks.add_recurringtask %}
-                        <a href="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-outline-info btn-sm" hx-get="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-outline-info btn-sm" title="Virar recorrente" hx-get="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-arrow-repeat me-1"></i>Virar recorrente
                         </a>
                         {% endif %}
                         {% if perms.possible_tasks.change_possibletask %}
-                        <a href="{% url 'possible_task_update' possible_task.id %}" class="btn btn-warning btn-sm" hx-get="{% url 'possible_task_update' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'possible_task_update' possible_task.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'possible_task_update' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-pencil"></i>
                         </a>
                         {% endif %}
                         {% if perms.possible_tasks.delete_possibletask %}
-                        <a href="{% url 'possible_task_delete' possible_task.id %}" class="btn btn-danger btn-sm" hx-get="{% url 'possible_task_delete' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'possible_task_delete' possible_task.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'possible_task_delete' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-trash"></i>
                         </a>
                         {% endif %}

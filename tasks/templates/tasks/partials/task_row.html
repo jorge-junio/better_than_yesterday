@@ -33,30 +33,30 @@
         {% endif %}
     </td>
     <td class="d-flex gap-1 flex-wrap">
-        <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm" hx-get="{% url 'task_detail' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm" title="Ver detalhes" hx-get="{% url 'task_detail' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-eye"></i>
         </a>
-        <a href="{% url 'task_update' task.id %}" class="btn btn-warning btn-sm" hx-get="{% url 'task_update' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_update' task.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'task_update' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-pencil"></i>
         </a>
         <form method="post" action="{% url 'task_toggle_complete' task.id %}" hx-post="{% url 'task_toggle_complete' task.id %}" hx-target="#task-row-{{ task.id }}" hx-swap="outerHTML">
             {% csrf_token %}
-            <button type="submit" class="btn btn-{% if task.is_completed %}secondary{% else %}success{% endif %} btn-sm">
+            <button type="submit" class="btn btn-{% if task.is_completed %}secondary{% else %}success{% endif %} btn-sm" aria-label="{% if task.is_completed %}Reabrir tarefa{% else %}Concluir tarefa{% endif %}" title="{% if task.is_completed %}Reabrir tarefa{% else %}Concluir tarefa{% endif %}">
                 {% if task.is_completed %}
-                    Reabrir
+                    <i class="bi bi-arrow-counterclockwise"></i>
                 {% else %}
-                    Concluir
+                    <i class="bi bi-check2-circle"></i>
                 {% endif %}
             </button>
         </form>
         <form method="post" action="{% url 'task_postpone' task.id %}" hx-post="{% url 'task_postpone' task.id %}" hx-target="#task-row-{{ task.id }}" hx-swap="outerHTML">
             {% csrf_token %}
             <input type="hidden" name="days" value="1">
-            <button type="submit" class="btn btn-outline-primary btn-sm">
+            <button type="submit" class="btn btn-outline-primary btn-sm" title="Adiar 1 dia">
                 Adiar 1 dia
             </button>
         </form>
-        <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm" hx-get="{% url 'task_delete' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'task_delete' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-trash"></i>
         </a>
     </td>

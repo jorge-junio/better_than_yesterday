@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --login-bg: #030712;
+      --login-surface: rgba(8, 15, 28, 0.78);
+      --login-surface-border: rgba(255, 255, 255, 0.08);
+      --login-text: #f1f5f9;
+      --login-muted: rgba(203, 213, 225, 0.70);
+      --login-accent: #8b5cf6;
+      --login-accent-2: #0f766e;
+      --login-accent-3: #94a3b8;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--login-text);
+      background:
+        linear-gradient(125deg, rgba(3, 7, 18, 0.94), rgba(6, 12, 24, 0.76) 45%, rgba(3, 7, 18, 0.96)),
+        url("{% static 'app/login-bg-dark.png' %}");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .login-shell {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-shell::before,
+    .login-shell::after {
+      content: '';
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(24px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .login-shell::before {
+      width: 22rem;
+      height: 22rem;
+      background: rgba(139, 92, 246, 0.12);
+      top: -6rem;
+      right: -4rem;
+    }
+
+    .login-shell::after {
+      width: 18rem;
+      height: 18rem;
+      background: rgba(15, 118, 110, 0.12);
+      bottom: -4rem;
+      left: -5rem;
+    }
+
+    @media (max-width: 991.98px) {
+      body {
+        background-attachment: scroll;
+      }
+
+      .login-shell {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+
+      .login-copy {
+        text-align: center;
+      }
+
+      .brand-lockup {
+        justify-content: center;
+      }
+
+      .accent-line {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    .login-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: .9rem;
+      padding: .95rem 1.1rem;
+      border-radius: 1.4rem;
+      background: rgba(8, 15, 29, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .brand-mark {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 1rem;
+      display: grid;
+      place-items: center;
+      font-family: 'Manrope', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      color: #f8fcff;
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.96), rgba(139, 92, 246, 0.96));
+      box-shadow: 0 16px 30px rgba(139, 92, 246, 0.20);
+    }
+
+    .brand-name {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .brand-tag {
+      color: var(--login-muted);
+      font-size: .86rem;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(9, 15, 28, 0.88), rgba(7, 12, 23, 0.80));
+      border: 1px solid var(--login-surface-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.50);
+    }
+
+    .feature-list i {
+      color: var(--login-accent);
+    }
+
+    .form-control, .form-control:focus {
+      background-color: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.10);
+      color: #fff;
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.42);
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 .2rem rgba(139, 92, 246, 0.18);
+    }
+
+    .form-label {
+      color: rgba(229, 238, 251, 0.82);
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, var(--login-accent), var(--login-accent-2));
+      border: 0;
+      box-shadow: 0 12px 28px rgba(15, 118, 110, 0.22);
+    }
+
+    .login-note {
+      color: var(--login-muted);
+      letter-spacing: .01em;
+    }
+
+    .accent-line {
+      width: 5.5rem;
+      height: .28rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--login-accent), var(--login-accent-2));
+    }
+
+    .hero-kicker {
+      color: rgba(226, 232, 240, 0.92);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main class="login-shell d-flex align-items-center py-5">
+    <div class="container position-relative">
+      <div class="row align-items-center g-4 g-xl-5">
+        <div class="col-lg-6 login-copy">
+          <div class="brand-lockup mb-4">
+            <div class="brand-mark">BTY</div>
+            <div>
+              <div class="brand-name">Better Than Yesterday</div>
+              <div class="brand-tag">Sistema de produtividade com foco e consistência</div>
+            </div>
+          </div>
+          <div class="hero-kicker mb-2">Task management</div>
+          <div class="accent-line mb-4"></div>
+          <h1 class="display-4 fw-bold mb-3">Organize tarefas, ritmo e progresso em um só lugar.</h1>
+          <p class="lead login-note mb-4">
+            Uma tela de entrada mais limpa, com foco no que importa: entrar rápido e continuar sua missão do dia.
+          </p>
+          <div class="d-flex flex-column gap-3 feature-list">
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-check2-circle fs-4"></i>
+              <div>
+                <div class="fw-semibold text-white">Agenda com foco</div>
+                <div class="text-white-50 small">Visual limpo para identificar a próxima ação sem ruído.</div>
+              </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-trophy fs-4"></i>
+              <div>
+                <div class="fw-semibold text-white">Gamificação leve</div>
+                <div class="text-white-50 small">Acompanhamento de nível, progresso e consistência.</div>
+              </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-lightning-charge fs-4"></i>
+              <div>
+                <div class="fw-semibold text-white">Acesso direto</div>
+                <div class="text-white-50 small">Entre e continue de onde parou sem fricção visual.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5 offset-lg-1">
+          <div class="login-card rounded-5 p-4 p-lg-5">
+            <div class="mb-4">
+              <div class="text-uppercase small fw-semibold mb-2" style="color: var(--login-accent);">Bem-vindo</div>
+              <h2 class="h3 mb-2 fw-bold">Faça login</h2>
+              <p class="login-note mb-0">Entre para continuar acompanhando suas tarefas do dia.</p>
+            </div>
+
+            <form method="post" class="vstack gap-3">
+              {% csrf_token %}
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+                </div>
+              {% endif %}
+
+              <div>
+                <label for="username" class="form-label">Usuário</label>
+                <input type="text" name="username" id="username" class="form-control form-control-lg" placeholder="Usuário" required>
+              </div>
+
+              <div>
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="Senha" required>
+              </div>
+
+              <button type="submit" class="btn btn-lg login-btn text-white fw-semibold mt-2" title="Entrar">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+              </button>
+
+              {% if form.errors %}
+                <div class="alert alert-danger mt-2 mb-0">
+                  <ul class="mb-0 ps-3">
+                    {% for field in form %}
+                      {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

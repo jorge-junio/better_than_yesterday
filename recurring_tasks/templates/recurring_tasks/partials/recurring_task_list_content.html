@@ -21,10 +21,10 @@
                 </select>
             </div>
             <div class="col-md-12">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" title="Filtrar">
                     <i class="bi bi-search"></i> Filtrar
                 </button>
-                <a href="{% url 'recurring_task_list' %}" class="btn btn-outline-secondary" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <a href="{% url 'recurring_task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                     Limpar
                 </a>
             </div>
@@ -33,7 +33,7 @@
 
     {% if perms.recurring_tasks.add_recurringtask %}
     <div class="col-md-4">
-        <a href="{% url 'recurring_task_create' %}" class="btn btn-success float-end" hx-get="{% url 'recurring_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'recurring_task_create' %}" class="btn btn-success float-end" title="Nova tarefa recorrente" hx-get="{% url 'recurring_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-plus"></i>Nova Tarefa Recorrente
         </a>
     </div>

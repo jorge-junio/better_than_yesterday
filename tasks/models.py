@@ -50,6 +50,7 @@ class Task(models.Model):
     started_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='iniciada em')
     completed_at = models.DateTimeField(null=True, blank=True, verbose_name='concluída em')
     finished_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='finalizada em')
+    time_spent = models.DurationField(null=True, blank=True, editable=False, verbose_name='tempo gasto')
     skipped_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='ignorada em')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -87,12 +88,6 @@ class Task(models.Model):
     @property
     def is_skipped(self):
         return self.skipped_in is not None
-
-    @property
-    def time_spent(self):
-        if not self.started_in or not self.finished_in:
-            return None
-        return self.finished_in - self.started_in
 
     @property
     def time_spent_display(self):

@@ -48,25 +48,30 @@ def start_task(task):
 
 
 @transaction.atomic
-def complete_task(task):
+def complete_task(task, time_spent=None, record_time_spent=True):
     started_now = False
+    computed_time_spent = time_spent
     if task.is_skipped:
         task.skipped_in = None
     if task.task_type == task.TaskType.OBJECTIVE:
-        task.started_in = None
+        if computed_time_spent is None:
+            computed_time_spent = (
+                timezone.now() - task.started_in if task.started_in is not None else timedelta(0)
+            )
     elif task.started_in is None:
         task.started_in = timezone.now()
         started_now = True
 
     if not task.is_completed:
         now = timezone.now()
+        if computed_time_spent is None and record_time_spent:
+            computed_time_spent = now - task.started_in if task.started_in is not None else timedelta(0)
         task.is_completed = True
         task.completed_at = now
         task.finished_in = now
-        update_fields = ['is_completed', 'completed_at', 'finished_in', 'updated_at']
-        if task.task_type == task.TaskType.OBJECTIVE and task.started_in is None:
-            update_fields.append('started_in')
-        elif started_now:
+        task.time_spent = computed_time_spent if record_time_spent else None
+        update_fields = ['is_completed', 'completed_at', 'finished_in', 'time_spent', 'updated_at']
+        if started_now:
             update_fields.append('started_in')
         if task.skipped_in is None:
             update_fields.append('skipped_in')
@@ -79,7 +84,9 @@ def reopen_task(task):
     if task.is_completed:
         task.is_completed = False
         task.completed_at = None
-        task.save(update_fields=['is_completed', 'completed_at', 'updated_at'])
+        task.finished_in = None
+        task.time_spent = None
+        task.save(update_fields=['is_completed', 'completed_at', 'finished_in', 'time_spent', 'updated_at'])
     return task
 
 

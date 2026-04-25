@@ -11,6 +11,53 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #sidebar-column {
+      width: 16rem;
+      transition: width 180ms ease, padding 180ms ease;
+    }
+
+    body.sidebar-collapsed #sidebar-column {
+      width: 4.75rem;
+    }
+
+    #sidebar-column .sidebar-shell {
+      width: 100%;
+    }
+
+    body.sidebar-collapsed #sidebar-column .sidebar-shell {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+
+    body.sidebar-collapsed #sidebar-column .sidebar-label {
+      display: none !important;
+    }
+
+    body.sidebar-collapsed #sidebar-column #menu {
+      align-items: center !important;
+    }
+
+    body.sidebar-collapsed #sidebar-column .nav-link,
+    body.sidebar-collapsed #sidebar-column button {
+      justify-content: center;
+    }
+
+    body.sidebar-collapsed #sidebar-column li {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    body.sidebar-collapsed #sidebar-column .sidebar-shell {
+      align-items: center !important;
+    }
+
+    #main-column {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  </style>
   <script>
     function getCookie(name) {
       const cookieValue = document.cookie
@@ -77,6 +124,48 @@
       };
 
       window.BTY.dashboardRefreshTimer = window.setInterval(refreshDashboard, 60000);
+    };
+
+    window.BTY.syncSidebarState = function () {
+      const shell = document.getElementById('sidebar-column');
+      const toggle = document.getElementById('sidebar-toggle');
+      if (!shell || !toggle) {
+        return;
+      }
+
+      const icon = toggle.querySelector('[data-sidebar-icon]');
+      const applyState = function (collapsed) {
+        document.body.classList.toggle('sidebar-collapsed', collapsed);
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        if (icon) {
+          icon.classList.toggle('bi-chevron-double-left', !collapsed);
+          icon.classList.toggle('bi-chevron-double-right', collapsed);
+        }
+        localStorage.setItem('bty-sidebar-collapsed', collapsed ? '1' : '0');
+      };
+
+      const stored = localStorage.getItem('bty-sidebar-collapsed');
+      applyState(stored === '1');
+
+      toggle.onclick = function () {
+        applyState(!document.body.classList.contains('sidebar-collapsed'));
+      };
+    };
+
+    window.BTY.cleanupModals = function () {
+      document.querySelectorAll('.modal.show').forEach((modalEl) => {
+        const instance = window.bootstrap && window.bootstrap.Modal
+          ? window.bootstrap.Modal.getInstance(modalEl)
+          : null;
+        if (instance) {
+          instance.hide();
+        }
+      });
+
+      document.querySelectorAll('.modal-backdrop').forEach((backdrop) => backdrop.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+      document.body.style.removeProperty('overflow');
     };
 
     window.BTY.renderDashboardCharts = function (root) {
@@ -174,6 +263,7 @@
       window.BTY.renderDashboardCharts(document);
       window.BTY.setPageTitle(document.querySelector('[data-page-title]'));
       window.BTY.syncDashboardRefresh();
+      window.BTY.syncSidebarState();
     });
 
     document.addEventListener('htmx:beforeRequest', function () {
@@ -185,9 +275,11 @@
     });
 
     document.addEventListener('htmx:afterSwap', function (event) {
+      window.BTY.cleanupModals();
       window.BTY.renderDashboardCharts(event.detail.target);
       window.BTY.setPageTitle(event.detail.target);
       window.BTY.syncDashboardRefresh();
+      window.BTY.syncSidebarState();
     });
   </script>
 </head>
@@ -203,14 +295,13 @@
 
   <div id="dashboard-refresh" class="d-none" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="false" hx-trigger="refresh"></div>
 
-<div class="container-fluid">
-
+  <div class="d-flex w-100 align-items-stretch">
     {% if user.is_authenticated %}
-        {% include 'components/_sidebar.html' %}
+      {% include 'components/_sidebar.html' %}
     {% endif %}
 
-    <div class="col py-3">
-      <div class="container mt-4">
+    <div id="main-column" class="py-3">
+      <div class="container-fluid mt-4 px-3 px-lg-4">
         <main id="page-content" {% if user.is_authenticated %}hx-boost="true"{% endif %}>
           {% block content %}{% endblock %}
         </main>

@@ -1,150 +1,68 @@
+{% load task_extras %}
 <div data-page-title="{{ page_title }}">
 {% if message_error %}
 <div class="alert alert-danger mb-4">{{ message_error }}</div>
 {% endif %}
-<div class="p-4 p-lg-5 rounded-4 mb-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #111827 0%, #0f766e 52%, #1d4ed8 100%); box-shadow: 0 1rem 2rem rgba(0, 0, 0, .28);">
-    <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 12rem; transform: translate(18%, -12%);">
-        <i class="bi bi-trophy-fill"></i>
-    </div>
-    <div class="row align-items-center g-4 position-relative">
-        <div class="col-lg-8">
-            <div class="text-uppercase small fw-semibold opacity-75 mb-2">Missão do dia</div>
-            <h1 class="display-6 mb-3">Feche as pendências e ganhe XP</h1>
-            <p class="mb-0 opacity-75">
-                Cada tarefa concluída rende XP. Mantendo consistência, você sobe de nível, mantém a sequência e desbloqueia selos.
-            </p>
-        </div>
-        <div class="col-lg-4 text-lg-end">
-            <div class="card bg-white bg-opacity-10 border-0 text-white">
-                <div class="card-body">
-                    <div class="small opacity-75">Nível atual</div>
-                    <div class="display-5 fw-bold mb-1">{{ level }}</div>
-                    <div class="fw-semibold">{{ rank_name }}</div>
-                    <div class="small opacity-75 mt-2">{{ total_xp }} XP acumulado</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <div class="text-muted small text-uppercase">XP ganho hoje</div>
-                <div class="display-6">{{ today_xp }}</div>
-                <div class="text-muted small">15 XP por tarefa concluída</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <div class="text-muted small text-uppercase">Sequência</div>
-                <div class="display-6">{{ streak_days }}</div>
-                <div class="text-muted small">dias perfeitos em sequência</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <div class="text-muted small text-uppercase">Missões concluídas</div>
-                <div class="display-6">{{ completed_tasks }} / {{ total_tasks }}</div>
-                <div class="text-muted small">{{ completion_rate }}% da agenda de hoje</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <div class="text-muted small text-uppercase">Próximo nível</div>
-                <div class="display-6">{{ xp_to_next_level }}</div>
-                <div class="text-muted small">XP faltando para subir de nível</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="mb-0">Barra de progresso</h5>
-            <span class="badge text-bg-info">{{ xp_in_level }}/100 XP</span>
-        </div>
-        <div class="progress" style="height: 12px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {{ xp_in_level }}%;" aria-valuenow="{{ xp_in_level }}" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-    </div>
-</div>
-
 <div class="row g-4 mb-4">
-    <div class="col-lg-7">
+    <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Tarefas de hoje</h5>
-                    <span class="badge text-bg-warning">{{ pending_count }} pendentes</span>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+                    <div>
+                        <h2 class="h5 mb-1">Tarefas de hoje</h2>
+                        <p class="text-muted small mb-0">As tarefas ficam aqui, com ações rápidas para avançar sem ruído visual.</p>
+                    </div>
+                    <span class="badge text-bg-warning align-self-start align-self-md-center">{{ pending_count }} pendentes</span>
                 </div>
 
                 {% if pending_tasks %}
-                    <div class="vstack gap-3">
+                    <div class="vstack gap-2">
                         {% for task in pending_tasks %}
-                        <div class="card border-start border-4 border-info shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                        <div class="card border-0 border-start border-4 border-info shadow-sm text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);">
+                            <div class="card-body py-2">
+                                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-start gap-2">
                                     <div class="flex-grow-1">
-                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                                             <span class="badge text-bg-dark">+15 XP</span>
-                                            <span class="badge text-bg-secondary">{{ task.get_priority_display }}</span>
+                                            <span class="badge text-bg-light text-dark">{{ task.get_priority_display }}</span>
                                             {% if task.source_type == 'recurrent' %}
-                                                <span class="badge text-bg-secondary">Recorrente</span>
+                                                <span class="badge text-bg-light text-dark">Recorrente</span>
                                             {% else %}
-                                                <span class="badge text-bg-secondary">Manual</span>
+                                                <span class="badge text-bg-light text-dark">Manual</span>
                                             {% endif %}
                                         </div>
-                                        <h5 class="mb-1">{{ task.title }}</h5>
-                                        {% if task.description %}
-                                            <p class="text-muted mb-2">{{ task.description }}</p>
-                                        {% endif %}
-                                        <div class="d-flex flex-wrap gap-2 small text-muted">
-                                            <span><i class="bi bi-calendar3 me-1"></i>{{ task.scheduled_date }}</span>
-                                            <span><i class="bi bi-clock me-1"></i>{{ task.scheduled_time|default:'-' }}</span>
-                                            <span><i class="bi bi-hourglass-split me-1"></i>{{ task.estimated_time|default:'-' }}</span>
-                                        </div>
-                                        <div class="d-flex flex-wrap gap-2 small text-muted mt-2">
-                                            {% if task.task_type == 'task' %}
-                                                <span><i class="bi bi-play-circle me-1"></i>Iniciada: {{ task.started_in|default:'-' }}</span>
-                                                <span><i class="bi bi-stopwatch me-1"></i>Tempo gasto: {{ task.time_spent_display }}</span>
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <h5 class="h6 mb-0">{{ task.title }}</h5>
+                                            {% if task.task_type == 'task' and task.started_in %}
+                                                <span class="badge text-bg-success-subtle text-success">Em andamento</span>
+                                            {% elif task.finished_in %}
+                                                <span class="badge text-bg-secondary-subtle text-secondary">Finalizada</span>
                                             {% endif %}
-                                            <span><i class="bi bi-check2-circle me-1"></i>Finalizada: {{ task.finished_in|default:'-' }}</span>
                                         </div>
                                     </div>
-                                    <div class="d-flex gap-2 align-items-start">
-                                        <a href="{% url 'task_detail' task.id %}" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'task_detail' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                                    <div class="d-flex flex-wrap gap-2 align-items-start justify-content-xl-end">
+                                        <a href="{% url 'task_detail' task.id %}" class="btn btn-light btn-sm" hx-get="{% url 'task_detail' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Ver detalhes" title="Ver detalhes">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         {% if perms.tasks.change_task %}
                                             {% if task.task_type == 'task' and not task.started_in %}
                                             <form method="post" action="{% url 'task_today_start' task.id %}" hx-post="{% url 'task_today_start' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="bi bi-play-fill me-1"></i>Iniciar tarefa
-                                                </button>
-                                            </form>
-                                            {% elif not task.finished_in %}
-                                            <form method="post" action="{% url 'task_today_complete' task.id %}" hx-post="{% url 'task_today_complete' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="bi bi-check2-circle me-1"></i>Concluir {% if task.task_type == 'objective' %}objetivo{% else %}tarefa{% endif %}
+                                                <button type="submit" class="btn btn-primary btn-sm" aria-label="Iniciar tarefa" title="Iniciar tarefa">
+                                                    <i class="bi bi-play-fill"></i>
                                                 </button>
                                             </form>
                                             {% endif %}
                                             {% if not task.finished_in %}
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#completeTaskModal-{{ task.id }}" aria-label="Concluir tarefa" title="Concluir tarefa">
+                                                <i class="bi bi-check2-circle"></i>
+                                            </button>
+                                            {% endif %}
+                                            {% if not task.finished_in %}
                                             <form method="post" action="{% url 'task_today_skip' task.id %}" hx-post="{% url 'task_today_skip' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                    <i class="bi bi-x-circle me-1"></i>Não vou cumprir hoje
+                                                <button type="submit" class="btn btn-outline-light btn-sm" aria-label="Ignorar hoje" title="Ignorar hoje">
+                                                    <i class="bi bi-x-circle"></i>
                                                 </button>
                                             </form>
                                             {% endif %}
@@ -153,11 +71,59 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="modal fade" id="completeTaskModal-{{ task.id }}" tabindex="-1" aria-labelledby="completeTaskModalLabel-{{ task.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <form method="post" action="{% url 'task_today_complete' task.id %}" hx-post="{% url 'task_today_complete' task.id %}" hx-target="#page-content" hx-swap="innerHTML">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="completeTaskModalLabel-{{ task.id }}">Concluir tarefa</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="mb-3 text-muted small">Informe o tempo gasto em formato <strong>HH:MM:SS</strong>. Se marcar a opção abaixo, a tarefa poderá ser concluída sem tempo.</p>
+                                            <div class="form-check mb-3">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="allowWithoutTime-{{ task.id }}"
+                                                    name="allow_without_time"
+                                                    value="1"
+                                                    onchange="document.getElementById('timeSpent-{{ task.id }}').required = !this.checked;"
+                                                >
+                                                <label class="form-check-label" for="allowWithoutTime-{{ task.id }}">
+                                                    Concluir sem informar o tempo
+                                                </label>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="timeSpent-{{ task.id }}" class="form-label">Tempo gasto</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="timeSpent-{{ task.id }}"
+                                                    name="time_spent"
+                                                    placeholder="HH:MM:SS"
+                                                    value="{{ task.estimated_time|duration_hms }}"
+                                                    required
+                                                >
+                                                <div class="form-text">Se houver tempo estimado cadastrado, ele vem preenchido automaticamente.</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-success" title="Concluir tarefa">
+                                                <i class="bi bi-check2-circle me-1"></i>Concluir
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                         {% endfor %}
                     </div>
                 {% else %}
                     <div class="text-center py-5">
-                        <div class="display-3 mb-3 text-success"><i class="bi bi-stars"></i></div>
+                        <div class="display-4 mb-3 text-success"><i class="bi bi-stars"></i></div>
                         <h4 class="mb-2">Missão concluída</h4>
                         <p class="text-muted mb-0">
                             {% if skipped_count %}
@@ -172,42 +138,112 @@
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Selos desbloqueados</h5>
-                <div class="vstack gap-3">
-                    {% for badge in badges %}
-                    <div class="p-3 rounded-4 border bg-body-tertiary">
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge text-bg-{{ badge.variant }}">{{ badge.label }}</span>
+    <div class="col-lg-4">
+        <div class="position-sticky" style="top: 1.5rem;">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="card border-0 shadow-sm mb-3 text-white" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #0f766e 100%);">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="small text-uppercase opacity-75">Nível atual</div>
+                                <i class="bi bi-trophy-fill fs-5 opacity-75"></i>
+                            </div>
+                            <div class="h3 mb-1">{{ level }}</div>
+                            <div class="small opacity-75">{{ rank_name }}</div>
                         </div>
-                        <div class="small text-muted">{{ badge.description }}</div>
                     </div>
-                    {% endfor %}
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="text-muted small text-uppercase">Progresso geral</div>
+                            <div class="h5 mb-0">{{ total_xp }} XP acumulado</div>
+                        </div>
+                        <span class="badge text-bg-info">{{ xp_in_level }}/100 XP</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ xp_in_level }}%;" aria-valuenow="{{ xp_in_level }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="small text-muted">Faltam <strong class="text-body">{{ xp_to_next_level }}</strong> XP para subir de nível.</div>
                 </div>
+            </div>
 
-                <hr class="my-4">
-
-                <h5 class="card-title mb-3">Recompensas do dia</h5>
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span>Tarefas concluídas</span>
-                        <strong>{{ completed_tasks }}</strong>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span>Pendentes</span>
-                        <strong>{{ pending_count }}</strong>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span>Conquista diária</span>
-                        <strong>{% if mission_complete %}Fechada{% else %}Em andamento{% endif %}</strong>
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small text-uppercase">Feitas hoje</div>
+                            <div class="h3 mb-1">{{ completed_tasks }}</div>
+                            <div class="small text-muted">de {{ total_tasks }} tarefas</div>
+                        </div>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small text-uppercase">XP de hoje</div>
+                            <div class="h3 mb-1">{{ today_xp }}</div>
+                            <div class="small text-muted">15 XP por tarefa</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small text-uppercase">Conclusão</div>
+                            <div class="h3 mb-1">{{ completion_rate }}%</div>
+                            <div class="small text-muted">agenda do dia</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small text-uppercase">Sequência</div>
+                            <div class="h3 mb-1">{{ streak_days }}</div>
+                            <div class="small text-muted">dias seguidos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="mt-4 p-3 rounded-4 text-white" style="background: linear-gradient(135deg, #2563eb, #14b8a6);">
-                    <div class="fw-semibold">Dica de ritmo</div>
-                    <div class="small opacity-75">Concluir a missão de hoje te aproxima do próximo nível e mantém sua sequência viva.</div>
+                    <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="card-title mb-0">Selos desbloqueados</h5>
+                    </div>
+                    <div class="vstack gap-3">
+                        {% for badge in badges %}
+                        <div class="p-3 rounded-4 border bg-body-tertiary">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge text-bg-{{ badge.variant }}">{{ badge.label }}</span>
+                            </div>
+                            <div class="small text-muted">{{ badge.description }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+                    <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Resumo do dia</h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Pendentes</span>
+                            <strong>{{ pending_count }}</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Tarefas concluídas</span>
+                            <strong>{{ completed_tasks }}</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Conquista diária</span>
+                            <strong>{% if mission_complete %}Fechada{% else %}Em andamento{% endif %}</strong>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 rounded-4 bg-primary-subtle text-primary-emphasis">
+                        <div class="fw-semibold">Dica de ritmo</div>
+                        <div class="small">Concluir a missão de hoje te aproxima do próximo nível e mantém sua sequência viva.</div>
+                    </div>
                 </div>
             </div>
         </div>

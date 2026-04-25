@@ -1,0 +1,33 @@
+<svg width="1600" height="1200" viewBox="0 0 1600 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1600" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1220"/>
+      <stop offset="0.5" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="300" y1="250" x2="1300" y2="950" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#14B8A6" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="1080" y1="150" x2="1420" y2="570" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity="0.14"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1200" fill="url(#g1)"/>
+  <circle cx="240" cy="210" r="210" fill="#38BDF8" fill-opacity="0.08"/>
+  <circle cx="1350" cy="240" r="260" fill="#14B8A6" fill-opacity="0.08"/>
+  <circle cx="1240" cy="900" r="320" fill="#60A5FA" fill-opacity="0.07"/>
+  <path d="M-40 980C240 820 400 760 620 820C850 880 1020 1070 1600 900V1240H-40V980Z" fill="url(#g2)" fill-opacity="0.7"/>
+  <path d="M1080 120C1210 70 1370 140 1490 260C1560 330 1600 420 1600 520V0H1040C1050 50 1060 95 1080 120Z" fill="url(#g3)" fill-opacity="0.9"/>
+  <g opacity="0.18">
+    <rect x="120" y="140" width="220" height="16" rx="8" fill="#E2E8F0"/>
+    <rect x="120" y="176" width="160" height="16" rx="8" fill="#E2E8F0"/>
+    <rect x="120" y="212" width="280" height="16" rx="8" fill="#E2E8F0"/>
+  </g>
+  <g opacity="0.14">
+    <rect x="1120" y="760" width="260" height="18" rx="9" fill="#E2E8F0"/>
+    <rect x="1120" y="796" width="180" height="18" rx="9" fill="#E2E8F0"/>
+    <rect x="1120" y="832" width="220" height="18" rx="9" fill="#E2E8F0"/>
+  </g>
+</svg>

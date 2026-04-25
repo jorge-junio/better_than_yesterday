@@ -1,79 +1,81 @@
-<div class="row flex-nowrap">
-  <div class="col-auto col-md-0 col-xl-0 px-0 bg-dark">
-    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
-      <button class="btn btn-dark d-block d-sm-none mb-3" type="button" data-bs-toggle="collapse"
+<aside id="sidebar-column" class="bg-dark flex-shrink-0">
+  <div class="sidebar-shell d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
+    <div class="d-flex w-100 align-items-center justify-content-between mb-3">
+      <button class="btn btn-dark d-block d-sm-none" type="button" data-bs-toggle="collapse" title="Abrir menu"
         data-bs-target="#menuCollapse" aria-expanded="false" aria-controls="menuCollapse">
         <i class="bi bi-list fs-4"></i>
       </button>
-      <div class="collapse d-sm-block" id="menuCollapse">
-        <ul class="nav flex-column align-items-start" id="menu">
-          {% if perms.tasks.view_task %}
-            <li>
-              <a href="{% url 'task_today' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-trophy fs-4"></i>
-                <span class="ms-1">Missão do dia</span>
-              </a>
-            </li>
-          {% endif %}
+    </div>
+
+    <div class="collapse d-sm-block w-100" id="menuCollapse">
+      <ul class="nav flex-column align-items-start w-100" id="menu">
+        {% if perms.tasks.view_task %}
           <li>
-            <a href="{% url 'dashboard' %}" class="nav-link px-0 align-middle" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-              <i class="bi bi-speedometer2 fs-4"></i>
-              <span class="ms-1">Dashboard</span>
+            <a href="{% url 'task_today' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-trophy fs-4"></i>
+              <span class="ms-1 sidebar-label">Missão do dia</span>
             </a>
           </li>
-          {% if perms.tasks.view_task %}
-            <li>
-              <a href="{% url 'task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-clipboard-check fs-4"></i>
-                <span class="ms-1">Tarefas</span>
-              </a>
-            </li>
-          {% endif %}
-          {% if perms.projects.view_project %}
-            <li>
-              <a href="{% url 'project_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-kanban fs-4"></i>
-                <span class="ms-1">Projetos</span>
-              </a>
-            </li>
-          {% endif %}
-          {% if perms.project_tasks.view_projecttask %}
-            <li>
-              <a href="{% url 'project_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-list-task fs-4"></i>
-                <span class="ms-1">Tarefas de projeto</span>
-              </a>
-            </li>
-          {% endif %}
-          {% if perms.possible_tasks.view_possibletask %}
-            <li>
-              <a href="{% url 'possible_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-lightbulb fs-4"></i>
-                <span class="ms-1">Possíveis tarefas</span>
-              </a>
-            </li>
-          {% endif %}
-          {% if perms.recurring_tasks.view_recurringtask %}
-            <li>
-              <a href="{% url 'recurring_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                <i class="bi bi-arrow-repeat fs-4"></i>
-                <span class="ms-1">Tarefas recorrentes</span>
-              </a>
-            </li>
-          {% endif %}
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <form action="{% url 'logout' %}" method="post" id="logout-form" class="nav-link px-0 align-middle">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-link text-decoration-none text-reset nav-link px-0 align-middle">
-                <i class="bi bi-box-arrow-right fs-4 align-middle"></i>
-                <span class="ms-1 align-middle">Sair</span>
-              </button>
-            </form>
+        {% endif %}
+        <li>
+          <a href="{% url 'dashboard' %}" class="nav-link px-0 align-middle" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <i class="bi bi-speedometer2 fs-4"></i>
+            <span class="ms-1 sidebar-label">Dashboard</span>
+          </a>
+        </li>
+        {% if perms.tasks.view_task %}
+          <li>
+            <a href="{% url 'task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-clipboard-check fs-4"></i>
+              <span class="ms-1 sidebar-label">Tarefas</span>
+            </a>
           </li>
-          {% endif %}
-        </ul>
-      </div>
-      <hr>
+        {% endif %}
+        {% if perms.projects.view_project %}
+          <li>
+            <a href="{% url 'project_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-kanban fs-4"></i>
+              <span class="ms-1 sidebar-label">Projetos</span>
+            </a>
+          </li>
+        {% endif %}
+        {% if perms.project_tasks.view_projecttask %}
+          <li>
+            <a href="{% url 'project_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-list-task fs-4"></i>
+              <span class="ms-1 sidebar-label">Tarefas de projeto</span>
+            </a>
+          </li>
+        {% endif %}
+        {% if perms.possible_tasks.view_possibletask %}
+          <li>
+            <a href="{% url 'possible_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-lightbulb fs-4"></i>
+              <span class="ms-1 sidebar-label">Possíveis tarefas</span>
+            </a>
+          </li>
+        {% endif %}
+        {% if perms.recurring_tasks.view_recurringtask %}
+          <li>
+            <a href="{% url 'recurring_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-arrow-repeat fs-4"></i>
+              <span class="ms-1 sidebar-label">Tarefas recorrentes</span>
+            </a>
+          </li>
+        {% endif %}
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <form action="{% url 'logout' %}" method="post" id="logout-form" class="nav-link px-0 align-middle">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link text-decoration-none text-reset nav-link px-0 align-middle" title="Sair">
+              <i class="bi bi-box-arrow-right fs-4 align-middle"></i>
+              <span class="ms-1 align-middle sidebar-label">Sair</span>
+            </button>
+          </form>
+        </li>
+        {% endif %}
+      </ul>
     </div>
+    <hr>
   </div>
+</aside>

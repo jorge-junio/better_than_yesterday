@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.dateparse import parse_duration
 from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
@@ -200,7 +201,32 @@ class TaskTodayCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, pk):
         reference_date = timezone.localdate()
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
-        services.complete_task(task)
+        allow_without_time = (request.POST.get('allow_without_time') or '').strip() in {'1', 'true', 'True', 'on'}
+        raw_time_spent = (request.POST.get('time_spent') or '').strip()
+        if not raw_time_spent and not allow_without_time:
+            context = services.get_today_mission_context(reference_date=reference_date)
+            context['page_title'] = 'BTY - Missão do Dia'
+            context['message_error'] = 'Informe o tempo gasto para concluir a tarefa.'
+            if is_htmx_request(request):
+                return render(request, 'tasks/partials/today_mission_content.html', context)
+            return redirect(reverse_lazy('task_today'))
+
+        parsed_time_spent = None
+        if raw_time_spent:
+            parsed_time_spent = parse_duration(raw_time_spent)
+            if parsed_time_spent is None:
+                context = services.get_today_mission_context(reference_date=reference_date)
+                context['page_title'] = 'BTY - Missão do Dia'
+                context['message_error'] = 'Use o formato HH:MM:SS para o tempo gasto.'
+                if is_htmx_request(request):
+                    return render(request, 'tasks/partials/today_mission_content.html', context)
+                return redirect(reverse_lazy('task_today'))
+
+        services.complete_task(
+            task,
+            time_spent=parsed_time_spent,
+            record_time_spent=bool(parsed_time_spent),
+        )
 
         if is_htmx_request(request):
             context = services.get_today_mission_context(reference_date=reference_date)

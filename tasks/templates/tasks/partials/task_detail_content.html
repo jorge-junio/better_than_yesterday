@@ -44,20 +44,20 @@
 
             {% if object.task_type == 'task' %}
                 <div class="alert alert-info mb-0">
-                    Esta tarefa usa início e conclusão. O tempo gasto é calculado a partir do início e do fim.
+                    Esta tarefa usa início e conclusão. O tempo gasto é registrado quando a tarefa é concluída.
                 </div>
             {% else %}
                 <div class="alert alert-warning mb-0">
-                    Este objetivo não usa início. A conclusão é registrada diretamente no final.
+                    Este objetivo não usa início. O tempo gasto é registrado quando a tarefa é concluída.
                 </div>
             {% endif %}
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">
-        <a href="{% url 'task_list' %}" class="btn btn-secondary" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary" title="Voltar para a agenda" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             Voltar para a agenda
         </a>
-        <a href="{% url 'task_update' object.id %}" class="btn btn-warning" hx-get="{% url 'task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             Editar
         </a>
     </div>

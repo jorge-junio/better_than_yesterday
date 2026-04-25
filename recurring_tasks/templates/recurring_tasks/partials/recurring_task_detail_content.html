@@ -42,10 +42,10 @@
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">
-        <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary" title="Voltar para a lista" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             Voltar para a lista
         </a>
-        <a href="{% url 'recurring_task_update' object.id %}" class="btn btn-warning" hx-get="{% url 'recurring_task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'recurring_task_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'recurring_task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             Editar
         </a>
     </div>

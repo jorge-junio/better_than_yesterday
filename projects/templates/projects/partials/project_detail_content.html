@@ -18,9 +18,9 @@
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">
-        <a href="{% url 'project_list' %}" class="btn btn-secondary" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
-        <a href="{% url 'project_task_create' %}?project={{ object.id }}" class="btn btn-success" hx-get="{% url 'project_task_create' %}?project={{ object.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Nova tarefa do projeto</a>
-        <a href="{% url 'project_update' object.id %}" class="btn btn-warning" hx-get="{% url 'project_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Editar</a>
+        <a href="{% url 'project_list' %}" class="btn btn-secondary" title="Voltar para a lista" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
+        <a href="{% url 'project_task_create' %}?project={{ object.id }}" class="btn btn-success" title="Nova tarefa do projeto" hx-get="{% url 'project_task_create' %}?project={{ object.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Nova tarefa do projeto</a>
+        <a href="{% url 'project_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'project_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Editar</a>
     </div>
 </div>
 </div>
