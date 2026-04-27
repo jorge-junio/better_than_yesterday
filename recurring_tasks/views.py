@@ -10,6 +10,7 @@ from . import forms, models
 
 class RecurringTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = models.RecurringTask
+    queryset = models.RecurringTask.objects.select_related('category')
     template_name = 'recurring_task_list.html'
     htmx_template_name = 'recurring_tasks/partials/recurring_task_list_content.html'
     page_title = 'BTY - Tarefas recorrentes'
@@ -70,6 +71,7 @@ class RecurringTaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMi
 
 class RecurringTaskDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = models.RecurringTask
+    queryset = models.RecurringTask.objects.select_related('category')
     template_name = 'recurring_task_detail.html'
     htmx_template_name = 'recurring_tasks/partials/recurring_task_detail_content.html'
     page_title = 'BTY - Tarefas recorrentes'
@@ -78,6 +80,7 @@ class RecurringTaskDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMi
 
 class RecurringTaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = models.RecurringTask
+    queryset = models.RecurringTask.objects.select_related('category')
     template_name = 'recurring_task_update.html'
     htmx_template_name = 'recurring_tasks/partials/recurring_task_form_content.html'
     page_title = 'BTY - Tarefas recorrentes'
@@ -101,6 +104,7 @@ class RecurringTaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMi
 
 class RecurringTaskDeleteView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = models.RecurringTask
+    queryset = models.RecurringTask.objects.select_related('category')
     template_name = 'recurring_task_delete.html'
     htmx_template_name = 'recurring_tasks/partials/recurring_task_delete_content.html'
     page_title = 'BTY - Tarefas recorrentes'

@@ -24,8 +24,8 @@ def ensure_tasks_for_date(target_date):
                 'title': recurring_task.name,
                 'description': recurring_task.description,
                 'estimated_time': recurring_task.estimated_time,
-                'task_type': recurring_task.task_type,
                 'priority': recurring_task.priority,
+                'category': recurring_task.category,
                 'source_type': Task.SourceType.RECURRENT,
             },
         )
@@ -37,9 +37,6 @@ def ensure_tasks_for_date(target_date):
 
 @transaction.atomic
 def start_task(task):
-    if task.task_type == task.TaskType.OBJECTIVE:
-        return task
-
     now = timezone.now()
     if task.started_in is None:
         task.started_in = now
@@ -53,17 +50,12 @@ def complete_task(task, time_spent=None, record_time_spent=True):
     computed_time_spent = time_spent
     if task.is_skipped:
         task.skipped_in = None
-    if task.task_type == task.TaskType.OBJECTIVE:
-        if computed_time_spent is None:
-            computed_time_spent = (
-                timezone.now() - task.started_in if task.started_in is not None else timedelta(0)
-            )
-    elif task.started_in is None:
-        task.started_in = timezone.now()
+    now = timezone.now()
+    if task.started_in is None:
+        task.started_in = now
         started_now = True
 
     if not task.is_completed:
-        now = timezone.now()
         if computed_time_spent is None and record_time_spent:
             computed_time_spent = now - task.started_in if task.started_in is not None else timedelta(0)
         task.is_completed = True
@@ -140,7 +132,7 @@ def get_today_mission_context(reference_date=None):
     reference_date = reference_date or timezone.localdate()
     ensure_tasks_for_date(reference_date)
 
-    all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task')
+    all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task', 'category')
     active_tasks = all_tasks.filter(skipped_in__isnull=True)
     skipped_tasks = all_tasks.filter(skipped_in__isnull=False)
     pending_tasks = active_tasks.filter(is_completed=False).order_by(*get_today_mission_ordering())

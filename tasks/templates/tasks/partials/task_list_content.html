@@ -2,19 +2,19 @@
 <div class="row mb-3">
     <div class="col-lg-8">
         <form method="get" action="{% url 'task_list' %}" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2 align-items-end">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">Data</label>
                 {{ filter_form.scheduled_date }}
             </div>
-            <div class="col-md-4">
-                <div class="form-check mt-4 pt-2">
-                    {{ filter_form.show_completed }}
-                    <label class="form-check-label" for="{{ filter_form.show_completed.id_for_label }}">
-                        Ver concluídas
-                    </label>
-                </div>
+            <div class="col-md-3">
+                <label class="form-label">{{ filter_form.status.label }}</label>
+                {{ filter_form.status }}
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label class="form-label">{{ filter_form.category.label }}</label>
+                {{ filter_form.category }}
+            </div>
+            <div class="col-md-3">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
                     <i class="bi bi-filter"></i> Filtrar
                 </button>
@@ -58,10 +58,8 @@
         <thead>
             <tr>
                 <th>Título</th>
+                <th>Categoria</th>
                 <th>Horário</th>
-                <th>Tempo estimado</th>
-                <th>Tempo gasto</th>
-                <th>Origem</th>
                 <th>Status</th>
                 <th>Ações</th>
             </tr>
@@ -71,7 +69,7 @@
                 {% include 'tasks/partials/task_row.html' %}
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center">Nenhuma tarefa encontrada para esta data.</td>
+                <td colspan="5" class="text-center">Nenhuma tarefa encontrada para esta data.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -6,10 +6,6 @@ from .services import sync_generated_tasks_from_recurring_task
 
 
 class RecurringTask(models.Model):
-    class TaskType(models.TextChoices):
-        TASK = 'task', 'Tarefa'
-        OBJECTIVE = 'objective', 'Objetivo'
-
     class Priority(models.IntegerChoices):
         LOW = 1, 'Baixa'
         MEDIUM = 2, 'Média'
@@ -33,16 +29,18 @@ class RecurringTask(models.Model):
     name = models.CharField(max_length=500, verbose_name='nome')
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
     estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
-    task_type = models.CharField(
-        max_length=20,
-        choices=TaskType.choices,
-        default=TaskType.TASK,
-        verbose_name='tipo',
-    )
     priority = models.PositiveSmallIntegerField(
         choices=Priority.choices,
         default=Priority.LOW,
         verbose_name='prioridade',
+    )
+    category = models.ForeignKey(
+        'categories.Category',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='recurring_tasks',
+        verbose_name='categoria',
     )
     recurrence_type = models.CharField(
         max_length=20,
@@ -73,9 +71,6 @@ class RecurringTask(models.Model):
 
     def clean(self):
         super().clean()
-
-        if self.task_type not in dict(self.TaskType.choices):
-            raise ValidationError({'task_type': 'Tipo de tarefa inválido.'})
 
         if self.recurrence_type == self.RecurrenceType.WEEKDAYS:
             if not self.weekdays:

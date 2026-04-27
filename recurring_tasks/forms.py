@@ -1,9 +1,19 @@
 from django import forms
 
+from categories.models import Category
+
 from . import models
 
 
 class RecurringTaskForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.order_by('name'),
+        required=False,
+        empty_label='Sem categoria',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Categoria',
+    )
+
     weekdays = forms.MultipleChoiceField(
         choices=models.RecurringTask.WEEKDAY_CHOICES,
         required=False,
@@ -23,8 +33,8 @@ class RecurringTaskForm(forms.ModelForm):
             'name',
             'description',
             'estimated_time',
-            'task_type',
             'priority',
+            'category',
             'recurrence_type',
             'weekdays',
             'start_date',
@@ -38,7 +48,6 @@ class RecurringTaskForm(forms.ModelForm):
             'estimated_time': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'HH:MM:SS'}
             ),
-            'task_type': forms.Select(attrs={'class': 'form-select'}),
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'recurrence_type': forms.Select(attrs={'class': 'form-select'}),
             'start_date': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
@@ -49,8 +58,8 @@ class RecurringTaskForm(forms.ModelForm):
             'name': 'Nome',
             'description': 'Descrição',
             'estimated_time': 'Tempo estimado',
-            'task_type': 'Tipo',
             'priority': 'Prioridade',
+            'category': 'Categoria',
             'recurrence_type': 'Tipo de recorrência',
             'start_date': 'Data inicial',
             'end_date': 'Data final',

@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('', include('progress.urls')),
     path('', include('projects.urls')),
+    path('', include('categories.urls')),
     path('', include('project_tasks.urls')),
     path('', include('possible_tasks.urls')),
     path('', include('tasks.urls')),

@@ -25,6 +25,9 @@
                                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                                             <span class="badge text-bg-dark">+15 XP</span>
                                             <span class="badge text-bg-light text-dark">{{ task.get_priority_display }}</span>
+                                            {% if task.category %}
+                                                <span class="badge text-bg-light text-dark">{{ task.category.name }}</span>
+                                            {% endif %}
                                             {% if task.source_type == 'recurrent' %}
                                                 <span class="badge text-bg-light text-dark">Recorrente</span>
                                             {% else %}
@@ -33,7 +36,7 @@
                                         </div>
                                         <div class="d-flex flex-wrap align-items-center gap-2">
                                             <h5 class="h6 mb-0">{{ task.title }}</h5>
-                                            {% if task.task_type == 'task' and task.started_in %}
+                                            {% if task.started_in and not task.finished_in %}
                                                 <span class="badge text-bg-success-subtle text-success">Em andamento</span>
                                             {% elif task.finished_in %}
                                                 <span class="badge text-bg-secondary-subtle text-secondary">Finalizada</span>
@@ -45,7 +48,7 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         {% if perms.tasks.change_task %}
-                                            {% if task.task_type == 'task' and not task.started_in %}
+                                            {% if not task.started_in and not task.finished_in %}
                                             <form method="post" action="{% url 'task_today_start' task.id %}" hx-post="{% url 'task_today_start' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-primary btn-sm" aria-label="Iniciar tarefa" title="Iniciar tarefa">

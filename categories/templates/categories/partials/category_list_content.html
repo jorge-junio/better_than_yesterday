@@ -1,0 +1,65 @@
+<div data-page-title="{{ page_title }}">
+<div class="row mb-3">
+    <div class="col-lg-8">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #111827 0%, #0f766e 55%, #1d4ed8 100%);">
+            <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
+                <i class="bi bi-tags-fill"></i>
+            </div>
+            <div class="position-relative">
+                <div class="text-uppercase small fw-semibold opacity-75 mb-2">Organização por contexto</div>
+                <h1 class="display-6 mb-2">Categorias</h1>
+                <p class="mb-0 opacity-75">Agrupe tarefas e recorrências por tema para filtrar e organizar o trabalho com mais clareza.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if perms.categories.add_category %}
+    <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
+        <a href="{% url 'category_create' %}" class="btn btn-success" title="Nova categoria" hx-get="{% url 'category_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <i class="bi bi-plus"></i> Nova Categoria
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if categories %}
+        <div class="vstack gap-3">
+            {% for category in categories %}
+            <div class="p-3 rounded-4 border border-3 border-info bg-body-tertiary">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge text-bg-secondary">#{{ category.id }}</span>
+                        </div>
+                        <h4 class="h5 mb-0">{{ category.name }}</h4>
+                    </div>
+                    <div class="d-flex gap-1 flex-wrap">
+                        {% if perms.categories.change_category %}
+                        <a href="{% url 'category_update' category.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'category_update' category.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        {% endif %}
+                        {% if perms.categories.delete_category %}
+                        <a href="{% url 'category_delete' category.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'category_delete' category.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="display-3 mb-3 text-muted"><i class="bi bi-tags"></i></div>
+            <h4 class="mb-2">Nenhuma categoria ainda</h4>
+            <p class="text-muted mb-0">Crie uma categoria para organizar tarefas e recorrências por assunto.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'components/_pagination.html' %}
+</div>

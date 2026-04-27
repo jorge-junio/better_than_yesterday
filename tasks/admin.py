@@ -7,10 +7,10 @@ from . import models
 class TaskAdmin(admin.ModelAdmin):
     list_display = (
         'title',
+        'category',
         'scheduled_date',
         'scheduled_time',
         'estimated_time',
-        'task_type',
         'priority',
         'source_type',
         'started_in',
@@ -18,6 +18,6 @@ class TaskAdmin(admin.ModelAdmin):
         'time_spent_display',
         'is_completed',
     )
-    list_filter = ('scheduled_date', 'task_type', 'priority', 'source_type', 'is_completed')
+    list_filter = ('scheduled_date', 'category', 'priority', 'source_type', 'is_completed')
     search_fields = ('title', 'description')
     ordering = ('-scheduled_date', 'scheduled_time', 'title')

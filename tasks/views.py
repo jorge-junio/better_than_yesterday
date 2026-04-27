@@ -57,12 +57,22 @@ class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permis
         services.ensure_tasks_for_date(selected_date)
 
         queryset = super().get_queryset().filter(scheduled_date=selected_date)
-        show_completed = self.request.GET.get('show_completed')
+        status = self.request.GET.get('status') or forms.TaskFilterForm.StatusChoices.ALL
+        category_id = self.request.GET.get('category')
 
-        if show_completed not in {'1', 'true', 'True', 'on'}:
-            queryset = queryset.filter(is_completed=False)
+        if status == forms.TaskFilterForm.StatusChoices.COMPLETED:
+            queryset = queryset.filter(is_completed=True)
+        elif status == forms.TaskFilterForm.StatusChoices.PENDING:
+            queryset = queryset.filter(is_completed=False, skipped_in__isnull=True)
+        elif status == forms.TaskFilterForm.StatusChoices.POSTPONED:
+            queryset = queryset.filter(skipped_in__isnull=False)
+        else:
+            status = forms.TaskFilterForm.StatusChoices.ALL
 
-        return queryset.select_related('recurring_task')
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset.select_related('recurring_task', 'category')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,7 +89,8 @@ class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permis
         context['completion_rate'] = int((completed / total) * 100) if total else 0
         context['filter_form'] = forms.TaskFilterForm(self.request.GET or None, initial={
             'scheduled_date': selected_date,
-            'show_completed': self.request.GET.get('show_completed') in {'1', 'true', 'True', 'on'},
+            'status': self.request.GET.get('status') or forms.TaskFilterForm.StatusChoices.ALL,
+            'category': self.request.GET.get('category') or '',
         })
         context['query_string'] = build_querystring(self.request, exclude={'page'})
         return context
@@ -130,6 +141,7 @@ class TaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
 
 class TaskDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = models.Task
+    queryset = models.Task.objects.select_related('recurring_task', 'category')
     template_name = 'task_detail.html'
     htmx_template_name = 'tasks/partials/task_detail_content.html'
     page_title = 'BTY - Detalhe da Tarefa'
@@ -138,6 +150,7 @@ class TaskDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
 
 class TaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = models.Task
+    queryset = models.Task.objects.select_related('recurring_task', 'category')
     template_name = 'task_update.html'
     htmx_template_name = 'tasks/partials/task_form_content.html'
     page_title = 'BTY - Editar Tarefa'
@@ -161,6 +174,7 @@ class TaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
 
 class TaskDeleteView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = models.Task
+    queryset = models.Task.objects.select_related('recurring_task', 'category')
     template_name = 'task_delete.html'
     htmx_template_name = 'tasks/partials/task_delete_content.html'
     page_title = 'BTY - Excluir Tarefa'

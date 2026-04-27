@@ -24,6 +24,7 @@ TENANT_APPS = [
     'django.contrib.admin',
     'django.contrib.sessions',
 
+    'categories',
     'progress',
     'projects',
     'project_tasks',

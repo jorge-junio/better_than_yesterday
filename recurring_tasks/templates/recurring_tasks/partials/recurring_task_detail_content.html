@@ -6,11 +6,17 @@
             <h3 class="card-title">{{ object.name }}</h3>
             <p class="card-text">{{ object.description }}</p>
             <dl class="row">
-                <dt class="col-sm-3">Tipo</dt>
+                <dt class="col-sm-3">Tipo de recorrência</dt>
                 <dd class="col-sm-9">{{ object.get_recurrence_type_display }}</dd>
 
                 <dt class="col-sm-3">Categoria</dt>
-                <dd class="col-sm-9">{{ object.get_task_type_display }}</dd>
+                <dd class="col-sm-9">
+                    {% if object.category %}
+                        {{ object.category.name }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
 
                 <dt class="col-sm-3">Tempo estimado</dt>
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
@@ -29,16 +35,9 @@
                 <dt class="col-sm-3">Status</dt>
                 <dd class="col-sm-9">{% if object.is_active %}Ativa{% else %}Inativa{% endif %}</dd>
             </dl>
-
-            {% if object.task_type == 'task' %}
-                <div class="alert alert-info mb-0">
-                    As tarefas geradas desta recorrência terão início e conclusão.
-                </div>
-            {% else %}
-                <div class="alert alert-warning mb-0">
-                    Os objetivos gerados desta recorrência não têm início: só a conclusão será registrada.
-                </div>
-            {% endif %}
+            <div class="alert alert-info mb-0">
+                As tarefas geradas desta recorrência podem ser iniciadas ou concluídas diretamente.
+            </div>
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">

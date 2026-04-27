@@ -24,7 +24,6 @@ class TaskModelTests(SimpleTestCase):
         )
 
         self.assertTrue(task.is_pending)
-        self.assertEqual(task.task_type, Task.TaskType.TASK)
         self.assertEqual(task.priority, Task.Priority.LOW)
 
     def test_recurrent_task_requires_recurring_origin(self):
@@ -37,19 +36,19 @@ class TaskModelTests(SimpleTestCase):
         with self.assertRaises(ValidationError):
             task.clean()
 
-    def test_objective_completes_without_starting(self):
+    def test_complete_without_starting_sets_same_start_and_finish(self):
         task = Task(
             title='Ler um capítulo',
             scheduled_date=date(2026, 4, 22),
-            task_type=Task.TaskType.OBJECTIVE,
         )
 
         with patch.object(Task, 'save') as save_mock:
             getattr(complete_task, '__wrapped__', complete_task)(task)
 
         self.assertTrue(task.is_completed)
-        self.assertIsNone(task.started_in)
+        self.assertIsNotNone(task.started_in)
         self.assertIsNotNone(task.finished_in)
+        self.assertEqual(task.started_in, task.finished_in)
         self.assertEqual(task.time_spent, timedelta(0))
         save_mock.assert_called_once()
 
@@ -57,7 +56,6 @@ class TaskModelTests(SimpleTestCase):
         task = Task(
             title='Estudar',
             scheduled_date=date(2026, 4, 22),
-            task_type=Task.TaskType.TASK,
         )
 
         started_at = datetime(2026, 4, 22, 10, 0, tzinfo=dt_timezone.utc)
@@ -76,7 +74,6 @@ class TaskModelTests(SimpleTestCase):
         task = Task(
             title='Estudar',
             scheduled_date=date(2026, 4, 22),
-            task_type=Task.TaskType.TASK,
         )
 
         with patch('tasks.services.timezone.now', side_effect=[
@@ -89,28 +86,17 @@ class TaskModelTests(SimpleTestCase):
         self.assertEqual(task.time_spent, timedelta(minutes=7, seconds=30))
         save_mock.assert_called_once()
 
-    def test_start_task_is_ignored_for_objective(self):
+    def test_start_task_sets_started_time_when_missing(self):
         task = Task(
             title='Escrever meta',
             scheduled_date=date(2026, 4, 22),
-            task_type=Task.TaskType.OBJECTIVE,
         )
 
         with patch.object(Task, 'save') as save_mock:
             getattr(start_task, '__wrapped__', start_task)(task)
 
-        self.assertIsNone(task.started_in)
-        save_mock.assert_not_called()
-
-    def test_skipped_task_is_not_pending(self):
-        task = Task(
-            title='Reunião',
-            scheduled_date=date(2026, 4, 22),
-        )
-        task.skipped_in = timezone.now()
-
-        self.assertFalse(task.is_pending)
-        self.assertTrue(task.is_skipped)
+        self.assertIsNotNone(task.started_in)
+        save_mock.assert_called_once()
 
     def test_skip_task_for_today_marks_skip_flag(self):
         task = Task(
@@ -136,6 +122,8 @@ class TaskModelTests(SimpleTestCase):
 
         self.assertIsNone(task.skipped_in)
         self.assertTrue(task.is_completed)
+        self.assertIsNotNone(task.started_in)
+        self.assertEqual(task.started_in, task.finished_in)
         save_mock.assert_called_once()
 
     def test_reopen_task_clears_completion_and_time_spent(self):
@@ -156,6 +144,16 @@ class TaskModelTests(SimpleTestCase):
         self.assertIsNone(task.finished_in)
         self.assertIsNone(task.time_spent)
         save_mock.assert_called_once()
+
+    def test_skipped_task_is_not_pending(self):
+        task = Task(
+            title='Reunião',
+            scheduled_date=date(2026, 4, 22),
+        )
+        task.skipped_in = timezone.now()
+
+        self.assertFalse(task.is_pending)
+        self.assertTrue(task.is_skipped)
 
     def test_parse_time_spent_parts_defaults_to_zero(self):
         duration, error = parse_time_spent_parts({})
@@ -213,7 +211,6 @@ class RecurrenceGenerationTests(SimpleTestCase):
 
         self.assertTrue(hasattr(recurring_task, 'occurs_on'))
         self.assertTrue(callable(ensure_tasks_for_date))
-        self.assertEqual(recurring_task.task_type, RecurringTask.TaskType.TASK)
 
     def test_today_mission_orders_by_started_priority_title(self):
         ordering = get_today_mission_ordering()

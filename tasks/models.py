@@ -3,10 +3,6 @@ from django.db import models
 
 
 class Task(models.Model):
-    class TaskType(models.TextChoices):
-        TASK = 'task', 'Tarefa'
-        OBJECTIVE = 'objective', 'Objetivo'
-
     class Priority(models.IntegerChoices):
         LOW = 1, 'Baixa'
         MEDIUM = 2, 'Média'
@@ -21,16 +17,18 @@ class Task(models.Model):
     estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
     scheduled_date = models.DateField(verbose_name='data')
     scheduled_time = models.TimeField(null=True, blank=True, verbose_name='horário')
-    task_type = models.CharField(
-        max_length=20,
-        choices=TaskType.choices,
-        default=TaskType.TASK,
-        verbose_name='tipo',
-    )
     priority = models.PositiveSmallIntegerField(
         choices=Priority.choices,
         default=Priority.LOW,
         verbose_name='prioridade',
+    )
+    category = models.ForeignKey(
+        'categories.Category',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='tasks',
+        verbose_name='categoria',
     )
     source_type = models.CharField(
         max_length=20,
@@ -77,9 +75,6 @@ class Task(models.Model):
 
         if self.recurring_task and self.source_type != self.SourceType.RECURRENT:
             self.source_type = self.SourceType.RECURRENT
-
-        if self.task_type not in dict(self.TaskType.choices):
-            raise ValidationError({'task_type': 'Tipo de tarefa inválido.'})
 
     @property
     def is_pending(self):

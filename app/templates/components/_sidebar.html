@@ -31,6 +31,14 @@
             </a>
           </li>
         {% endif %}
+        {% if perms.categories.view_category %}
+          <li>
+            <a href="{% url 'category_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'category_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <i class="bi bi-tags fs-4"></i>
+              <span class="ms-1 sidebar-label">Categorias</span>
+            </a>
+          </li>
+        {% endif %}
         {% if perms.projects.view_project %}
           <li>
             <a href="{% url 'project_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">

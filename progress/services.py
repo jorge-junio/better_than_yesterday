@@ -88,7 +88,7 @@ def get_range_summary(start_date=None, end_date=None):
         .order_by('weekday')
     )
 
-    pending_tasks = queryset.filter(is_completed=False).select_related('recurring_task')
+    pending_tasks = queryset.filter(is_completed=False).select_related('recurring_task', 'category')
 
     return {
         'start_date': start_date,

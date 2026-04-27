@@ -6,9 +6,6 @@
             <h3 class="card-title">{{ object.title }}</h3>
             <p class="card-text">{{ object.description }}</p>
             <dl class="row">
-                <dt class="col-sm-3">Tipo</dt>
-                <dd class="col-sm-9">{{ object.get_task_type_display }}</dd>
-
                 <dt class="col-sm-3">Data</dt>
                 <dd class="col-sm-9">{{ object.scheduled_date }}</dd>
 
@@ -18,19 +15,23 @@
                 <dt class="col-sm-3">Tempo estimado</dt>
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
 
-                {% if object.task_type == 'task' %}
-                    <dt class="col-sm-3">Iniciada em</dt>
-                    <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
+                <dt class="col-sm-3">Categoria</dt>
+                <dd class="col-sm-9">
+                    {% if object.category %}
+                        {{ object.category.name }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
 
-                    <dt class="col-sm-3">Tempo gasto</dt>
-                    <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
+                <dt class="col-sm-3">Iniciada em</dt>
+                <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
 
-                    <dt class="col-sm-3">Finalizada em</dt>
-                    <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
-                {% else %}
-                    <dt class="col-sm-3">Concluída em</dt>
-                    <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
-                {% endif %}
+                <dt class="col-sm-3">Tempo gasto</dt>
+                <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
+
+                <dt class="col-sm-3">Concluída em</dt>
+                <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
 
                 <dt class="col-sm-3">Prioridade</dt>
                 <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
@@ -42,15 +43,9 @@
                 <dd class="col-sm-9">{% if object.is_completed %}Concluída{% else %}Pendente{% endif %}</dd>
             </dl>
 
-            {% if object.task_type == 'task' %}
-                <div class="alert alert-info mb-0">
-                    Esta tarefa usa início e conclusão. O tempo gasto é registrado quando a tarefa é concluída.
-                </div>
-            {% else %}
-                <div class="alert alert-warning mb-0">
-                    Este objetivo não usa início. O tempo gasto é registrado quando a tarefa é concluída.
-                </div>
-            {% endif %}
+            <div class="alert alert-info mb-0">
+                Todas as tarefas podem ser iniciadas ou concluídas diretamente. Ao concluir sem iniciar, o início e a finalização ficam iguais.
+            </div>
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">

@@ -122,6 +122,7 @@
                         <thead>
                             <tr>
                                 <th>Título</th>
+                                <th>Categoria</th>
                                 <th>Data</th>
                                 <th>Horário</th>
                                 <th>Origem</th>
@@ -131,6 +132,13 @@
                             {% for task in range_summary.pending_tasks %}
                             <tr>
                                 <td>{{ task.title }}</td>
+                                <td>
+                                    {% if task.category %}
+                                        {{ task.category.name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
                                 <td>{{ task.scheduled_date }}</td>
                                 <td>{{ task.scheduled_time|default:'-' }}</td>
                                 <td>
@@ -143,7 +151,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Nenhuma pendência no intervalo selecionado.</td>
+                                <td colspan="5" class="text-center text-muted">Nenhuma pendência no intervalo selecionado.</td>
                             </tr>
                             {% endfor %}
                         </tbody>

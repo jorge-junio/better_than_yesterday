@@ -5,24 +5,17 @@
         <div class="text-muted small">{{ task.description }}</div>
         {% endif %}
         <div class="mt-1">
-            {% if task.task_type == 'objective' %}
-                <span class="badge text-bg-info">Objetivo</span>
-            {% else %}
-                <span class="badge text-bg-secondary">Tarefa</span>
-            {% endif %}
             <span class="badge text-bg-dark">{{ task.get_priority_display }}</span>
         </div>
     </td>
-    <td>{{ task.scheduled_time|default:'-' }}</td>
-    <td>{{ task.estimated_time|default:'-' }}</td>
-    <td>{{ task.time_spent_display }}</td>
     <td>
-        {% if task.source_type == 'recurrent' %}
-            Recorrente
+        {% if task.category %}
+            {{ task.category.name }}
         {% else %}
-            Manual
+            -
         {% endif %}
     </td>
+    <td>{{ task.scheduled_time|default:'-' }}</td>
     <td>
         {% if task.is_completed %}
             <span class="badge text-bg-success">Concluída</span>
@@ -49,6 +42,7 @@
                 {% endif %}
             </button>
         </form>
+        {% if not task.recurring_task %}
         <form method="post" action="{% url 'task_postpone' task.id %}" hx-post="{% url 'task_postpone' task.id %}" hx-target="#task-row-{{ task.id }}" hx-swap="outerHTML">
             {% csrf_token %}
             <input type="hidden" name="days" value="1">
@@ -56,6 +50,7 @@
                 Adiar 1 dia
             </button>
         </form>
+        {% endif %}
         <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'task_delete' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-trash"></i>
         </a>

@@ -46,14 +46,13 @@ class RecurringTaskModelTests(SimpleTestCase):
         self.assertTrue(task.occurs_on(date(2026, 4, 24)))
         self.assertFalse(task.occurs_on(date(2026, 4, 23)))
 
-    def test_defaults_to_task_type(self):
+    def test_defaults_to_priority(self):
         task = RecurringTask(
             name='Academia',
             recurrence_type=RecurringTask.RecurrenceType.WEEKDAYS,
             weekdays=['mon'],
         )
 
-        self.assertEqual(task.task_type, RecurringTask.TaskType.TASK)
         self.assertEqual(task.priority, RecurringTask.Priority.LOW)
 
 
@@ -85,7 +84,6 @@ class RecurringTaskFormTests(SimpleTestCase):
                 'name': 'Revisão',
                 'description': '',
                 'estimated_time': '',
-                'task_type': RecurringTask.TaskType.TASK,
                 'priority': RecurringTask.Priority.LOW,
                 'recurrence_type': RecurringTask.RecurrenceType.SPECIFIC_DATES,
                 'specific_dates': '01/01/2027\n02/01/2027',
@@ -129,7 +127,6 @@ class RecurringTaskSyncTests(SimpleTestCase):
             name='Academia',
             description='Treino na academia',
             estimated_time=None,
-            task_type=RecurringTask.TaskType.TASK,
             priority=RecurringTask.Priority.HIGH,
             generated_tasks=MagicMock(),
         )
@@ -147,7 +144,6 @@ class RecurringTaskSyncTests(SimpleTestCase):
         update_mock.assert_called_once()
         kwargs = update_mock.call_args.kwargs
         self.assertEqual(kwargs['priority'], RecurringTask.Priority.HIGH)
-        self.assertEqual(kwargs['task_type'], RecurringTask.TaskType.TASK)
 
     def test_sync_generated_tasks_raises_validation_error_when_update_fails(self):
         recurring_task = SimpleNamespace(
@@ -155,7 +151,6 @@ class RecurringTaskSyncTests(SimpleTestCase):
             name='Academia',
             description='Treino na academia',
             estimated_time=None,
-            task_type=RecurringTask.TaskType.TASK,
             priority=RecurringTask.Priority.HIGH,
             generated_tasks=MagicMock(),
         )
