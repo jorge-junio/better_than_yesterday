@@ -134,7 +134,10 @@
                                 <td>{{ task.title }}</td>
                                 <td>
                                     {% if task.category %}
-                                        {{ task.category.name }}
+                                        <span class="badge text-bg-light text-dark border border-1">
+                                            <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ task.category.color }};"></span>
+                                            {{ task.category.name }}
+                                        </span>
                                     {% else %}
                                         -
                                     {% endif %}

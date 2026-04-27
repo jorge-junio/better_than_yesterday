@@ -18,7 +18,10 @@
                 <dt class="col-sm-3">Categoria</dt>
                 <dd class="col-sm-9">
                     {% if object.category %}
-                        {{ object.category.name }}
+                        <span class="badge text-bg-light text-dark border border-1">
+                            <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ object.category.color }};"></span>
+                            {{ object.category.name }}
+                        </span>
                     {% else %}
                         -
                     {% endif %}

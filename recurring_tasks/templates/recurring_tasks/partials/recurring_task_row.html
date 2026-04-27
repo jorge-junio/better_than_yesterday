@@ -1,9 +1,11 @@
 <tr id="recurring-task-row-{{ recurring_task.id }}">
-    <td>{{ recurring_task.id }}</td>
     <td>{{ recurring_task.name }}</td>
     <td>
         {% if recurring_task.category %}
-            {{ recurring_task.category.name }}
+            <span class="badge text-bg-light text-dark border border-1">
+                <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ recurring_task.category.color }};"></span>
+                {{ recurring_task.category.name }}
+            </span>
         {% else %}
             -
         {% endif %}

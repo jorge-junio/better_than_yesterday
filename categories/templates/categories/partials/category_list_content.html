@@ -31,9 +31,15 @@
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge text-bg-secondary">#{{ category.id }}</span>
+                            <span class="badge text-bg-light text-dark border border-1">
+                                <span class="me-1 d-inline-block align-middle" style="width: .65rem; height: .65rem; border-radius: 50%; background-color: {{ category.color }};"></span>
+                                {{ category.color }}
+                            </span>
                         </div>
-                        <h4 class="h5 mb-0">{{ category.name }}</h4>
+                        <h4 class="h5 mb-0">
+                            <span class="me-2 d-inline-block align-middle" style="width: .9rem; height: .9rem; border-radius: 50%; background-color: {{ category.color }};"></span>
+                            {{ category.name }}
+                        </h4>
                     </div>
                     <div class="d-flex gap-1 flex-wrap">
                         {% if perms.categories.change_category %}

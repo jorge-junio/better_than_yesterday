@@ -11,71 +11,121 @@
       <ul class="nav flex-column align-items-start w-100" id="menu">
         {% if perms.tasks.view_task %}
           <li>
-            <a href="{% url 'task_today' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <a href="{% url 'task_today' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'task_today' %}active{% endif %}" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'task_today' %}aria-current="page"{% endif %}>
               <i class="bi bi-trophy fs-4"></i>
               <span class="ms-1 sidebar-label">Missão do dia</span>
             </a>
           </li>
         {% endif %}
         <li>
-          <a href="{% url 'dashboard' %}" class="nav-link px-0 align-middle" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+          <a href="{% url 'dashboard' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>
             <i class="bi bi-speedometer2 fs-4"></i>
             <span class="ms-1 sidebar-label">Dashboard</span>
           </a>
         </li>
-        {% if perms.tasks.view_task %}
-          <li>
-            <a href="{% url 'task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <li class="w-100 mt-2">
+          <button
+            id="sidebarTasksToggle"
+            class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_start' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}active{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarTasksGroup"
+            aria-expanded="{% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_start' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}true{% else %}false{% endif %}"
+            aria-controls="sidebarTasksGroup"
+          >
+            <span class="d-inline-flex align-items-center">
               <i class="bi bi-clipboard-check fs-4"></i>
-              <span class="ms-1 sidebar-label">Tarefas</span>
-            </a>
-          </li>
-        {% endif %}
-        {% if perms.categories.view_category %}
-          <li>
-            <a href="{% url 'category_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'category_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-              <i class="bi bi-tags fs-4"></i>
-              <span class="ms-1 sidebar-label">Categorias</span>
-            </a>
-          </li>
-        {% endif %}
-        {% if perms.projects.view_project %}
-          <li>
-            <a href="{% url 'project_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+              <span class="ms-1 sidebar-label fw-semibold">Tarefas</span>
+            </span>
+            <i class="bi bi-chevron-down small sidebar-label"></i>
+          </button>
+          <div
+            class="collapse {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_start' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}show{% endif %} w-100"
+            id="sidebarTasksGroup"
+          >
+            <ul class="nav flex-column align-items-start w-100 ms-3 ps-2 border-start border-secondary border-opacity-25">
+              {% if perms.tasks.view_task %}
+                <li class="w-100">
+                  <a href="{% url 'task_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'task_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-clipboard-data fs-5"></i>
+                    <span class="ms-1 sidebar-label">Tarefas</span>
+                  </a>
+                </li>
+              {% endif %}
+              {% if perms.categories.view_category %}
+                <li class="w-100">
+                  <a href="{% url 'category_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}" hx-get="{% url 'category_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'category_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-tags fs-5"></i>
+                    <span class="ms-1 sidebar-label">Categorias</span>
+                  </a>
+                </li>
+              {% endif %}
+              {% if perms.recurring_tasks.view_recurringtask %}
+                <li class="w-100">
+                  <a href="{% url 'recurring_task_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'recurring_task_list' %}active{% endif %}" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'recurring_task_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-arrow-repeat fs-5"></i>
+                    <span class="ms-1 sidebar-label">Tarefas recorrentes</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </li>
+
+        <li class="w-100 mt-2">
+          <button
+            id="sidebarProjectsToggle"
+            class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_task_list' or request.resolver_match.url_name == 'project_task_create' or request.resolver_match.url_name == 'project_task_update' or request.resolver_match.url_name == 'project_task_delete' or request.resolver_match.url_name == 'project_task_detail' or request.resolver_match.url_name == 'project_task_toggle_complete' or request.resolver_match.url_name == 'possible_task_list' or request.resolver_match.url_name == 'possible_task_create' or request.resolver_match.url_name == 'possible_task_update' or request.resolver_match.url_name == 'possible_task_delete' %}active{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarProjectsGroup"
+            aria-expanded="{% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_task_list' or request.resolver_match.url_name == 'project_task_create' or request.resolver_match.url_name == 'project_task_update' or request.resolver_match.url_name == 'project_task_delete' or request.resolver_match.url_name == 'project_task_detail' or request.resolver_match.url_name == 'project_task_toggle_complete' or request.resolver_match.url_name == 'possible_task_list' or request.resolver_match.url_name == 'possible_task_create' or request.resolver_match.url_name == 'possible_task_update' or request.resolver_match.url_name == 'possible_task_delete' %}true{% else %}false{% endif %}"
+            aria-controls="sidebarProjectsGroup"
+          >
+            <span class="d-inline-flex align-items-center">
               <i class="bi bi-kanban fs-4"></i>
-              <span class="ms-1 sidebar-label">Projetos</span>
-            </a>
-          </li>
-        {% endif %}
-        {% if perms.project_tasks.view_projecttask %}
-          <li>
-            <a href="{% url 'project_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-              <i class="bi bi-list-task fs-4"></i>
-              <span class="ms-1 sidebar-label">Tarefas de projeto</span>
-            </a>
-          </li>
-        {% endif %}
-        {% if perms.possible_tasks.view_possibletask %}
-          <li>
-            <a href="{% url 'possible_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-              <i class="bi bi-lightbulb fs-4"></i>
-              <span class="ms-1 sidebar-label">Possíveis tarefas</span>
-            </a>
-          </li>
-        {% endif %}
-        {% if perms.recurring_tasks.view_recurringtask %}
-          <li>
-            <a href="{% url 'recurring_task_list' %}" class="nav-link px-0 align-middle" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-              <i class="bi bi-arrow-repeat fs-4"></i>
-              <span class="ms-1 sidebar-label">Tarefas recorrentes</span>
-            </a>
-          </li>
-        {% endif %}
+              <span class="ms-1 sidebar-label fw-semibold">Projetos</span>
+            </span>
+            <i class="bi bi-chevron-down small sidebar-label"></i>
+          </button>
+          <div
+            class="collapse {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_task_list' or request.resolver_match.url_name == 'project_task_create' or request.resolver_match.url_name == 'project_task_update' or request.resolver_match.url_name == 'project_task_delete' or request.resolver_match.url_name == 'project_task_detail' or request.resolver_match.url_name == 'project_task_toggle_complete' or request.resolver_match.url_name == 'possible_task_list' or request.resolver_match.url_name == 'possible_task_create' or request.resolver_match.url_name == 'possible_task_update' or request.resolver_match.url_name == 'possible_task_delete' %}show{% endif %} w-100"
+            id="sidebarProjectsGroup"
+          >
+            <ul class="nav flex-column align-items-start w-100 ms-3 ps-2 border-start border-secondary border-opacity-25">
+              {% if perms.projects.view_project %}
+                <li class="w-100">
+                  <a href="{% url 'project_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'project_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-kanban fs-5"></i>
+                    <span class="ms-1 sidebar-label">Projetos</span>
+                  </a>
+                </li>
+              {% endif %}
+              {% if perms.project_tasks.view_projecttask %}
+                <li class="w-100">
+                  <a href="{% url 'project_task_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'project_task_list' %}active{% endif %}" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'project_task_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-list-task fs-5"></i>
+                    <span class="ms-1 sidebar-label">Tarefas de projeto</span>
+                  </a>
+                </li>
+              {% endif %}
+              {% if perms.possible_tasks.view_possibletask %}
+                <li class="w-100">
+                  <a href="{% url 'possible_task_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'possible_task_list' %}active{% endif %}" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'possible_task_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-lightbulb fs-5"></i>
+                    <span class="ms-1 sidebar-label">Possíveis tarefas</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </li>
+
         {% if user.is_authenticated %}
         <li class="nav-item">
           <form action="{% url 'logout' %}" method="post" id="logout-form" class="nav-link px-0 align-middle">
             {% csrf_token %}
-            <button type="submit" class="btn btn-link text-decoration-none text-reset nav-link px-0 align-middle" title="Sair">
+            <button type="submit" class="btn btn-link text-decoration-none nav-link sidebar-nav-link px-0 align-middle w-100 text-start" title="Sair">
               <i class="bi bi-box-arrow-right fs-4 align-middle"></i>
               <span class="ms-1 align-middle sidebar-label">Sair</span>
             </button>

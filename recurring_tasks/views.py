@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx_redirect, is_htmx_request
+from categories.models import Category
 
 from . import forms, models
 
@@ -23,6 +24,7 @@ class RecurringTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixi
         name = self.request.GET.get('name')
         recurrence_type = self.request.GET.get('recurrence_type')
         is_active = self.request.GET.get('is_active')
+        category_id = self.request.GET.get('category')
 
         if name:
             queryset = queryset.filter(name__icontains=name)
@@ -33,10 +35,14 @@ class RecurringTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixi
         if is_active in {'0', '1'}:
             queryset = queryset.filter(is_active=bool(int(is_active)))
 
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.order_by('name')
         context['query_string'] = build_querystring(self.request, exclude={'page'})
         return context
 

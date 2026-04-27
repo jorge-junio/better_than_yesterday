@@ -4,6 +4,7 @@ from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
+from categories.models import Category
 from recurring_tasks.models import RecurringTask
 
 from .models import Task
@@ -128,19 +129,29 @@ def get_completion_streak(reference_date=None, lookback_days=60):
     return streak
 
 
-def get_today_mission_context(reference_date=None):
+def get_today_mission_context(reference_date=None, category_id=None):
     reference_date = reference_date or timezone.localdate()
     ensure_tasks_for_date(reference_date)
 
     all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task', 'category')
     active_tasks = all_tasks.filter(skipped_in__isnull=True)
     skipped_tasks = all_tasks.filter(skipped_in__isnull=False)
-    pending_tasks = active_tasks.filter(is_completed=False).order_by(*get_today_mission_ordering())
+    pending_tasks = active_tasks.filter(is_completed=False)
+
+    if category_id == 'none':
+        pending_tasks = pending_tasks.filter(category__isnull=True)
+    elif category_id:
+        pending_tasks = pending_tasks.filter(category_id=category_id)
+
+    pending_tasks = pending_tasks.order_by(*get_today_mission_ordering())
     total_tasks = active_tasks.count()
     completed_tasks = active_tasks.filter(is_completed=True).count()
     skipped_count = skipped_tasks.count()
     pending_count = total_tasks - completed_tasks
+    visible_pending_count = pending_tasks.count()
     completion_rate = int((completed_tasks / total_tasks) * 100) if total_tasks else 0
+    today_categories = Category.objects.filter(tasks__scheduled_date=reference_date).distinct().order_by('name')
+    has_uncategorized_tasks = all_tasks.filter(category__isnull=True).exists()
 
     streak_days = get_completion_streak(reference_date=reference_date)
     lifetime_completed = Task.objects.filter(is_completed=True).count()
@@ -197,6 +208,10 @@ def get_today_mission_context(reference_date=None):
         'reference_date': reference_date,
         'all_tasks': all_tasks,
         'pending_tasks': pending_tasks,
+        'today_categories': today_categories,
+        'has_uncategorized_tasks': has_uncategorized_tasks,
+        'selected_category_id': category_id or '',
+        'visible_pending_count': visible_pending_count,
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks,
         'pending_count': pending_count,

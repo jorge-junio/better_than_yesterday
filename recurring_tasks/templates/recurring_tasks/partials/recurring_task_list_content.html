@@ -2,10 +2,10 @@
 <div class="row mb-3">
     <div class="col-md-8">
         <form method="get" action="{% url 'recurring_task_list' %}" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <select name="recurrence_type" class="form-select">
                     <option value="">Tipo de recorrência</option>
                     <option value="weekdays" {% if request.GET.recurrence_type == 'weekdays' %}selected{% endif %}>Dias da semana</option>
@@ -14,6 +14,16 @@
                 </select>
             </div>
             <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">Categoria</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
                 <select name="is_active" class="form-select">
                     <option value="">Status</option>
                     <option value="1" {% if request.GET.is_active == '1' %}selected{% endif %}>Ativo</option>
@@ -44,7 +54,6 @@
     <table class="table table-striped table-bordered align-middle">
         <thead class="thead-dark">
             <tr>
-                <th>ID</th>
                 <th>Nome</th>
                 <th>Categoria</th>
                 <th>Prioridade</th>
@@ -60,7 +69,7 @@
                 {% include 'recurring_tasks/partials/recurring_task_row.html' %}
             {% empty %}
             <tr>
-                <td colspan="9" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
+                <td colspan="8" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
             </tr>
             {% endfor %}
         </tbody>

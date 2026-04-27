@@ -5,14 +5,59 @@
 {% endif %}
 <div class="row g-4 mb-4">
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
-                    <div>
-                        <h2 class="h5 mb-1">Tarefas de hoje</h2>
-                        <p class="text-muted small mb-0">As tarefas ficam aqui, com ações rápidas para avançar sem ruído visual.</p>
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+                        <div>
+                            <h2 class="h5 mb-1">Tarefas de hoje</h2>
+                            <p class="text-muted small mb-0">As tarefas ficam aqui, com ações rápidas para avançar sem ruído visual.</p>
+                        </div>
+                    <span class="badge text-bg-warning align-self-start align-self-md-center">{{ visible_pending_count }} pendentes</span>
                     </div>
-                    <span class="badge text-bg-warning align-self-start align-self-md-center">{{ pending_count }} pendentes</span>
+
+                <div class="mb-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a
+                            href="{% url 'task_today' %}"
+                            class="btn btn-sm {% if not selected_category_id %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                            title="Ver todas as categorias"
+                            hx-get="{% url 'task_today' %}"
+                            hx-target="#page-content"
+                            hx-swap="innerHTML"
+                            hx-push-url="true"
+                        >
+                            Todas
+                        </a>
+
+                        {% if has_uncategorized_tasks %}
+                        <a
+                            href="{% url 'task_today' %}?category=none"
+                            class="btn btn-sm {% if selected_category_id == 'none' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                            title="Ver tarefas sem categoria"
+                            hx-get="{% url 'task_today' %}?category=none"
+                            hx-target="#page-content"
+                            hx-swap="innerHTML"
+                            hx-push-url="true"
+                        >
+                            Sem categoria
+                        </a>
+                        {% endif %}
+
+                        {% for category in today_categories %}
+                        <a
+                            href="{% url 'task_today' %}?category={{ category.id }}"
+                            class="btn btn-sm {% if selected_category_id == category.id|stringformat:'s' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                            title="Filtrar por {{ category.name }}"
+                            hx-get="{% url 'task_today' %}?category={{ category.id }}"
+                            hx-target="#page-content"
+                            hx-swap="innerHTML"
+                            hx-push-url="true"
+                        >
+                            <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ category.color }};"></span>
+                            {{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 {% if pending_tasks %}
@@ -26,7 +71,10 @@
                                             <span class="badge text-bg-dark">+15 XP</span>
                                             <span class="badge text-bg-light text-dark">{{ task.get_priority_display }}</span>
                                             {% if task.category %}
-                                                <span class="badge text-bg-light text-dark">{{ task.category.name }}</span>
+                                                <span class="badge text-bg-light text-dark border border-1">
+                                                    <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ task.category.color }};"></span>
+                                                    {{ task.category.name }}
+                                                </span>
                                             {% endif %}
                                             {% if task.source_type == 'recurrent' %}
                                                 <span class="badge text-bg-light text-dark">Recorrente</span>
@@ -49,7 +97,7 @@
                                         </a>
                                         {% if perms.tasks.change_task %}
                                             {% if not task.started_in and not task.finished_in %}
-                                            <form method="post" action="{% url 'task_today_start' task.id %}" hx-post="{% url 'task_today_start' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
+                                            <form method="post" action="{% url 'task_today_start' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_start' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-primary btn-sm" aria-label="Iniciar tarefa" title="Iniciar tarefa">
                                                     <i class="bi bi-play-fill"></i>
@@ -62,7 +110,7 @@
                                             </button>
                                             {% endif %}
                                             {% if not task.finished_in %}
-                                            <form method="post" action="{% url 'task_today_skip' task.id %}" hx-post="{% url 'task_today_skip' task.id %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
+                                            <form method="post" action="{% url 'task_today_skip' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_skip' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-outline-light btn-sm" aria-label="Ignorar hoje" title="Ignorar hoje">
                                                     <i class="bi bi-x-circle"></i>
@@ -77,7 +125,7 @@
                         <div class="modal fade" id="completeTaskModal-{{ task.id }}" tabindex="-1" aria-labelledby="completeTaskModalLabel-{{ task.id }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <form method="post" action="{% url 'task_today_complete' task.id %}" hx-post="{% url 'task_today_complete' task.id %}" hx-target="#page-content" hx-swap="innerHTML">
+                                    <form method="post" action="{% url 'task_today_complete' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_complete' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML">
                                         {% csrf_token %}
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="completeTaskModalLabel-{{ task.id }}">Concluir tarefa</h5>
