@@ -19,4 +19,4 @@ jobs:
           username: ${{ secrets.USERNAME_PROD }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
           port: ${{ secrets.PORT_PROD }}
-          script: caminho_do_script_de_deploy ${{ github.event.inputs.versao }}
+          script: ~/scripts/sgn/deploy.sh ${{ github.event.inputs.versao }}

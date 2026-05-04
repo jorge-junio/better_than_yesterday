@@ -20,24 +20,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build image produção
-        run: |
-          docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }} --target prod .
-          docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker --target worker .
-          # docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_from_integration --target worker_from_integration .
-          # docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_from_integration_dl --target worker_from_integration_dl .
-          # docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_nuvem_fiscal --target worker_nuvem_fiscal .
-          # docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_nuvem_fiscal_dl --target worker_nuvem_fiscal_dl .
+        run: docker build -t ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }} .
 
 
       - name: Log in to registry
         # This is where you will update the personal access token to GITHUB_TOKEN
-        run: echo "${{ secrets.DEPLOY_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+        run: echo "${{ secrets.DEPLOY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image
-        run: |
-          docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}
-          docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker
-          # docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_from_integration
-          # docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_from_integration_dl
-          # docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_nuvem_fiscal
-          # docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}-worker_nuvem_fiscal_dl
+        run: docker push ghcr.io/$GITHUB_REPOSITORY:${{ github.event.inputs.versao }}
