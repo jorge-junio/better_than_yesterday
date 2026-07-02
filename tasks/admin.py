@@ -13,10 +13,9 @@ class TaskAdmin(admin.ModelAdmin):
         'estimated_time',
         'priority',
         'source_type',
-        'started_in',
-        'finished_in',
-        'time_spent_display',
+        'completed_at',
         'is_completed',
+        'is_skipped',
     )
     list_filter = ('scheduled_date', 'category', 'priority', 'source_type', 'is_completed')
     search_fields = ('title', 'description')

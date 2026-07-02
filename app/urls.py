@@ -16,6 +16,8 @@ urlpatterns = [
     path('', include('categories.urls')),
     path('', include('project_tasks.urls')),
     path('', include('possible_tasks.urls')),
+    path('', include('english_words.urls')),
+    path('', include('evaluations.urls')),
     path('', include('tasks.urls')),
     path('', include('recurring_tasks.urls')),
 ]

@@ -22,13 +22,45 @@
     {% endif %}
 </div>
 
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" action="{% url 'possible_task_list' %}" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2 align-items-end">
+            <div class="col-md-8 col-lg-6">
+                <label class="form-label" for="possible-task-project-filter">Projeto</label>
+                <select id="possible-task-project-filter" name="project" class="form-select">
+                    <option value="">Todos os projetos</option>
+                    <option value="none" {% if request.GET.project == 'none' %}selected{% endif %}>Sem projeto</option>
+                    {% for project in projects %}
+                    <option value="{{ project.id }}" {% if request.GET.project == project.id|stringformat:'s' %}selected{% endif %}>{{ project.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-8 col-lg-4">
+                <label class="form-label" for="possible-task-conversion-filter">Conversão</label>
+                <select id="possible-task-conversion-filter" name="conversion" class="form-select">
+                    <option value="not_converted" {% if selected_conversion == 'not_converted' %}selected{% endif %}>Não convertidas</option>
+                    <option value="converted" {% if selected_conversion == 'converted' %}selected{% endif %}>Convertidas</option>
+                </select>
+            </div>
+            <div class="col-md-4 col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary" title="Filtrar">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+                <a href="{% url 'possible_task_list' %}?conversion=not_converted" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'possible_task_list' %}?conversion=not_converted" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         {% if possible_tasks %}
         <div class="vstack gap-3">
             {% for possible_task in possible_tasks %}
             <div
-                class="p-3 rounded-4 border
+                class="p-3 rounded-4 border position-relative
                     {% if possible_task.priority == possible_task.Priority.HIGH %}
                         border-danger bg-danger-subtle
                     {% elif possible_task.priority == possible_task.Priority.MEDIUM %}
@@ -41,6 +73,11 @@
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span class="badge text-bg-secondary">{{ possible_task.created_at|date:'d/m/Y H:i' }}</span>
+                            {% if possible_task.project %}
+                            <span class="badge text-bg-dark">{{ possible_task.project.title }}</span>
+                            {% else %}
+                            <span class="badge text-bg-light text-dark">Sem projeto</span>
+                            {% endif %}
                             <span
                                 class="badge
                                     {% if possible_task.priority == possible_task.Priority.HIGH %}
@@ -55,40 +92,28 @@
                             </span>
                         </div>
                         <h4 class="h5 mb-2" style="max-width: 78ch; overflow-wrap: anywhere;">{{ possible_task.title }}</h4>
-                        <button
-                            class="btn btn-sm mb-2
-                                {% if possible_task.priority == possible_task.Priority.HIGH %}
-                                    btn-danger
-                                {% elif possible_task.priority == possible_task.Priority.MEDIUM %}
-                                    btn-warning
-                                {% else %}
-                                    btn-success
-                                {% endif %}"
-                            type="button"
-                            title="Expandir ou recolher descrição"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#possible-task-description-{{ possible_task.id }}"
-                            aria-expanded="false"
-                            aria-controls="possible-task-description-{{ possible_task.id }}"
-                        >
-                            <i class="bi bi-chevron-down me-1"></i>Expandir descrição
-                        </button>
-                        <div class="collapse" id="possible-task-description-{{ possible_task.id }}">
-                            <div class="pt-2">
-                                <p class="mb-0">{{ possible_task.description }}</p>
-                            </div>
-                        </div>
                     </div>
-                    <div class="d-flex flex-wrap gap-2 align-items-start">
-                        {% if perms.tasks.add_task %}
-                        <a href="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-primary btn-sm" title="Virar tarefa" hx-get="{{ create_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-arrow-right-circle me-1"></i>Virar tarefa
-                        </a>
-                        {% endif %}
-                        {% if perms.recurring_tasks.add_recurringtask %}
-                        <a href="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" class="btn btn-outline-info btn-sm" title="Virar recorrente" hx-get="{{ create_recurring_task_base_url }}?description={{ possible_task.description|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-arrow-repeat me-1"></i>Virar recorrente
-                        </a>
+                    <div class="d-flex flex-wrap gap-2 align-items-start position-relative z-2">
+                        {% if possible_task.generated_object %}
+                        <span class="badge text-bg-success align-self-center">
+                            Virou {{ possible_task.generated_type_label|lower }}
+                        </span>
+                        {% else %}
+                            {% if perms.tasks.add_task %}
+                            <a href="{{ create_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-primary btn-sm" title="Virar tarefa" hx-get="{{ create_task_base_url }}?possible_task={{ possible_task.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Virar tarefa">
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </a>
+                            {% endif %}
+                            {% if perms.recurring_tasks.add_recurringtask %}
+                            <a href="{{ create_recurring_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-outline-info btn-sm" title="Virar recorrente" hx-get="{{ create_recurring_task_base_url }}?possible_task={{ possible_task.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Virar recorrente">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </a>
+                            {% endif %}
+                            {% if perms.project_tasks.add_projecttask %}
+                            <a href="{{ create_project_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-outline-primary btn-sm" title="Virar tarefa de projeto" hx-get="{{ create_project_task_base_url }}?possible_task={{ possible_task.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Virar tarefa de projeto">
+                                <i class="bi bi-kanban"></i>
+                            </a>
+                            {% endif %}
                         {% endif %}
                         {% if perms.possible_tasks.change_possibletask %}
                         <a href="{% url 'possible_task_update' possible_task.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'possible_task_update' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
@@ -102,14 +127,22 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if perms.possible_tasks.view_possibletask %}
+                <a href="{% url 'possible_task_detail' possible_task.id %}" class="stretched-link" title="Ver detalhes" hx-get="{% url 'possible_task_detail' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Ver detalhes da possível tarefa {{ possible_task.title }}"></a>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
         {% else %}
         <div class="text-center py-5">
             <div class="display-3 mb-3 text-muted"><i class="bi bi-lightbulb"></i></div>
+            {% if request.GET.project or request.GET.conversion %}
+            <h4 class="mb-2">Nenhuma possível tarefa encontrada</h4>
+            <p class="text-muted mb-0">Tente outro filtro ou limpe a seleção.</p>
+            {% else %}
             <h4 class="mb-2">Nenhuma possível tarefa ainda</h4>
             <p class="text-muted mb-0">Adicione uma ideia para transformar depois em tarefa ou recorrência.</p>
+            {% endif %}
         </div>
         {% endif %}
     </div>

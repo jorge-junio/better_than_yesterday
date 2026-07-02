@@ -1,4 +1,3 @@
-{% load task_extras %}
 <div data-page-title="{{ page_title }}">
 {% if message_error %}
 <div class="alert alert-danger mb-4">{{ message_error }}</div>
@@ -9,19 +8,40 @@
                 <div class="card-body">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
                         <div>
-                            <h2 class="h5 mb-1">Tarefas de hoje</h2>
-                            <p class="text-muted small mb-0">As tarefas ficam aqui, com ações rápidas para avançar sem ruído visual.</p>
+                            <h2 class="h5 mb-1">Tarefas do dia</h2>
+                            <p class="text-muted small mb-0">Selecione outro dia para revisar ou atualizar tarefas antigas sem sair desta tela.</p>
                         </div>
-                    <span class="badge text-bg-warning align-self-start align-self-md-center">{{ visible_pending_count }} pendentes</span>
+                        <span class="badge text-bg-warning align-self-start align-self-md-center">{{ visible_pending_count }} pendentes</span>
                     </div>
+
+                <div class="card border-0 shadow-sm mb-4 bg-body-tertiary">
+                    <div class="card-body">
+                        <form method="get" action="{% url 'task_today' %}" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-3 align-items-end">
+                            <div class="col-md-5 col-lg-4">
+                                <label class="form-label" for="task-today-date">Dia</label>
+                                <input
+                                    type="date"
+                                    id="task-today-date"
+                                    name="scheduled_date"
+                                    class="form-control"
+                                    value="{{ selected_date|date:'Y-m-d' }}"
+                                >
+                            </div>
+                            <div class="col-md-7 col-lg-8 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Filtrar</button>
+                                <a href="{% url 'task_today' %}" class="btn btn-outline-secondary" title="Voltar para hoje" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Hoje</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
                 <div class="mb-4">
                     <div class="d-flex flex-wrap gap-2">
                         <a
-                            href="{% url 'task_today' %}"
+                            href="{% url 'task_today' %}?scheduled_date={{ selected_date|date:'Y-m-d' }}"
                             class="btn btn-sm {% if not selected_category_id %}btn-primary{% else %}btn-outline-primary{% endif %}"
                             title="Ver todas as categorias"
-                            hx-get="{% url 'task_today' %}"
+                            hx-get="{% url 'task_today' %}?scheduled_date={{ selected_date|date:'Y-m-d' }}"
                             hx-target="#page-content"
                             hx-swap="innerHTML"
                             hx-push-url="true"
@@ -31,10 +51,10 @@
 
                         {% if has_uncategorized_tasks %}
                         <a
-                            href="{% url 'task_today' %}?category=none"
+                            href="{% url 'task_today' %}?scheduled_date={{ selected_date|date:'Y-m-d' }}&category=none"
                             class="btn btn-sm {% if selected_category_id == 'none' %}btn-primary{% else %}btn-outline-primary{% endif %}"
                             title="Ver tarefas sem categoria"
-                            hx-get="{% url 'task_today' %}?category=none"
+                            hx-get="{% url 'task_today' %}?scheduled_date={{ selected_date|date:'Y-m-d' }}&category=none"
                             hx-target="#page-content"
                             hx-swap="innerHTML"
                             hx-push-url="true"
@@ -45,10 +65,10 @@
 
                         {% for category in today_categories %}
                         <a
-                            href="{% url 'task_today' %}?category={{ category.id }}"
+                            href="{% url 'task_today' %}?scheduled_date={{ selected_date|date:'Y-m-d' }}&category={{ category.id }}"
                             class="btn btn-sm {% if selected_category_id == category.id|stringformat:'s' %}btn-primary{% else %}btn-outline-primary{% endif %}"
                             title="Filtrar por {{ category.name }}"
-                            hx-get="{% url 'task_today' %}?category={{ category.id }}"
+                            hx-get="{% url 'task_today' %}?scheduled_date={{ selected_date|date:'Y-m-d' }}&category={{ category.id }}"
                             hx-target="#page-content"
                             hx-swap="innerHTML"
                             hx-push-url="true"
@@ -84,11 +104,6 @@
                                         </div>
                                         <div class="d-flex flex-wrap align-items-center gap-2">
                                             <h5 class="h6 mb-0">{{ task.title }}</h5>
-                                            {% if task.started_in and not task.finished_in %}
-                                                <span class="badge text-bg-success-subtle text-success">Em andamento</span>
-                                            {% elif task.finished_in %}
-                                                <span class="badge text-bg-secondary-subtle text-secondary">Finalizada</span>
-                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="d-flex flex-wrap gap-2 align-items-start justify-content-xl-end">
@@ -96,23 +111,18 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         {% if perms.tasks.change_task %}
-                                            {% if not task.started_in and not task.finished_in %}
-                                            <form method="post" action="{% url 'task_today_start' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_start' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
+                                            {% if not task.completed_at and not task.is_skipped %}
+                                            <form method="post" action="{% url 'task_today_complete' task.id %}?scheduled_date={{ selected_date|date:'Y-m-d' }}{% if selected_category_id %}&category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_complete' task.id %}?scheduled_date={{ selected_date|date:'Y-m-d' }}{% if selected_category_id %}&category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-primary btn-sm" aria-label="Iniciar tarefa" title="Iniciar tarefa">
-                                                    <i class="bi bi-play-fill"></i>
+                                                <button type="submit" class="btn btn-success btn-sm" aria-label="Concluir tarefa" title="Concluir tarefa">
+                                                    <i class="bi bi-check2-circle"></i>
                                                 </button>
                                             </form>
                                             {% endif %}
-                                            {% if not task.finished_in %}
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#completeTaskModal-{{ task.id }}" aria-label="Concluir tarefa" title="Concluir tarefa">
-                                                <i class="bi bi-check2-circle"></i>
-                                            </button>
-                                            {% endif %}
-                                            {% if not task.finished_in %}
-                                            <form method="post" action="{% url 'task_today_skip' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_skip' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
+                                            {% if not task.completed_at and not task.is_skipped %}
+                                            <form method="post" action="{% url 'task_today_skip' task.id %}?scheduled_date={{ selected_date|date:'Y-m-d' }}{% if selected_category_id %}&category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_skip' task.id %}?scheduled_date={{ selected_date|date:'Y-m-d' }}{% if selected_category_id %}&category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML" class="m-0">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-light btn-sm" aria-label="Ignorar hoje" title="Ignorar hoje">
+                                                <button type="submit" class="btn btn-outline-light btn-sm" aria-label="Não vou cumprir hoje" title="Não vou cumprir hoje">
                                                     <i class="bi bi-x-circle"></i>
                                                 </button>
                                             </form>
@@ -122,77 +132,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal fade" id="completeTaskModal-{{ task.id }}" tabindex="-1" aria-labelledby="completeTaskModalLabel-{{ task.id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <form method="post" action="{% url 'task_today_complete' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-post="{% url 'task_today_complete' task.id %}{% if selected_category_id %}?category={{ selected_category_id }}{% endif %}" hx-target="#page-content" hx-swap="innerHTML">
-                                        {% csrf_token %}
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="completeTaskModalLabel-{{ task.id }}">Concluir tarefa</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p class="mb-3 text-muted small">Informe o tempo gasto nos campos abaixo. Se houver tempo estimado, ele preenche os campos automaticamente; caso contrário, tudo abre com <strong>0</strong>.</p>
-                                            <div class="row g-3">
-                                                <div class="col-4">
-                                                    <label for="timeSpentHours-{{ task.id }}" class="form-label">Horas</label>
-                                                    <input
-                                                        type="number"
-                                                        class="form-control"
-                                                        id="timeSpentHours-{{ task.id }}"
-                                                        name="time_spent_hours"
-                                                        min="0"
-                                                        step="1"
-                                                        value="{{ task.estimated_time|duration_part:'hours' }}"
-                                                    >
-                                                </div>
-                                                <div class="col-4">
-                                                    <label for="timeSpentMinutes-{{ task.id }}" class="form-label">Minutos</label>
-                                                    <input
-                                                        type="number"
-                                                        class="form-control"
-                                                        id="timeSpentMinutes-{{ task.id }}"
-                                                        name="time_spent_minutes"
-                                                        min="0"
-                                                        step="1"
-                                                        value="{{ task.estimated_time|duration_part:'minutes' }}"
-                                                    >
-                                                </div>
-                                                <div class="col-4">
-                                                    <label for="timeSpentSeconds-{{ task.id }}" class="form-label">Segundos</label>
-                                                    <input
-                                                        type="number"
-                                                        class="form-control"
-                                                        id="timeSpentSeconds-{{ task.id }}"
-                                                        name="time_spent_seconds"
-                                                        min="0"
-                                                        step="1"
-                                                        value="{{ task.estimated_time|duration_part:'seconds' }}"
-                                                    >
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-success" title="Concluir tarefa">
-                                                <i class="bi bi-check2-circle me-1"></i>Concluir
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
                         {% endfor %}
                     </div>
                 {% else %}
                     <div class="text-center py-5">
                         <div class="display-4 mb-3 text-success"><i class="bi bi-stars"></i></div>
-                        <h4 class="mb-2">Missão concluída</h4>
+                        <h4 class="mb-2">Nenhuma tarefa pendente neste dia</h4>
                         <p class="text-muted mb-0">
                             {% if skipped_count %}
-                                Você já concluiu ou ignorou todas as tarefas de hoje. Volte amanhã para a próxima rodada de XP.
+                                Você já concluiu ou ignorou todas as tarefas deste dia. Você pode escolher outra data acima.
                             {% else %}
-                                Você já fechou todas as tarefas de hoje. Volte amanhã para a próxima rodada de XP.
+                                Você já fechou todas as tarefas deste dia. Você pode escolher outra data acima.
                             {% endif %}
                         </p>
                     </div>

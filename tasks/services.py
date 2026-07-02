@@ -37,55 +37,32 @@ def ensure_tasks_for_date(target_date):
 
 
 @transaction.atomic
-def start_task(task):
-    now = timezone.now()
-    if task.started_in is None:
-        task.started_in = now
-        task.save(update_fields=['started_in', 'updated_at'])
-    return task
-
-
-@transaction.atomic
-def complete_task(task, time_spent=None, record_time_spent=True):
-    started_now = False
-    computed_time_spent = time_spent
+def complete_task(task):
     if task.is_skipped:
         task.skipped_in = None
     now = timezone.now()
-    if task.started_in is None:
-        task.started_in = now
-        started_now = True
-
-    if not task.is_completed:
-        if computed_time_spent is None and record_time_spent:
-            computed_time_spent = now - task.started_in if task.started_in is not None else timedelta(0)
-        task.is_completed = True
+    if task.completed_at is None:
         task.completed_at = now
-        task.finished_in = now
-        task.time_spent = computed_time_spent if record_time_spent else None
-        update_fields = ['is_completed', 'completed_at', 'finished_in', 'time_spent', 'updated_at']
-        if started_now:
-            update_fields.append('started_in')
-        if task.skipped_in is None:
-            update_fields.append('skipped_in')
-        task.save(update_fields=update_fields)
+    task.is_completed = True
+    update_fields = ['is_completed', 'completed_at', 'updated_at']
+    if task.skipped_in is None:
+        update_fields.append('skipped_in')
+    task.save(update_fields=update_fields)
     return task
 
 
 @transaction.atomic
 def reopen_task(task):
-    if task.is_completed:
-        task.is_completed = False
+    if task.completed_at is not None:
         task.completed_at = None
-        task.finished_in = None
-        task.time_spent = None
-        task.save(update_fields=['is_completed', 'completed_at', 'finished_in', 'time_spent', 'updated_at'])
+        task.is_completed = False
+        task.save(update_fields=['is_completed', 'completed_at', 'updated_at'])
     return task
 
 
 @transaction.atomic
 def skip_task_for_today(task):
-    if not task.is_completed and task.skipped_in is None:
+    if task.completed_at is None and task.skipped_in is None:
         task.skipped_in = timezone.now()
         task.save(update_fields=['skipped_in', 'updated_at'])
     return task
@@ -100,9 +77,17 @@ def postpone_task(task, days=1):
 
 def get_today_mission_ordering():
     return (
-        F('started_in').desc(nulls_last=True),
         F('priority').desc(nulls_last=True),
         'title',
+    )
+
+
+def filter_pending_tasks(queryset):
+    today = timezone.localdate()
+    return queryset.filter(
+        completed_at__isnull=True,
+        skipped_in__isnull=True,
+        scheduled_date=today,
     )
 
 
@@ -120,7 +105,7 @@ def get_completion_streak(reference_date=None, lookback_days=60):
                 continue
             break
 
-        completed = day_tasks.filter(is_completed=True).count()
+        completed = day_tasks.filter(completed_at__isnull=False).count()
         if completed != total:
             break
 
@@ -136,7 +121,7 @@ def get_today_mission_context(reference_date=None, category_id=None):
     all_tasks = Task.objects.filter(scheduled_date=reference_date).select_related('recurring_task', 'category')
     active_tasks = all_tasks.filter(skipped_in__isnull=True)
     skipped_tasks = all_tasks.filter(skipped_in__isnull=False)
-    pending_tasks = active_tasks.filter(is_completed=False)
+    pending_tasks = active_tasks.filter(completed_at__isnull=True)
 
     if category_id == 'none':
         pending_tasks = pending_tasks.filter(category__isnull=True)
@@ -145,16 +130,16 @@ def get_today_mission_context(reference_date=None, category_id=None):
 
     pending_tasks = pending_tasks.order_by(*get_today_mission_ordering())
     total_tasks = active_tasks.count()
-    completed_tasks = active_tasks.filter(is_completed=True).count()
+    completed_tasks = active_tasks.filter(completed_at__isnull=False).count()
     skipped_count = skipped_tasks.count()
-    pending_count = total_tasks - completed_tasks
+    pending_count = pending_tasks.count()
     visible_pending_count = pending_tasks.count()
     completion_rate = int((completed_tasks / total_tasks) * 100) if total_tasks else 0
     today_categories = Category.objects.filter(tasks__scheduled_date=reference_date).distinct().order_by('name')
     has_uncategorized_tasks = all_tasks.filter(category__isnull=True).exists()
 
     streak_days = get_completion_streak(reference_date=reference_date)
-    lifetime_completed = Task.objects.filter(is_completed=True).count()
+    lifetime_completed = Task.objects.filter(completed_at__isnull=False).count()
     total_xp = lifetime_completed * 15
     level = max(total_xp // 100 + 1, 1)
     xp_in_level = total_xp % 100

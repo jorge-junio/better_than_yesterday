@@ -8,7 +8,7 @@
         <div>
             <div class="text-uppercase small fw-semibold opacity-75">Dashboard de produtividade</div>
             <h1 class="display-6 mb-2">Visão geral de hoje e do período</h1>
-            <p class="mb-0 opacity-75">Acompanhe a conclusão diária, o comportamento por dia da semana e as pendências abertas no intervalo selecionado.</p>
+            <p class="mb-0 opacity-75">Acompanhe a conclusão diária, o comportamento por dia da semana e as tarefas abertas ou não concluídas no intervalo selecionado.</p>
         </div>
         <div class="text-lg-end">
             <div class="small opacity-75">Hoje</div>
@@ -46,8 +46,8 @@
     <div class="col-md-3">
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
-                <div class="text-muted">Conclusão no período</div>
-                <div class="display-6">{{ range_summary.completion_rate }}%</div>
+                <div class="text-muted">Não concluídas no período</div>
+                <div class="display-6">{{ range_summary.not_completed }}</div>
             </div>
         </div>
     </div>
@@ -178,7 +178,11 @@
                         <strong>{{ range_summary.completed }}</strong>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span>Pendentes</span>
+                        <span>Não concluídas no período</span>
+                        <strong>{{ range_summary.not_completed }}</strong>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Pendentes abertas</span>
                         <strong>{{ range_summary.pending }}</strong>
                     </div>
                 </div>

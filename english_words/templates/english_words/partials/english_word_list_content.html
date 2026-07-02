@@ -1,0 +1,75 @@
+<div data-page-title="{{ page_title }}">
+<div class="row mb-3">
+    <div class="col-lg-8">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0f766e 100%);">
+            <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
+                <i class="bi bi-translate"></i>
+            </div>
+            <div class="position-relative">
+                <div class="text-uppercase small fw-semibold opacity-75 mb-2">Vocabulário</div>
+                <h1 class="display-6 mb-2">Palavras em inglês</h1>
+                <p class="mb-0 opacity-75">Salve palavras, uma lista de significados e observações para consultar quando precisar.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if perms.english_words.add_englishword %}
+    <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
+        <a href="{% url 'english_word_create' %}" class="btn btn-success" title="Nova palavra em inglês" hx-get="{% url 'english_word_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <i class="bi bi-plus"></i> Nova palavra
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if english_words %}
+        <div class="vstack gap-3">
+            {% for english_word in english_words %}
+            <div class="p-3 rounded-4 border border-3 border-info bg-body-tertiary position-relative">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                    <div class="flex-grow-1">
+                        <h4 class="h5 mb-2">{{ english_word.word }}</h4>
+                        {% if english_word.meanings_text %}
+                        <ul class="mb-2 text-body-secondary ps-3">
+                            {% for meaning in english_word.meanings_text %}
+                            <li>{{ meaning }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% if english_word.note %}
+                        <p class="mb-0 small text-body-secondary">{{ english_word.note }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex gap-2 align-items-start position-relative z-2">
+                        {% if perms.english_words.change_englishword %}
+                        <a href="{% url 'english_word_update' english_word.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'english_word_update' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        {% endif %}
+                        {% if perms.english_words.delete_englishword %}
+                        <a href="{% url 'english_word_delete' english_word.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'english_word_delete' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if perms.english_words.view_englishword %}
+                <a href="{% url 'english_word_detail' english_word.id %}" class="stretched-link" title="Ver detalhes" hx-get="{% url 'english_word_detail' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Ver detalhes da palavra {{ english_word.word }}"></a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="display-3 mb-3 text-muted"><i class="bi bi-translate"></i></div>
+            <h4 class="mb-2">Nenhuma palavra ainda</h4>
+            <p class="text-muted mb-0">Cadastre sua primeira palavra em inglês para começar sua lista.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'components/_pagination.html' %}
+</div>

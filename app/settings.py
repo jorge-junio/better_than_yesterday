@@ -1,8 +1,8 @@
 from pathlib import Path
 from decouple import config
 import dj_database_url
-# from app.shared_apps import SHARED_APPS
-# from app.tenant_apps import TENANT_APPS
+from app.shared_apps import SHARED_APPS
+from app.tenant_apps import TENANT_APPS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,31 +17,11 @@ SECRET_KEY = 'django-insecure-$mwsyti#0_2c-r&anpilk3u620ya!44)-(bo1v!2d2gbo)d%!-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.meusite.localhost', '*', '192.168.0.5']
-
-TENANT_APPS = [
-    'django.contrib.auth',
-    'django.contrib.admin',
-    'django.contrib.sessions',
-
-    'categories',
-    'progress',
-    'projects',
-    'project_tasks',
-    'possible_tasks',
-    'recurring_tasks',
-    'tasks',
-]
-
-SHARED_APPS = [
-    'django.contrib.contenttypes',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
-    'django_tenants',
-
-    'tenants',
-]
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='.jjsistema.com,178.105.93.228,localhost,127.0.0.1',
+    cast=lambda value: [host.strip() for host in value.split(',') if host.strip()],
+)
 
 # Application definition
 INSTALLED_APPS = SHARED_APPS + TENANT_APPS
@@ -142,4 +122,17 @@ DATE_FORMAT = 'Y-m-d'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

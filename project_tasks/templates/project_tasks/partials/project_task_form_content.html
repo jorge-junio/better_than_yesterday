@@ -5,6 +5,9 @@
         <div class="card-body">
             <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-target="#page-content" hx-swap="innerHTML">
                 {% csrf_token %}
+                {% if possible_task_id %}
+                    <input type="hidden" name="possible_task_id" value="{{ possible_task_id }}">
+                {% endif %}
                 {% if form.non_field_errors %}
                     <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                 {% endif %}

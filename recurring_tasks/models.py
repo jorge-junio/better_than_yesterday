@@ -42,6 +42,14 @@ class RecurringTask(models.Model):
         related_name='recurring_tasks',
         verbose_name='categoria',
     )
+    origin_possible_task = models.OneToOneField(
+        'possible_tasks.PossibleTask',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='generated_recurring_task',
+        verbose_name='possível tarefa de origem',
+    )
     recurrence_type = models.CharField(
         max_length=20,
         choices=RecurrenceType.choices,

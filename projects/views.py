@@ -3,9 +3,9 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from app.utils import HtmxTemplateMixin, PageTitleMixin, htmx_redirect, is_htmx_request
+from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx_redirect, is_htmx_request
 
-from . import forms, models
+from . import forms, models, services
 
 
 class ProjectListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -16,6 +16,19 @@ class ProjectListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Per
     context_object_name = 'projects'
     paginate_by = 20
     permission_required = 'projects.view_project'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        title = self.request.GET.get('title')
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['default_project'] = services.get_default_project()
+        context['query_string'] = build_querystring(self.request, exclude={'page'})
+        return context
 
 
 class ProjectCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):

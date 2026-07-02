@@ -4,7 +4,11 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from app.utils import HtmxTemplateMixin, PageTitleMixin, htmx_redirect, is_htmx_request
+from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx_redirect, is_htmx_request
+from projects.models import Project
+from projects import services as project_services
+
+from possible_tasks import services as possible_task_services
 
 from . import forms, models, services
 
@@ -19,7 +23,26 @@ class ProjectTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin,
     permission_required = 'project_tasks.view_projecttask'
 
     def get_queryset(self):
-        return super().get_queryset().select_related('project').order_by('-priority', 'title')
+        queryset = super().get_queryset().select_related('project').order_by('-priority', 'title')
+        if 'project' in self.request.GET:
+            project_id = self.request.GET.get('project')
+        else:
+            default_project = project_services.get_default_project()
+            project_id = str(default_project.id) if default_project else None
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = Project.objects.order_by('title')
+        if 'project' in self.request.GET:
+            context['selected_project_id'] = self.request.GET.get('project') or ''
+        else:
+            default_project = project_services.get_default_project()
+            context['selected_project_id'] = str(default_project.id) if default_project else ''
+        context['query_string'] = build_querystring(self.request, exclude={'page'})
+        return context
 
 
 class ProjectTaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -36,15 +59,34 @@ class ProjectTaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixi
         context['page_heading'] = 'Cadastrar Tarefa de Projeto'
         context['submit_label'] = 'Salvar tarefa'
         context['cancel_url'] = reverse_lazy('project_task_list')
+        context['possible_task_id'] = self.request.GET.get('possible_task')
         return context
 
     def get_initial(self):
         initial = super().get_initial()
-        initial['project'] = self.request.GET.get('project')
+        project_id = self.request.GET.get('project')
+        possible_task_id = self.request.GET.get('possible_task')
+        if possible_task_id:
+            possible_task = possible_task_services.get_possible_task(possible_task_id)
+            initial['title'] = possible_task.title
+            initial['description'] = possible_task.description
+            initial['priority'] = possible_task.priority
+            if possible_task.project_id:
+                project_id = possible_task.project_id
+        if project_id:
+            initial['project'] = project_id
+        else:
+            default_project = project_services.get_default_project()
+            if default_project:
+                initial['project'] = default_project.pk
         return initial
 
     def form_valid(self, form):
+        possible_task_id = self.request.POST.get('possible_task_id')
+        possible_task = possible_task_services.get_possible_task(possible_task_id) if possible_task_id else None
         response = super().form_valid(form)
+        if possible_task:
+            possible_task_services.link_possible_task_to_generated_object(possible_task, self.object)
         if is_htmx_request(self.request):
             return htmx_redirect(self.get_success_url())
         return response
@@ -75,7 +117,11 @@ class ProjectTaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixi
         return context
 
     def form_valid(self, form):
+        possible_task_id = self.request.POST.get('possible_task_id')
+        possible_task = possible_task_services.get_possible_task(possible_task_id) if possible_task_id else None
         response = super().form_valid(form)
+        if possible_task:
+            possible_task_services.link_possible_task_to_generated_object(possible_task, self.object)
         if is_htmx_request(self.request):
             return htmx_redirect(self.get_success_url())
         return response

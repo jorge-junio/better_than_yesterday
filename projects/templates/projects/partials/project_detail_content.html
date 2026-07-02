@@ -4,6 +4,11 @@
     <div class="card">
         <div class="card-body">
             <h3 class="card-title">{{ object.title }}</h3>
+            {% if object.is_default %}
+            <div class="mb-2">
+                <span class="badge text-bg-success">Projeto padrão</span>
+            </div>
+            {% endif %}
             <p class="card-text">{{ object.description }}</p>
             <dl class="row">
                 <dt class="col-sm-3">Tarefas vinculadas</dt>

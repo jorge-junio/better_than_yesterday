@@ -23,14 +23,56 @@
             <span class="ms-1 sidebar-label">Dashboard</span>
           </a>
         </li>
+        {% if perms.english_words.view_englishword or perms.evaluations.view_evaluation %}
+        <li class="w-100 mt-2">
+          <button
+            id="sidebarEnglishToggle"
+            class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'english_word_list' or request.resolver_match.url_name == 'english_word_create' or request.resolver_match.url_name == 'english_word_detail' or request.resolver_match.url_name == 'english_word_update' or request.resolver_match.url_name == 'english_word_delete' or request.resolver_match.url_name == 'evaluation_list' or request.resolver_match.url_name == 'evaluation_create' or request.resolver_match.url_name == 'evaluation_quiz' or request.resolver_match.url_name == 'evaluation_detail' or request.resolver_match.url_name == 'evaluation_update' or request.resolver_match.url_name == 'evaluation_delete' %}active{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarEnglishGroup"
+            aria-expanded="{% if request.resolver_match.url_name == 'english_word_list' or request.resolver_match.url_name == 'english_word_create' or request.resolver_match.url_name == 'english_word_detail' or request.resolver_match.url_name == 'english_word_update' or request.resolver_match.url_name == 'english_word_delete' or request.resolver_match.url_name == 'evaluation_list' or request.resolver_match.url_name == 'evaluation_create' or request.resolver_match.url_name == 'evaluation_quiz' or request.resolver_match.url_name == 'evaluation_detail' or request.resolver_match.url_name == 'evaluation_update' or request.resolver_match.url_name == 'evaluation_delete' %}true{% else %}false{% endif %}"
+            aria-controls="sidebarEnglishGroup"
+          >
+            <span class="d-inline-flex align-items-center">
+              <i class="bi bi-book fs-4"></i>
+              <span class="ms-1 sidebar-label fw-semibold">Inglês</span>
+            </span>
+            <i class="bi bi-chevron-down small sidebar-label"></i>
+          </button>
+          <div
+            class="collapse {% if request.resolver_match.url_name == 'english_word_list' or request.resolver_match.url_name == 'english_word_create' or request.resolver_match.url_name == 'english_word_detail' or request.resolver_match.url_name == 'english_word_update' or request.resolver_match.url_name == 'english_word_delete' or request.resolver_match.url_name == 'evaluation_list' or request.resolver_match.url_name == 'evaluation_create' or request.resolver_match.url_name == 'evaluation_quiz' or request.resolver_match.url_name == 'evaluation_detail' or request.resolver_match.url_name == 'evaluation_update' or request.resolver_match.url_name == 'evaluation_delete' %}show{% endif %} w-100"
+            id="sidebarEnglishGroup"
+          >
+            <ul class="nav flex-column align-items-start w-100 ms-3 ps-2 border-start border-secondary border-opacity-25">
+              {% if perms.english_words.view_englishword %}
+                <li class="w-100">
+                  <a href="{% url 'english_word_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'english_word_list' %}active{% endif %}" hx-get="{% url 'english_word_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'english_word_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-book fs-5"></i>
+                    <span class="ms-1 sidebar-label">Palavras</span>
+                  </a>
+                </li>
+              {% endif %}
+              {% if perms.evaluations.view_evaluation %}
+                <li class="w-100">
+                  <a href="{% url 'evaluation_list' %}" class="nav-link sidebar-nav-link px-0 align-middle {% if request.resolver_match.url_name == 'evaluation_list' %}active{% endif %}" hx-get="{% url 'evaluation_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" {% if request.resolver_match.url_name == 'evaluation_list' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-clipboard-check fs-5"></i>
+                    <span class="ms-1 sidebar-label">Avaliações</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </li>
+        {% endif %}
         <li class="w-100 mt-2">
           <button
             id="sidebarTasksToggle"
-            class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_start' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}active{% endif %}"
+            class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}active{% endif %}"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#sidebarTasksGroup"
-            aria-expanded="{% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_start' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}true{% else %}false{% endif %}"
+            aria-expanded="{% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}true{% else %}false{% endif %}"
             aria-controls="sidebarTasksGroup"
           >
             <span class="d-inline-flex align-items-center">
@@ -40,7 +82,7 @@
             <i class="bi bi-chevron-down small sidebar-label"></i>
           </button>
           <div
-            class="collapse {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_start' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}show{% endif %} w-100"
+            class="collapse {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}show{% endif %} w-100"
             id="sidebarTasksGroup"
           >
             <ul class="nav flex-column align-items-start w-100 ms-3 ps-2 border-start border-secondary border-opacity-25">

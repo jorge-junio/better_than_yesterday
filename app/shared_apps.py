@@ -1,10 +1,8 @@
 SHARED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+    'django_tenants',
+    'tenants',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    'tenant'
 ]

@@ -1,0 +1,98 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">{{ page_heading }}</h3>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="{{ request.get_full_path }}" hx-post="{{ request.get_full_path }}" hx-target="#page-content" hx-swap="innerHTML">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                {% if editor_mode %}
+                <div class="mb-3">
+                    <label class="form-label">Significados</label>
+                    <div id="meanings-list" class="vstack gap-2">
+                        {% for meaning in meanings_values %}
+                        <div class="d-flex gap-2 align-items-start meaning-row">
+                            <input type="text" name="meanings" class="form-control text-uppercase" data-uppercase="true" value="{{ meaning }}" placeholder="Digite um significado">
+                            <button type="button" class="btn btn-outline-danger" data-remove-meaning title="Remover significado">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-meaning-btn" title="Adicionar significado">
+                        <i class="bi bi-plus"></i> Adicionar significado
+                    </button>
+                    <template id="meaning-row-template">
+                        <div class="d-flex gap-2 align-items-start meaning-row">
+                            <input type="text" name="meanings" class="form-control text-uppercase" data-uppercase="true" value="" placeholder="Digite um significado">
+                            <button type="button" class="btn btn-outline-danger" data-remove-meaning title="Remover significado">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+                <script>
+                    (function () {
+                        const list = document.getElementById('meanings-list');
+                        const addBtn = document.getElementById('add-meaning-btn');
+                        const template = document.getElementById('meaning-row-template');
+                        if (!list || !addBtn || !template || list.dataset.initialized === 'true') {
+                            return;
+                        }
+                        list.dataset.initialized = 'true';
+
+                        const ensureOneRow = () => {
+                            if (!list.querySelector('.meaning-row')) {
+                                list.appendChild(template.content.firstElementChild.cloneNode(true));
+                            }
+                        };
+
+                        const addRow = () => {
+                            list.appendChild(template.content.firstElementChild.cloneNode(true));
+                        };
+
+                        addBtn.addEventListener('click', addRow);
+                        list.addEventListener('click', (event) => {
+                            const removeButton = event.target.closest('[data-remove-meaning]');
+                            if (!removeButton) {
+                                return;
+                            }
+                            const row = removeButton.closest('.meaning-row');
+                            if (row) {
+                                row.remove();
+                            }
+                            ensureOneRow();
+                        });
+
+                        ensureOneRow();
+                    })();
+                </script>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary" title="{{ submit_label }}">{{ submit_label }}</button>
+                <a href="{{ cancel_url }}" class="btn btn-secondary ms-2" title="Cancelar" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+</div>

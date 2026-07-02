@@ -131,6 +131,29 @@
       indicator.classList.toggle('d-none', !visible);
     };
 
+    window.BTY.applyUppercaseMask = function (root) {
+      const scope = root && root.querySelectorAll ? root : document;
+      const fields = [];
+
+      if (scope.matches && scope.matches('[data-uppercase]')) {
+        fields.push(scope);
+      }
+
+      scope.querySelectorAll('[data-uppercase]').forEach((field) => {
+        fields.push(field);
+      });
+
+      fields.forEach((field) => {
+        if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+          return;
+        }
+        const uppercased = field.value.toUpperCase();
+        if (field.value !== uppercased) {
+          field.value = uppercased;
+        }
+      });
+    };
+
     window.BTY.syncDashboardRefresh = function () {
       const refreshTarget = document.getElementById('dashboard-refresh');
       if (!refreshTarget) {
@@ -183,6 +206,34 @@
         applyState(!document.body.classList.contains('sidebar-collapsed'));
       };
     };
+
+    document.addEventListener('input', function (event) {
+      const field = event.target;
+      if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+        return;
+      }
+      if (!field.matches('[data-uppercase]')) {
+        return;
+      }
+
+      const selectionStart = field.selectionStart;
+      const selectionEnd = field.selectionEnd;
+      const uppercased = field.value.toUpperCase();
+      if (field.value !== uppercased) {
+        field.value = uppercased;
+        if (selectionStart !== null && selectionEnd !== null && typeof field.setSelectionRange === 'function') {
+          field.setSelectionRange(selectionStart, selectionEnd);
+        }
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      window.BTY.applyUppercaseMask(document);
+    });
+
+    document.addEventListener('htmx:afterSwap', function (event) {
+      window.BTY.applyUppercaseMask(event.target);
+    });
 
     window.BTY.syncSidebarActive = function () {
       const sidebar = document.getElementById('sidebar-column');
@@ -319,7 +370,11 @@
           labels: todayChartData.labels,
           datasets: [{
             data: todayChartData.values,
-            backgroundColor: ['rgba(34, 197, 94, 0.9)', 'rgba(239, 68, 68, 0.9)'],
+            backgroundColor: [
+              'rgba(34, 197, 94, 0.9)',
+              'rgba(245, 158, 11, 0.9)',
+              'rgba(239, 68, 68, 0.9)',
+            ],
             borderWidth: 0,
           }],
         },
@@ -337,7 +392,11 @@
           labels: rangeChartData.labels,
           datasets: [{
             data: rangeChartData.values,
-            backgroundColor: ['rgba(59, 130, 246, 0.9)', 'rgba(245, 158, 11, 0.9)'],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.9)',
+              'rgba(245, 158, 11, 0.9)',
+              'rgba(239, 68, 68, 0.9)',
+            ],
             borderWidth: 0,
           }],
         },

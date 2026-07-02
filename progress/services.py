@@ -5,6 +5,7 @@ from django.db.models.functions import ExtractIsoWeekDay
 from django.utils import timezone
 
 from tasks.models import Task
+from tasks.services import filter_pending_tasks
 
 
 WEEKDAY_LABELS = {
@@ -32,8 +33,9 @@ def get_today_summary(reference_date=None):
     reference_date = reference_date or timezone.localdate()
     queryset = Task.objects.filter(scheduled_date=reference_date)
     total = queryset.count()
-    completed = queryset.filter(is_completed=True).count()
-    pending = total - completed
+    completed = queryset.filter(completed_at__isnull=False).count()
+    pending = filter_pending_tasks(queryset).count()
+    not_completed = queryset.filter(completed_at__isnull=True, skipped_in__isnull=False).count()
     completion_rate = int((completed / total) * 100) if total else 0
 
     return {
@@ -41,6 +43,7 @@ def get_today_summary(reference_date=None):
         'total': total,
         'completed': completed,
         'pending': pending,
+        'not_completed': not_completed,
         'completion_rate': completion_rate,
     }
 
@@ -69,13 +72,20 @@ def build_weekday_productivity(rows):
     return summary
 
 
-def get_range_summary(start_date=None, end_date=None):
+def get_range_summary(start_date=None, end_date=None, reference_date=None):
     start_date, end_date = normalize_range(start_date, end_date)
+    reference_date = reference_date or timezone.localdate()
     queryset = Task.objects.filter(scheduled_date__range=(start_date, end_date))
 
     total = queryset.count()
-    completed = queryset.filter(is_completed=True).count()
-    pending = total - completed
+    completed = queryset.filter(completed_at__isnull=False).count()
+    pending = filter_pending_tasks(queryset).count()
+    not_completed = queryset.filter(
+        (
+            Q(completed_at__isnull=True, skipped_in__isnull=True, scheduled_date__lt=reference_date)
+            | Q(skipped_in__isnull=False, scheduled_date__lte=reference_date)
+        )
+    ).count()
     completion_rate = int((completed / total) * 100) if total else 0
 
     weekday_rows = (
@@ -83,18 +93,19 @@ def get_range_summary(start_date=None, end_date=None):
         .values('weekday')
         .annotate(
             total=Count('id'),
-            completed=Count('id', filter=Q(is_completed=True)),
+            completed=Count('id', filter=Q(completed_at__isnull=False)),
         )
         .order_by('weekday')
     )
 
-    pending_tasks = queryset.filter(is_completed=False).select_related('recurring_task', 'category')
+    pending_tasks = filter_pending_tasks(queryset).select_related('recurring_task', 'category')
 
     return {
         'start_date': start_date,
         'end_date': end_date,
         'total': total,
         'completed': completed,
+        'not_completed': not_completed,
         'pending': pending,
         'completion_rate': completion_rate,
         'weekday_productivity': build_weekday_productivity(list(weekday_rows)),
@@ -105,18 +116,18 @@ def get_range_summary(start_date=None, end_date=None):
 def get_dashboard_context(start_date=None, end_date=None, reference_date=None):
     reference_date = reference_date or timezone.localdate()
     today_summary = get_today_summary(reference_date=reference_date)
-    range_summary = get_range_summary(start_date, end_date)
+    range_summary = get_range_summary(start_date, end_date, reference_date=reference_date)
 
     return {
         'today_summary': today_summary,
         'range_summary': range_summary,
         'completion_chart_data': {
-            'labels': ['Concluídas', 'Pendentes'],
-            'values': [today_summary['completed'], today_summary['pending']],
+            'labels': ['Concluídas', 'Pendentes', 'Não concluídas'],
+            'values': [today_summary['completed'], today_summary['pending'], today_summary['not_completed']],
         },
         'range_status_chart_data': {
-            'labels': ['Concluídas', 'Pendentes'],
-            'values': [range_summary['completed'], range_summary['pending']],
+            'labels': ['Concluídas', 'Pendentes abertas', 'Não concluídas'],
+            'values': [range_summary['completed'], range_summary['pending'], range_summary['not_completed']],
         },
         'weekday_chart_data': {
             'labels': [item['label'] for item in range_summary['weekday_productivity']],

@@ -27,14 +27,11 @@
                     {% endif %}
                 </dd>
 
-                <dt class="col-sm-3">Iniciada em</dt>
-                <dd class="col-sm-9">{{ object.started_in|default:'-' }}</dd>
-
-                <dt class="col-sm-3">Tempo gasto</dt>
-                <dd class="col-sm-9">{{ object.time_spent_display }}</dd>
-
                 <dt class="col-sm-3">Concluída em</dt>
-                <dd class="col-sm-9">{{ object.finished_in|default:'-' }}</dd>
+                <dd class="col-sm-9">{{ object.completed_at|default:'-' }}</dd>
+
+                <dt class="col-sm-3">Não cumprida hoje</dt>
+                <dd class="col-sm-9">{% if object.is_skipped %}Sim{% else %}Não{% endif %}</dd>
 
                 <dt class="col-sm-3">Prioridade</dt>
                 <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
@@ -42,12 +39,19 @@
                 <dt class="col-sm-3">Origem</dt>
                 <dd class="col-sm-9">{{ object.get_source_type_display }}</dd>
 
+                {% if object.origin_possible_task %}
+                <dt class="col-sm-3">Possível tarefa</dt>
+                <dd class="col-sm-9">
+                    {{ object.origin_possible_task.title }}
+                </dd>
+                {% endif %}
+
                 <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">{% if object.is_completed %}Concluída{% else %}Pendente{% endif %}</dd>
+                <dd class="col-sm-9">{% if object.completed_at %}Concluída{% else %}Pendente{% endif %}</dd>
             </dl>
 
             <div class="alert alert-info mb-0">
-                Todas as tarefas podem ser iniciadas ou concluídas diretamente. Ao concluir sem iniciar, o início e a finalização ficam iguais.
+                As tarefas agora são concluídas com um único clique. Se necessário, você pode marcar que não vai cumprir no dia.
             </div>
         </div>
     </div>

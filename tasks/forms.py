@@ -7,14 +7,6 @@ from . import models
 
 
 class TaskForm(forms.ModelForm):
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.order_by('name'),
-        required=False,
-        empty_label='Sem categoria',
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label='Categoria',
-    )
-
     class Meta:
         model = models.Task
         fields = [
@@ -24,7 +16,6 @@ class TaskForm(forms.ModelForm):
             'scheduled_date',
             'scheduled_time',
             'priority',
-            'category',
             'is_completed',
         ]
         widgets = {
@@ -45,7 +36,6 @@ class TaskForm(forms.ModelForm):
             'scheduled_date': 'Data',
             'scheduled_time': 'Horário',
             'priority': 'Prioridade',
-            'category': 'Categoria',
             'is_completed': 'Concluída',
         }
 
@@ -57,6 +47,16 @@ class TaskFilterForm(forms.Form):
         PENDING = 'pending', 'Pendentes'
         POSTPONED = 'postponed', 'Adiadas'
 
+    title = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Título',
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Descrição',
+    )
     scheduled_date = forms.DateField(
         required=False,
         widget=forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),

@@ -5,6 +5,6 @@ from . import models
 
 @admin.register(models.PossibleTask)
 class PossibleTaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'description', 'created_at', 'updated_at')
-    search_fields = ('title', 'description')
+    list_display = ('id', 'title', 'project', 'description', 'created_at', 'updated_at')
+    search_fields = ('title', 'description', 'project__title')
     ordering = ('-created_at',)

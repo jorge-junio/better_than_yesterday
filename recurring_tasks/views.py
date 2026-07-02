@@ -5,6 +5,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 
 from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx_redirect, is_htmx_request
 from categories.models import Category
+from possible_tasks import services as possible_task_services
 
 from . import forms, models
 
@@ -61,15 +62,26 @@ class RecurringTaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMi
         context['page_heading'] = 'Cadastrar Tarefa Recorrente'
         context['submit_label'] = 'Salvar tarefa recorrente'
         context['cancel_url'] = reverse_lazy('recurring_task_list')
+        context['possible_task_id'] = self.request.GET.get('possible_task')
         return context
 
     def get_initial(self):
         initial = super().get_initial()
         initial['description'] = self.request.GET.get('description', '')
+        possible_task_id = self.request.GET.get('possible_task')
+        if possible_task_id:
+            possible_task = possible_task_services.get_possible_task(possible_task_id)
+            initial['name'] = possible_task.title
+            initial['description'] = possible_task.description
+            initial['priority'] = possible_task.priority
         return initial
 
     def form_valid(self, form):
+        possible_task_id = self.request.POST.get('possible_task_id')
+        possible_task = possible_task_services.get_possible_task(possible_task_id) if possible_task_id else None
         response = super().form_valid(form)
+        if possible_task:
+            possible_task_services.link_possible_task_to_generated_object(possible_task, self.object)
         if is_htmx_request(self.request):
             return htmx_redirect(self.get_success_url())
         return response
@@ -102,7 +114,11 @@ class RecurringTaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMi
         return context
 
     def form_valid(self, form):
+        possible_task_id = self.request.POST.get('possible_task_id')
+        possible_task = possible_task_services.get_possible_task(possible_task_id) if possible_task_id else None
         response = super().form_valid(form)
+        if possible_task:
+            possible_task_services.link_possible_task_to_generated_object(possible_task, self.object)
         if is_htmx_request(self.request):
             return htmx_redirect(self.get_success_url())
         return response

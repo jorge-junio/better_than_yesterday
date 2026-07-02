@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from urllib.parse import urlencode
-
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,39 +10,35 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, T
 
 from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx_redirect, is_htmx_request
 
+from possible_tasks import services as possible_task_services
+
 from . import forms, models, services
 
 
-def parse_time_spent_parts(post_data):
-    values = {}
-    for key in ('hours', 'minutes', 'seconds'):
-        raw_value = (post_data.get(f'time_spent_{key}') or '0').strip()
-        try:
-            parsed_value = int(raw_value)
-        except ValueError:
-            return None, 'Use apenas números inteiros nos campos de tempo.'
-
-        if parsed_value < 0:
-            return None, 'Os campos de tempo não podem ser negativos.'
-
-        values[key] = parsed_value
-
-    return timedelta(
-        hours=values['hours'],
-        minutes=values['minutes'],
-        seconds=values['seconds'],
-    ), None
+def get_today_reference_date(request):
+    raw_date = request.GET.get('scheduled_date') or request.POST.get('scheduled_date')
+    if not raw_date:
+        return timezone.localdate()
+    try:
+        return datetime.strptime(raw_date, '%Y-%m-%d').date()
+    except ValueError as exc:
+        raise Http404('Data inválida.') from exc
 
 
 def get_today_category_id(request):
     return request.GET.get('category') or request.POST.get('category')
 
 
-def build_task_today_url(category_id=None):
+def build_task_today_url(scheduled_date=None, category_id=None):
     base_url = reverse_lazy('task_today')
-    if not category_id:
+    params = {}
+    if scheduled_date:
+        params['scheduled_date'] = scheduled_date.isoformat()
+    if category_id:
+        params['category'] = category_id
+    if not params:
         return str(base_url)
-    return f"{base_url}?{urlencode({'category': category_id})}"
+    return f"{base_url}?{urlencode(params)}"
 
 
 class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -69,13 +64,21 @@ class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permis
         services.ensure_tasks_for_date(selected_date)
 
         queryset = super().get_queryset().filter(scheduled_date=selected_date)
+        title = self.request.GET.get('title')
+        description = self.request.GET.get('description')
         status = self.request.GET.get('status') or forms.TaskFilterForm.StatusChoices.ALL
         category_id = self.request.GET.get('category')
 
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+
+        if description:
+            queryset = queryset.filter(description__icontains=description)
+
         if status == forms.TaskFilterForm.StatusChoices.COMPLETED:
-            queryset = queryset.filter(is_completed=True)
+            queryset = queryset.filter(completed_at__isnull=False)
         elif status == forms.TaskFilterForm.StatusChoices.PENDING:
-            queryset = queryset.filter(is_completed=False, skipped_in__isnull=True)
+            queryset = services.filter_pending_tasks(queryset)
         elif status == forms.TaskFilterForm.StatusChoices.POSTPONED:
             queryset = queryset.filter(skipped_in__isnull=False)
         else:
@@ -92,7 +95,7 @@ class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permis
         total = models.Task.objects.filter(scheduled_date=selected_date).count()
         completed = models.Task.objects.filter(
             scheduled_date=selected_date,
-            is_completed=True,
+            completed_at__isnull=False,
         ).count()
 
         context['selected_date'] = selected_date
@@ -100,6 +103,8 @@ class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permis
         context['completed_tasks'] = completed
         context['completion_rate'] = int((completed / total) * 100) if total else 0
         context['filter_form'] = forms.TaskFilterForm(self.request.GET or None, initial={
+            'title': self.request.GET.get('title') or '',
+            'description': self.request.GET.get('description') or '',
             'scheduled_date': selected_date,
             'status': self.request.GET.get('status') or forms.TaskFilterForm.StatusChoices.ALL,
             'category': self.request.GET.get('category') or '',
@@ -116,7 +121,12 @@ class TaskTodayView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(services.get_today_mission_context(category_id=get_today_category_id(self.request)))
+        reference_date = get_today_reference_date(self.request)
+        context.update(services.get_today_mission_context(
+            reference_date=reference_date,
+            category_id=get_today_category_id(self.request),
+        ))
+        context['selected_date'] = reference_date
         return context
 
 
@@ -134,18 +144,29 @@ class TaskCreateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
         context['page_heading'] = 'Cadastrar Tarefa'
         context['submit_label'] = 'Salvar'
         context['cancel_url'] = reverse_lazy('task_list')
+        context['possible_task_id'] = self.request.GET.get('possible_task')
         return context
 
     def get_initial(self):
         initial = super().get_initial()
         initial['scheduled_date'] = timezone.localdate()
         initial['description'] = self.request.GET.get('description', '')
+        possible_task_id = self.request.GET.get('possible_task')
+        if possible_task_id:
+            possible_task = possible_task_services.get_possible_task(possible_task_id)
+            initial['title'] = possible_task.title
+            initial['description'] = possible_task.description
+            initial['priority'] = possible_task.priority
         return initial
 
     def form_valid(self, form):
         form.instance.source_type = models.Task.SourceType.MANUAL
         form.instance.recurring_task = None
+        possible_task_id = self.request.POST.get('possible_task_id')
+        possible_task = possible_task_services.get_possible_task(possible_task_id) if possible_task_id else None
         response = super().form_valid(form)
+        if possible_task:
+            possible_task_services.link_possible_task_to_generated_object(possible_task, self.object)
         if is_htmx_request(self.request):
             return htmx_redirect(self.get_success_url())
         return response
@@ -212,7 +233,7 @@ class TaskToggleCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, pk):
         task = get_object_or_404(models.Task, pk=pk)
-        if task.is_completed:
+        if task.completed_at is not None:
             services.reopen_task(task)
         else:
             services.complete_task(task)
@@ -245,53 +266,25 @@ class TaskTodayCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = 'tasks.change_task'
 
     def post(self, request, pk):
-        reference_date = timezone.localdate()
+        reference_date = get_today_reference_date(request)
         category_id = get_today_category_id(request)
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
-        parsed_time_spent, error_message = parse_time_spent_parts(request.POST)
-        if error_message:
-            context = services.get_today_mission_context(reference_date=reference_date, category_id=category_id)
-            context['page_title'] = 'BTY - Missão do Dia'
-            context['message_error'] = error_message
-            if is_htmx_request(request):
-                return render(request, 'tasks/partials/today_mission_content.html', context)
-            return redirect(build_task_today_url(category_id))
-
-        services.complete_task(
-            task,
-            time_spent=parsed_time_spent,
-        )
+        services.complete_task(task)
 
         if is_htmx_request(request):
             context = services.get_today_mission_context(reference_date=reference_date, category_id=category_id)
             context['page_title'] = 'BTY - Missão do Dia'
+            context['selected_date'] = reference_date
             return render(request, 'tasks/partials/today_mission_content.html', context)
 
-        return redirect(build_task_today_url(category_id))
-
-
-class TaskTodayStartView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'tasks.change_task'
-
-    def post(self, request, pk):
-        reference_date = timezone.localdate()
-        category_id = get_today_category_id(request)
-        task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
-        services.start_task(task)
-
-        if is_htmx_request(request):
-            context = services.get_today_mission_context(reference_date=reference_date, category_id=category_id)
-            context['page_title'] = 'BTY - Missão do Dia'
-            return render(request, 'tasks/partials/today_mission_content.html', context)
-
-        return redirect(build_task_today_url(category_id))
+        return redirect(build_task_today_url(reference_date, category_id))
 
 
 class TaskTodaySkipView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = 'tasks.change_task'
 
     def post(self, request, pk):
-        reference_date = timezone.localdate()
+        reference_date = get_today_reference_date(request)
         category_id = get_today_category_id(request)
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
         services.skip_task_for_today(task)
@@ -299,6 +292,7 @@ class TaskTodaySkipView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if is_htmx_request(request):
             context = services.get_today_mission_context(reference_date=reference_date, category_id=category_id)
             context['page_title'] = 'BTY - Missão do Dia'
+            context['selected_date'] = reference_date
             return render(request, 'tasks/partials/today_mission_content.html', context)
 
-        return redirect(build_task_today_url(category_id))
+        return redirect(build_task_today_url(reference_date, category_id))

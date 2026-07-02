@@ -9,3 +9,4 @@ pycodestyle==2.14.0
 pyflakes==3.4.0
 python-decouple==3.8
 sqlparse==0.5.5
+whitenoise==6.7.0

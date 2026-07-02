@@ -10,9 +10,15 @@
                 {% endif %}
 
                 {% for field in form %}
+                    {% if field.name == 'is_default' %}
+                    <div class="mb-3 form-check">
+                        {{ field }}
+                        {{ field.label_tag }}
+                    {% else %}
                     <div class="mb-3">
                         {{ field.label_tag }}
                         {{ field }}
+                    {% endif %}
                         {% if field.help_text %}
                             <div class="form-text">{{ field.help_text }}</div>
                         {% endif %}

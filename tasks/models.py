@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 
 class Task(models.Model):
@@ -44,11 +45,16 @@ class Task(models.Model):
         related_name='generated_tasks',
         verbose_name='tarefa recorrente',
     )
+    origin_possible_task = models.OneToOneField(
+        'possible_tasks.PossibleTask',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='generated_task',
+        verbose_name='possível tarefa de origem',
+    )
     is_completed = models.BooleanField(default=False, verbose_name='concluída')
-    started_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='iniciada em')
     completed_at = models.DateTimeField(null=True, blank=True, verbose_name='concluída em')
-    finished_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='finalizada em')
-    time_spent = models.DurationField(null=True, blank=True, editable=False, verbose_name='tempo gasto')
     skipped_in = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='ignorada em')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -78,21 +84,12 @@ class Task(models.Model):
 
     @property
     def is_pending(self):
-        return not self.is_completed and self.skipped_in is None
+        if self.completed_at is not None or self.skipped_in is not None:
+            return False
+
+        today = timezone.localdate()
+        return self.scheduled_date == today
 
     @property
     def is_skipped(self):
         return self.skipped_in is not None
-
-    @property
-    def time_spent_display(self):
-        duration = self.time_spent
-        if duration is None:
-            return '-'
-
-        total_seconds = int(duration.total_seconds())
-        sign = '-' if total_seconds < 0 else ''
-        total_seconds = abs(total_seconds)
-        hours, remainder = divmod(total_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        return f'{sign}{hours:02d}:{minutes:02d}:{seconds:02d}'

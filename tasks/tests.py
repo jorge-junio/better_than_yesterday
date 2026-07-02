@@ -1,5 +1,6 @@
-from datetime import date, datetime, timedelta, timezone as dt_timezone
+from datetime import date, timedelta
 from types import SimpleNamespace
+from unittest import mock
 from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
@@ -11,8 +12,8 @@ from app.utils import htmx_redirect
 from recurring_tasks.models import RecurringTask
 
 from .models import Task
-from .views import TaskCreateView, TaskTodayCompleteView, parse_time_spent_parts
-from .services import complete_task, ensure_tasks_for_date, get_today_mission_ordering, reopen_task, skip_task_for_today, start_task
+from .views import TaskCreateView, TaskListView, TaskTodayCompleteView
+from .services import complete_task, ensure_tasks_for_date, get_today_mission_ordering, reopen_task, skip_task_for_today
 from .templatetags.task_extras import duration_part
 
 
@@ -23,8 +24,18 @@ class TaskModelTests(SimpleTestCase):
             scheduled_date=date(2026, 4, 22),
         )
 
-        self.assertTrue(task.is_pending)
+        with patch('tasks.models.timezone.localdate', return_value=date(2026, 4, 22)):
+            self.assertTrue(task.is_pending)
         self.assertEqual(task.priority, Task.Priority.LOW)
+
+    def test_task_after_tomorrow_is_not_pending(self):
+        task = Task(
+            title='Comprar pão',
+            scheduled_date=date(2026, 4, 24),
+        )
+
+        with patch('tasks.models.timezone.localdate', return_value=date(2026, 4, 22)):
+            self.assertFalse(task.is_pending)
 
     def test_recurrent_task_requires_recurring_origin(self):
         task = Task(
@@ -36,66 +47,18 @@ class TaskModelTests(SimpleTestCase):
         with self.assertRaises(ValidationError):
             task.clean()
 
-    def test_complete_without_starting_sets_same_start_and_finish(self):
+    def test_complete_task_marks_completed(self):
         task = Task(
             title='Ler um capítulo',
             scheduled_date=date(2026, 4, 22),
         )
 
-        with patch.object(Task, 'save') as save_mock:
+        with patch.object(Task, 'save') as save_mock, patch('tasks.services.timezone.now') as now_mock:
+            now_mock.return_value = timezone.now()
             getattr(complete_task, '__wrapped__', complete_task)(task)
 
         self.assertTrue(task.is_completed)
-        self.assertIsNotNone(task.started_in)
-        self.assertIsNotNone(task.finished_in)
-        self.assertEqual(task.started_in, task.finished_in)
-        self.assertEqual(task.time_spent, timedelta(0))
-        save_mock.assert_called_once()
-
-    def test_task_completes_with_start_time_when_missing(self):
-        task = Task(
-            title='Estudar',
-            scheduled_date=date(2026, 4, 22),
-        )
-
-        started_at = datetime(2026, 4, 22, 10, 0, tzinfo=dt_timezone.utc)
-        finished_at = datetime(2026, 4, 22, 11, 30, 15, tzinfo=dt_timezone.utc)
-
-        with patch('tasks.services.timezone.now', side_effect=[started_at, finished_at]), patch.object(Task, 'save') as save_mock:
-            getattr(complete_task, '__wrapped__', complete_task)(task)
-
-        self.assertTrue(task.is_completed)
-        self.assertIsNotNone(task.started_in)
-        self.assertIsNotNone(task.finished_in)
-        self.assertEqual(task.time_spent, timedelta(hours=1, minutes=30, seconds=15))
-        save_mock.assert_called_once()
-
-    def test_task_completes_with_explicit_time_spent(self):
-        task = Task(
-            title='Estudar',
-            scheduled_date=date(2026, 4, 22),
-        )
-
-        with patch('tasks.services.timezone.now', side_effect=[
-            datetime(2026, 4, 22, 10, 0, tzinfo=dt_timezone.utc),
-            datetime(2026, 4, 22, 10, 10, tzinfo=dt_timezone.utc),
-        ]), patch.object(Task, 'save') as save_mock:
-            getattr(complete_task, '__wrapped__', complete_task)(task, time_spent=timedelta(minutes=7, seconds=30))
-
-        self.assertTrue(task.is_completed)
-        self.assertEqual(task.time_spent, timedelta(minutes=7, seconds=30))
-        save_mock.assert_called_once()
-
-    def test_start_task_sets_started_time_when_missing(self):
-        task = Task(
-            title='Escrever meta',
-            scheduled_date=date(2026, 4, 22),
-        )
-
-        with patch.object(Task, 'save') as save_mock:
-            getattr(start_task, '__wrapped__', start_task)(task)
-
-        self.assertIsNotNone(task.started_in)
+        self.assertIsNotNone(task.completed_at)
         save_mock.assert_called_once()
 
     def test_skip_task_for_today_marks_skip_flag(self):
@@ -122,18 +85,15 @@ class TaskModelTests(SimpleTestCase):
 
         self.assertIsNone(task.skipped_in)
         self.assertTrue(task.is_completed)
-        self.assertIsNotNone(task.started_in)
-        self.assertEqual(task.started_in, task.finished_in)
+        self.assertIsNotNone(task.completed_at)
         save_mock.assert_called_once()
 
-    def test_reopen_task_clears_completion_and_time_spent(self):
+    def test_reopen_task_clears_completion(self):
         task = Task(
             title='Treino',
             scheduled_date=date(2026, 4, 22),
             is_completed=True,
             completed_at=timezone.now(),
-            finished_in=timezone.now(),
-            time_spent=timedelta(minutes=42),
         )
 
         with patch.object(Task, 'save') as save_mock:
@@ -141,8 +101,6 @@ class TaskModelTests(SimpleTestCase):
 
         self.assertFalse(task.is_completed)
         self.assertIsNone(task.completed_at)
-        self.assertIsNone(task.finished_in)
-        self.assertIsNone(task.time_spent)
         save_mock.assert_called_once()
 
     def test_skipped_task_is_not_pending(self):
@@ -152,14 +110,9 @@ class TaskModelTests(SimpleTestCase):
         )
         task.skipped_in = timezone.now()
 
-        self.assertFalse(task.is_pending)
+        with patch('tasks.models.timezone.localdate', return_value=date(2026, 4, 22)):
+            self.assertFalse(task.is_pending)
         self.assertTrue(task.is_skipped)
-
-    def test_parse_time_spent_parts_defaults_to_zero(self):
-        duration, error = parse_time_spent_parts({})
-
-        self.assertIsNone(error)
-        self.assertEqual(duration, timedelta(0))
 
     def test_duration_part_splits_timedelta(self):
         value = timedelta(hours=2, minutes=5, seconds=9)
@@ -169,14 +122,9 @@ class TaskModelTests(SimpleTestCase):
         self.assertEqual(duration_part(value, 'seconds'), 9)
         self.assertEqual(duration_part(None, 'hours'), 0)
 
-    def test_today_complete_converts_time_parts(self):
+    def test_today_complete_calls_complete_task_without_time_input(self):
         request = RequestFactory().post(
-            '/tasks/today/1/complete/',
-            data={
-                'time_spent_hours': '1',
-                'time_spent_minutes': '30',
-                'time_spent_seconds': '15',
-            },
+            '/tasks/today/1/complete/?scheduled_date=2026-04-21',
             HTTP_HX_REQUEST='true',
         )
         request.user = SimpleNamespace(is_authenticated=True, has_perms=lambda perms: True)
@@ -187,18 +135,19 @@ class TaskModelTests(SimpleTestCase):
             scheduled_date=date(2026, 4, 22),
         )
 
-        with patch('tasks.views.get_object_or_404', return_value=task) as get_object_mock, patch('tasks.views.services.complete_task') as complete_mock, patch('tasks.views.services.get_today_mission_context') as context_mock:
+        with patch('tasks.views.get_object_or_404', return_value=task) as get_object_mock, patch('tasks.views.services.complete_task') as complete_mock, patch('tasks.views.services.get_today_mission_context') as context_mock, patch('tasks.views.render') as render_mock:
             context_mock.return_value = {'page_title': 'BTY - Missão do Dia'}
+            render_mock.return_value = HttpResponse('ok')
 
             response = view(request, pk=1)
 
         self.assertEqual(response.status_code, 200)
-        get_object_mock.assert_called_once()
+        get_object_mock.assert_called_once_with(Task, pk=1, scheduled_date=date(2026, 4, 21))
         context_mock.assert_called_once()
         complete_mock.assert_called_once()
-        kwargs = complete_mock.call_args.kwargs
-        self.assertEqual(kwargs['time_spent'], timedelta(hours=1, minutes=30, seconds=15))
-        self.assertNotIn('record_time_spent', kwargs)
+        self.assertFalse(complete_mock.call_args.kwargs)
+        render_mock.assert_called_once()
+        self.assertEqual(render_mock.call_args.args[2]['selected_date'], date(2026, 4, 21))
 
 
 class RecurrenceGenerationTests(SimpleTestCase):
@@ -212,13 +161,12 @@ class RecurrenceGenerationTests(SimpleTestCase):
         self.assertTrue(hasattr(recurring_task, 'occurs_on'))
         self.assertTrue(callable(ensure_tasks_for_date))
 
-    def test_today_mission_orders_by_started_priority_title(self):
+    def test_today_mission_orders_by_priority_title(self):
         ordering = get_today_mission_ordering()
 
-        self.assertEqual(len(ordering), 3)
-        self.assertEqual(str(ordering[0]), 'OrderBy(F(started_in), descending=True)')
-        self.assertEqual(str(ordering[1]), 'OrderBy(F(priority), descending=True)')
-        self.assertEqual(ordering[2], 'title')
+        self.assertEqual(len(ordering), 2)
+        self.assertEqual(str(ordering[0]), 'OrderBy(F(priority), descending=True)')
+        self.assertEqual(ordering[1], 'title')
 
 
 class TaskCreateViewTests(SimpleTestCase):
@@ -228,6 +176,57 @@ class TaskCreateViewTests(SimpleTestCase):
         view.request = request
 
         self.assertEqual(view.get_initial()['description'], 'Comprar leite')
+
+    def test_prefills_possible_task_data(self):
+        request = RequestFactory().get('/tasks/create/?possible_task=7')
+        view = TaskCreateView()
+        view.request = request
+
+        possible_task = SimpleNamespace(
+            title='Comprar pão',
+            description='Ir à padaria',
+            priority=Task.Priority.HIGH,
+        )
+
+        with patch('tasks.views.possible_task_services.get_possible_task', return_value=possible_task):
+            initial = view.get_initial()
+
+        self.assertEqual(initial['title'], 'Comprar pão')
+        self.assertEqual(initial['description'], 'Ir à padaria')
+        self.assertEqual(initial['priority'], Task.Priority.HIGH)
+
+
+class TaskListViewTests(SimpleTestCase):
+    def setUp(self):
+        self.request_factory = RequestFactory()
+
+    def test_filters_by_title_and_description(self):
+        request = self.request_factory.get(
+            '/tasks/list/',
+            {'title': 'reunião', 'description': 'status'},
+        )
+        request.user = SimpleNamespace(is_authenticated=True, has_perms=lambda perms: True)
+        view = TaskListView()
+        view.request = request
+
+        base_queryset = mock.Mock()
+        date_queryset = mock.Mock()
+        title_queryset = mock.Mock()
+        description_queryset = mock.Mock()
+        final_queryset = mock.Mock()
+        base_queryset.filter.return_value = date_queryset
+        date_queryset.filter.return_value = title_queryset
+        title_queryset.filter.return_value = description_queryset
+        description_queryset.select_related.return_value = final_queryset
+
+        with patch('tasks.views.services.ensure_tasks_for_date') as ensure_mock, patch.object(Task._default_manager, 'all', return_value=base_queryset):
+            queryset = view.get_queryset()
+
+        ensure_mock.assert_called_once()
+        date_queryset.filter.assert_called_once_with(title__icontains='reunião')
+        title_queryset.filter.assert_called_once_with(description__icontains='status')
+        description_queryset.select_related.assert_called_once_with('recurring_task', 'category')
+        self.assertIs(queryset, final_queryset)
 
 
 class HtmxRedirectTests(SimpleTestCase):

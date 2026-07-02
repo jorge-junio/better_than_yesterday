@@ -64,6 +64,24 @@ class RecurringTaskCreateViewTests(SimpleTestCase):
 
         self.assertEqual(view.get_initial()['description'], 'Fazer alongamento')
 
+    def test_prefills_possible_task_data(self):
+        request = RequestFactory().get('/recurring-tasks/create/?possible_task=7')
+        view = RecurringTaskCreateView()
+        view.request = request
+
+        possible_task = SimpleNamespace(
+            title='Revisar boletim',
+            description='Revisão mensal do boletim',
+            priority=RecurringTask.Priority.MEDIUM,
+        )
+
+        with patch('recurring_tasks.views.possible_task_services.get_possible_task', return_value=possible_task):
+            initial = view.get_initial()
+
+        self.assertEqual(initial['name'], 'Revisar boletim')
+        self.assertEqual(initial['description'], 'Revisão mensal do boletim')
+        self.assertEqual(initial['priority'], RecurringTask.Priority.MEDIUM)
+
 
 class RecurringTaskFormTests(SimpleTestCase):
     def test_specific_dates_initial_is_rendered_as_multiline_text(self):
@@ -128,6 +146,7 @@ class RecurringTaskSyncTests(SimpleTestCase):
             description='Treino na academia',
             estimated_time=None,
             priority=RecurringTask.Priority.HIGH,
+            category=None,
             generated_tasks=MagicMock(),
         )
 
@@ -152,6 +171,7 @@ class RecurringTaskSyncTests(SimpleTestCase):
             description='Treino na academia',
             estimated_time=None,
             priority=RecurringTask.Priority.HIGH,
+            category=None,
             generated_tasks=MagicMock(),
         )
 

@@ -13,13 +13,32 @@
         </div>
     </div>
 
-    {% if perms.projects.add_project %}
     <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
+        {% if perms.projects.add_project %}
         <a href="{% url 'project_create' %}" class="btn btn-success" title="Novo projeto" hx-get="{% url 'project_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-plus"></i> Novo projeto
         </a>
+        {% endif %}
     </div>
-    {% endif %}
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" action="{% url 'project_list' %}" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2 align-items-end">
+            <div class="col-md-8 col-lg-6">
+                <label class="form-label" for="project-title-filter">Nome do projeto</label>
+                <input type="text" id="project-title-filter" class="form-control" name="title" placeholder="Digite o nome do projeto" value="{{ request.GET.title }}">
+            </div>
+            <div class="col-md-4 col-lg-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary" title="Filtrar">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+                <a href="{% url 'project_list' %}" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'project_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card shadow-sm">
@@ -27,18 +46,16 @@
         {% if projects %}
         <div class="vstack gap-3">
             {% for project in projects %}
-            <div class="p-3 rounded-4 border border-3 border-primary bg-body-tertiary">
+            <div class="p-3 rounded-4 border border-3 border-primary bg-body-tertiary position-relative">
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
                     <div class="flex-grow-1">
                         <h4 class="h5 mb-2">{{ project.title }}</h4>
+                        {% if project.is_default %}
+                        <span class="badge text-bg-success mb-2">Projeto padrão</span>
+                        {% endif %}
                         <p class="mb-0 text-body-secondary">{{ project.description }}</p>
                     </div>
-                    <div class="d-flex gap-2 align-items-start">
-                        {% if perms.projects.view_project %}
-                        <a href="{% url 'project_detail' project.id %}" class="btn btn-info btn-sm" title="Ver detalhes" hx-get="{% url 'project_detail' project.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        {% endif %}
+                    <div class="d-flex gap-2 align-items-start position-relative z-2">
                         {% if perms.projects.change_project %}
                         <a href="{% url 'project_update' project.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'project_update' project.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-pencil"></i>
@@ -51,14 +68,22 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if perms.projects.view_project %}
+                <a href="{% url 'project_detail' project.id %}" class="stretched-link" title="Ver detalhes" hx-get="{% url 'project_detail' project.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Ver detalhes do projeto {{ project.title }}"></a>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
         {% else %}
         <div class="text-center py-5">
             <div class="display-3 mb-3 text-muted"><i class="bi bi-kanban"></i></div>
+            {% if request.GET.title %}
+            <h4 class="mb-2">Nenhum projeto encontrado</h4>
+            <p class="text-muted mb-0">Tente outro nome ou limpe o filtro para ver todos os projetos.</p>
+            {% else %}
             <h4 class="mb-2">Nenhum projeto ainda</h4>
             <p class="text-muted mb-0">Cadastre o primeiro projeto para organizar suas tarefas.</p>
+            {% endif %}
         </div>
         {% endif %}
     </div>

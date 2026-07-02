@@ -1,0 +1,67 @@
+<div data-page-title="{{ page_title }}">
+<div class="container mt-4">
+    <h3 class="display-6">Detalhes da Avaliação</h3>
+    <div class="card">
+        <div class="card-body">
+            <div class="p-3 rounded-4 bg-body-tertiary border mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <div>
+                        <div class="text-uppercase small fw-semibold text-body-secondary">Resumo</div>
+                        <h4 class="h5 mb-0">Avaliação de vocabulário</h4>
+                    </div>
+                    <span class="badge {% if object.is_completed %}text-bg-success{% else %}text-bg-warning{% endif %}">
+                        {% if object.is_completed %}Concluída{% else %}Em andamento{% endif %}
+                    </span>
+                </div>
+                <div class="progress mb-3" style="height: 8px;">
+                    <div class="progress-bar {% if object.is_completed %}bg-success{% else %}bg-info{% endif %}" role="progressbar" style="width: {{ object.progress_percentage }}%;" aria-valuenow="{{ object.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge text-bg-secondary">Avaliada em {{ object.tested_at|date:'d/m/Y H:i' }}</span>
+                    <span class="badge text-bg-info">Respondidas {{ object.answered_items_count }}/{{ object.questions_requested }}</span>
+                    <span class="badge text-bg-success">Acertos {{ object.correct_items_count }}</span>
+                    <span class="badge text-bg-danger">Erros {{ object.incorrect_items_count }}</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3">Itens</h5>
+            {% if object.items.all %}
+            <div class="vstack gap-3">
+                {% for item in object.items.all %}
+                <div class="p-3 rounded-4 border border-1 {% if item.is_correct %}border-success bg-success-subtle{% else %}border-danger bg-danger-subtle{% endif %}">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge text-bg-dark">{{ item.word.word|upper }}</span>
+                            <span class="badge {% if item.is_correct %}text-bg-success{% else %}text-bg-danger{% endif %}">
+                                {% if item.is_correct %}Acertou{% else %}Errou{% endif %}
+                            </span>
+                        </div>
+                        {% if perms.english_words.change_englishword %}
+                        <a href="{% url 'english_word_update' item.word.id %}?return_to={{ word_return_to_url|urlencode }}" class="btn {% if item.is_correct %}btn-outline-success{% else %}btn-outline-danger{% endif %} btn-sm" title="Editar palavra" hx-get="{% url 'english_word_update' item.word.id %}?return_to={{ word_return_to_url|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <i class="bi bi-pencil-square"></i> Editar palavra
+                        </a>
+                        {% endif %}
+                    </div>
+                    <p class="mb-1"><strong>Resposta:</strong> {{ item.answer|upper }}</p>
+                    {% if item.word.meanings_text %}
+                    <p class="mb-0 text-body-secondary"><strong>Significados:</strong> {{ item.word.meanings_text|join:', '|upper }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Nenhum item cadastrado para esta avaliação.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'evaluation_list' %}" class="btn btn-secondary" title="Voltar para a lista" hx-get="{% url 'evaluation_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
+        {% if not object.is_completed %}
+        <a href="{% url 'evaluation_quiz' object.id %}" class="btn btn-success" title="Continuar quiz" hx-get="{% url 'evaluation_quiz' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Continuar quiz</a>
+        {% endif %}
+        <a href="{% url 'evaluation_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'evaluation_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Editar</a>
+    </div>
+</div>
+</div>

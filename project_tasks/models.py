@@ -19,6 +19,14 @@ class ProjectTask(models.Model):
         related_name='project_tasks',
         verbose_name='projeto',
     )
+    origin_possible_task = models.OneToOneField(
+        'possible_tasks.PossibleTask',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='generated_project_task',
+        verbose_name='possível tarefa de origem',
+    )
     title = models.CharField(max_length=200, verbose_name='título')
     description = models.TextField(verbose_name='descrição')
     priority = models.PositiveSmallIntegerField(
