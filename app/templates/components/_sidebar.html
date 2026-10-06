@@ -1,13 +1,10 @@
-<aside id="sidebar-column" class="bg-dark flex-shrink-0">
-  <div class="sidebar-shell d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
-    <div class="d-flex w-100 align-items-center justify-content-between mb-3">
-      <button class="btn btn-dark d-block d-sm-none" type="button" data-bs-toggle="collapse" title="Abrir menu"
-        data-bs-target="#menuCollapse" aria-expanded="false" aria-controls="menuCollapse">
-        <i class="bi bi-list fs-4"></i>
-      </button>
-    </div>
-
-    <div class="collapse d-sm-block w-100" id="menuCollapse">
+<aside id="sidebar-column" class="offcanvas-lg offcanvas-start bg-dark flex-shrink-0" tabindex="-1" aria-labelledby="sidebar-title">
+  <div class="offcanvas-header d-lg-none">
+    <h2 class="offcanvas-title h5" id="sidebar-title">Menu</h2>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar-column" aria-label="Fechar menu" title="Fechar menu"></button>
+  </div>
+  <div class="sidebar-shell offcanvas-body d-flex flex-column align-items-start px-3 pt-2 text-white">
+    <div class="w-100" id="menuCollapse">
       <ul class="nav flex-column align-items-start w-100" id="menu">
         {% if perms.tasks.view_task %}
           <li>
@@ -27,6 +24,7 @@
         <li class="w-100 mt-2">
           <button
             id="sidebarEnglishToggle"
+            title="Expandir ou recolher grupo"
             class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'english_word_list' or request.resolver_match.url_name == 'english_word_create' or request.resolver_match.url_name == 'english_word_detail' or request.resolver_match.url_name == 'english_word_update' or request.resolver_match.url_name == 'english_word_delete' or request.resolver_match.url_name == 'evaluation_list' or request.resolver_match.url_name == 'evaluation_create' or request.resolver_match.url_name == 'evaluation_quiz' or request.resolver_match.url_name == 'evaluation_detail' or request.resolver_match.url_name == 'evaluation_update' or request.resolver_match.url_name == 'evaluation_delete' %}active{% endif %}"
             type="button"
             data-bs-toggle="collapse"
@@ -68,6 +66,7 @@
         <li class="w-100 mt-2">
           <button
             id="sidebarTasksToggle"
+            title="Expandir ou recolher grupo"
             class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'recurring_task_list' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_update' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_delete' or request.resolver_match.url_name == 'task_toggle_complete' or request.resolver_match.url_name == 'task_postpone' or request.resolver_match.url_name == 'task_today_complete' or request.resolver_match.url_name == 'task_today_skip' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' or request.resolver_match.url_name == 'recurring_task_create' or request.resolver_match.url_name == 'recurring_task_update' or request.resolver_match.url_name == 'recurring_task_delete' %}active{% endif %}"
             type="button"
             data-bs-toggle="collapse"
@@ -117,6 +116,7 @@
         <li class="w-100 mt-2">
           <button
             id="sidebarProjectsToggle"
+            title="Expandir ou recolher grupo"
             class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_task_list' or request.resolver_match.url_name == 'project_task_create' or request.resolver_match.url_name == 'project_task_update' or request.resolver_match.url_name == 'project_task_delete' or request.resolver_match.url_name == 'project_task_detail' or request.resolver_match.url_name == 'project_task_toggle_complete' or request.resolver_match.url_name == 'possible_task_list' or request.resolver_match.url_name == 'possible_task_create' or request.resolver_match.url_name == 'possible_task_update' or request.resolver_match.url_name == 'possible_task_delete' %}active{% endif %}"
             type="button"
             data-bs-toggle="collapse"

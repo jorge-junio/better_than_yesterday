@@ -118,7 +118,7 @@
                     <span class="badge text-bg-warning">{{ range_summary.pending }}</span>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-sm align-middle">
+                    <table class="table mobile-card-table table-sm align-middle">
                         <thead>
                             <tr>
                                 <th>Título</th>
@@ -131,8 +131,8 @@
                         <tbody>
                             {% for task in range_summary.pending_tasks %}
                             <tr>
-                                <td>{{ task.title }}</td>
-                                <td>
+                                <td data-label="Título">{{ task.title }}</td>
+                                <td data-label="Categoria">
                                     {% if task.category %}
                                         <span class="badge text-bg-light text-dark border border-1">
                                             <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ task.category.color }};"></span>
@@ -142,9 +142,9 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{{ task.scheduled_date }}</td>
-                                <td>{{ task.scheduled_time|default:'-' }}</td>
-                                <td>
+                                <td data-label="Data">{{ task.scheduled_date }}</td>
+                                <td data-label="Horário">{{ task.scheduled_time|default:'-' }}</td>
+                                <td data-label="Origem">
                                     {% if task.source_type == 'recurrent' %}
                                         Recorrente
                                     {% else %}

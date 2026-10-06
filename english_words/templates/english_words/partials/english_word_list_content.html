@@ -42,7 +42,7 @@
                         <p class="mb-0 small text-body-secondary">{{ english_word.note }}</p>
                         {% endif %}
                     </div>
-                    <div class="d-flex gap-2 align-items-start position-relative z-2">
+                    <div class="d-flex gap-2 align-items-start position-relative z-2 flex-wrap">
                         {% if perms.english_words.change_englishword %}
                         <a href="{% url 'english_word_update' english_word.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'english_word_update' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-pencil"></i>

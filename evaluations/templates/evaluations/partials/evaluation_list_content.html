@@ -39,7 +39,7 @@
                         <h4 class="h5 mb-2">Avaliação de vocabulário</h4>
                         <p class="mb-0 text-body-secondary">Clique para ver os itens e os resultados.</p>
                     </div>
-                    <div class="d-flex gap-2 align-items-start position-relative z-2">
+                    <div class="d-flex gap-2 align-items-start position-relative z-2 flex-wrap">
                         {% if perms.evaluations.view_evaluation %}
                         <a href="{% url 'evaluation_detail' evaluation.id %}" class="btn btn-outline-primary btn-sm" title="Ver resultado" hx-get="{% url 'evaluation_detail' evaluation.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                             <i class="bi bi-clipboard-data"></i> Ver resultado

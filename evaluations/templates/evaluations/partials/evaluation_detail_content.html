@@ -56,7 +56,7 @@
             {% endif %}
         </div>
     </div>
-    <div class="mt-3 d-flex gap-2">
+    <div class="mt-3 d-flex gap-2 flex-wrap">
         <a href="{% url 'evaluation_list' %}" class="btn btn-secondary" title="Voltar para a lista" hx-get="{% url 'evaluation_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
         {% if not object.is_completed %}
         <a href="{% url 'evaluation_quiz' object.id %}" class="btn btn-success" title="Continuar quiz" hx-get="{% url 'evaluation_quiz' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Continuar quiz</a>

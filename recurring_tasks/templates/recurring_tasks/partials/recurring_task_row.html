@@ -1,6 +1,6 @@
 <tr id="recurring-task-row-{{ recurring_task.id }}">
-    <td>{{ recurring_task.name }}</td>
-    <td>
+    <td data-label="Nome">{{ recurring_task.name }}</td>
+    <td data-label="Categoria">
         {% if recurring_task.category %}
             <span class="badge text-bg-light text-dark border border-1">
                 <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ recurring_task.category.color }};"></span>
@@ -10,10 +10,10 @@
             -
         {% endif %}
     </td>
-    <td><span class="badge text-bg-dark">{{ recurring_task.get_priority_display }}</span></td>
-    <td>{{ recurring_task.estimated_time|default:'-' }}</td>
-    <td>{{ recurring_task.get_recurrence_type_display }}</td>
-    <td>
+    <td data-label="Prioridade"><span class="badge text-bg-dark">{{ recurring_task.get_priority_display }}</span></td>
+    <td data-label="Tempo estimado">{{ recurring_task.estimated_time|default:'-' }}</td>
+    <td data-label="Tipo">{{ recurring_task.get_recurrence_type_display }}</td>
+    <td data-label="Resumo">
         {% if recurring_task.recurrence_type == 'weekdays' %}
             {{ recurring_task.weekday_labels|join:', ' }}
         {% elif recurring_task.recurrence_type == 'date_range' %}
@@ -22,14 +22,14 @@
             {{ recurring_task.specific_dates_display|join:', ' }}
         {% endif %}
     </td>
-    <td>
+    <td data-label="Status">
         {% if recurring_task.is_active %}
             <span class="badge text-bg-success">Ativa</span>
         {% else %}
             <span class="badge text-bg-secondary">Inativa</span>
         {% endif %}
     </td>
-    <td class="d-flex gap-1 flex-wrap">
+    <td class="d-flex gap-1 flex-wrap" data-label="Ações">
         {% if perms.recurring_tasks.view_recurringtask %}
         <a href="{% url 'recurring_task_detail' recurring_task.id %}" class="btn btn-info btn-sm" title="Ver detalhes" hx-get="{% url 'recurring_task_detail' recurring_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-eye"></i>

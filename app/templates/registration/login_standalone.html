@@ -3,7 +3,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -198,6 +198,7 @@
       font-weight: 700;
     }
   </style>
+  <link rel="stylesheet" href="{% static 'app/mobile.css' %}">
 </head>
 <body>
   <main class="login-shell d-flex align-items-center py-5">
@@ -260,12 +261,12 @@
 
               <div>
                 <label for="username" class="form-label">Usuário</label>
-                <input type="text" name="username" id="username" class="form-control form-control-lg" placeholder="Usuário" required>
+                <input type="text" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" id="username" class="form-control form-control-lg" placeholder="Usuário" required>
               </div>
 
               <div>
                 <label for="password" class="form-label">Senha</label>
-                <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="Senha" required>
+                <input type="password" name="password" autocomplete="current-password" id="password" class="form-control form-control-lg" placeholder="Senha" required>
               </div>
 
               <button type="submit" class="btn btn-lg login-btn text-white fw-semibold mt-2" title="Entrar">

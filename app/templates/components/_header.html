@@ -1,9 +1,14 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
   <div class="container-fluid">
     <div class="d-flex align-items-center gap-2">
-      <button id="sidebar-toggle" class="btn btn-outline-light btn-sm d-none d-sm-inline-flex align-items-center justify-content-center" type="button" aria-label="Expandir ou recolher menu" title="Expandir ou recolher menu">
+      {% if user.is_authenticated %}
+      <button class="btn btn-outline-light d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-column" aria-controls="sidebar-column" aria-label="Abrir menu" title="Abrir menu">
+        <i class="bi bi-list fs-4" aria-hidden="true"></i>
+      </button>
+      <button id="sidebar-toggle" class="btn btn-outline-light btn-sm d-none d-lg-inline-flex align-items-center justify-content-center" type="button" aria-label="Expandir ou recolher menu" title="Expandir ou recolher menu">
         <i class="bi bi-chevron-double-left" data-sidebar-icon></i>
       </button>
+      {% endif %}
       <a class="navbar-brand text-white mb-0" href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Sistema de Controle de Tarefas</a>
     </div>
   </div>

@@ -24,10 +24,12 @@
                     </div>
                 {% endfor %}
 
+                <div class="d-flex flex-wrap gap-2 form-actions">
                 <button type="submit" class="btn btn-primary" title="{{ submit_label }}">{{ submit_label }}</button>
-                <a href="{{ cancel_url }}" class="btn btn-secondary ms-2" title="Cancelar" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <a href="{{ cancel_url }}" class="btn btn-secondary" title="Cancelar" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
                     Cancelar
                 </a>
+                </div>
             </form>
         </div>
     </div>

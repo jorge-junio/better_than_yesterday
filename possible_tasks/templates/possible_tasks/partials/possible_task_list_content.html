@@ -42,7 +42,7 @@
                     <option value="converted" {% if selected_conversion == 'converted' %}selected{% endif %}>Convertidas</option>
                 </select>
             </div>
-            <div class="col-md-4 col-lg-2 d-flex gap-2">
+            <div class="col-md-4 col-lg-2 d-flex gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
                     <i class="bi bi-search"></i> Filtrar
                 </button>
@@ -71,7 +71,7 @@
             >
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
                     <div class="flex-grow-1">
-                        <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                             <span class="badge text-bg-secondary">{{ possible_task.created_at|date:'d/m/Y H:i' }}</span>
                             {% if possible_task.project %}
                             <span class="badge text-bg-dark">{{ possible_task.project.title }}</span>

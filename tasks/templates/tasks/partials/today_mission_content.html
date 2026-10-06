@@ -27,8 +27,8 @@
                                     value="{{ selected_date|date:'Y-m-d' }}"
                                 >
                             </div>
-                            <div class="col-md-7 col-lg-8 d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Filtrar</button>
+                            <div class="col-md-7 col-lg-8 d-flex gap-2 flex-wrap">
+                                <button type="submit" class="btn btn-primary" title="Filtrar tarefas">Filtrar</button>
                                 <a href="{% url 'task_today' %}" class="btn btn-outline-secondary" title="Voltar para hoje" hx-get="{% url 'task_today' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Hoje</a>
                             </div>
                         </form>
@@ -226,7 +226,7 @@
                     <div class="vstack gap-3">
                         {% for badge in badges %}
                         <div class="p-3 rounded-4 border border-primary bg-body-tertiary">
-                            <div class="d-flex align-items-center gap-2 mb-1">
+                            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                                 <span class="badge text-bg-{{ badge.variant }}">{{ badge.label }}</span>
                             </div>
                             <div class="small text-muted">{{ badge.description }}</div>

@@ -1,5 +1,5 @@
 <tr id="task-row-{{ task.id }}">
-    <td>
+    <td data-label="Título">
         <strong>{{ task.title }}</strong>
         {% if task.description %}
         <div class="text-muted small">{{ task.description }}</div>
@@ -8,7 +8,7 @@
             <span class="badge text-bg-dark">{{ task.get_priority_display }}</span>
         </div>
     </td>
-    <td>
+    <td data-label="Categoria">
         {% if task.category %}
             <span class="badge text-bg-light text-dark border border-1">
                 <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ task.category.color }};"></span>
@@ -18,8 +18,8 @@
             -
         {% endif %}
     </td>
-    <td>{{ task.scheduled_time|default:'-' }}</td>
-    <td>
+    <td data-label="Horário">{{ task.scheduled_time|default:'-' }}</td>
+    <td data-label="Status">
         {% if task.completed_at %}
             <span class="badge text-bg-success">Concluída</span>
         {% elif task.is_skipped %}
@@ -28,7 +28,7 @@
             <span class="badge text-bg-warning">Pendente</span>
         {% endif %}
     </td>
-    <td class="d-flex gap-1 flex-wrap">
+    <td class="d-flex gap-1 flex-wrap" data-label="Ações">
         <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm" title="Ver detalhes" hx-get="{% url 'task_detail' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-eye"></i>
         </a>
