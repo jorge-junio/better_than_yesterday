@@ -163,6 +163,47 @@
           </div>
         </li>
 
+        {% if perms.workouts.view_workout or perms.workouts.view_workoutsession %}
+        <li class="w-100 mt-2">
+          <button id="sidebarWorkoutsToggle" title="Expandir ou recolher treinos" class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarWorkoutsGroup" aria-expanded="{% if request.resolver_match.app_name == 'workouts' or '/workouts/' in request.path %}true{% else %}false{% endif %}" aria-controls="sidebarWorkoutsGroup">
+            <span class="d-inline-flex align-items-center">
+              <svg class="fs-4 flex-shrink-0" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <rect x="3" y="6" width="4" height="12" rx="1"></rect>
+                <rect x="17" y="6" width="4" height="12" rx="1"></rect>
+                <path d="M7 12h10M1 9v6M23 9v6"></path>
+              </svg>
+              <span class="ms-1 sidebar-label fw-semibold">Treinos</span>
+            </span>
+            <i class="bi bi-chevron-down small sidebar-label"></i>
+          </button>
+          <div class="collapse {% if '/workouts/' in request.path %}show{% endif %} w-100" id="sidebarWorkoutsGroup">
+            <ul class="nav flex-column align-items-start w-100 ms-3 ps-2 border-start border-secondary border-opacity-25">
+              {% if perms.workouts.view_workout %}<li class="w-100"><a href="{% url 'workout_list' %}" class="nav-link sidebar-nav-link px-0 align-middle" hx-get="{% url 'workout_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true"><i class="bi bi-calendar3 fs-5"></i><span class="ms-1 sidebar-label">Treino</span></a></li>{% endif %}
+              {% if perms.workouts.view_workoutsession %}
+              <li class="w-100"><a href="{% url 'workout_history' %}" class="nav-link sidebar-nav-link px-0 align-middle" hx-get="{% url 'workout_history' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true"><i class="bi bi-clock-history fs-5"></i><span class="ms-1 sidebar-label">Histórico</span></a></li>
+              <li class="w-100"><a href="{% url 'workout_train' %}" class="nav-link sidebar-nav-link px-0 align-middle" hx-get="{% url 'workout_train' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true"><i class="bi bi-play-circle fs-5"></i><span class="ms-1 sidebar-label">Treinar</span></a></li>
+              {% endif %}
+            </ul>
+          </div>
+        </li>
+        {% endif %}
+
+        {% if perms.shopping.view_shoppinglist or perms.shopping.view_shoppingsession %}
+        <li class="w-100 mt-2">
+          <button id="sidebarShoppingToggle" title="Expandir ou recolher compras" class="btn btn-link sidebar-group-toggle nav-link px-0 align-middle w-100 text-start d-flex align-items-center justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarShoppingGroup" aria-expanded="{% if '/shopping/' in request.path %}true{% else %}false{% endif %}" aria-controls="sidebarShoppingGroup">
+            <span class="d-inline-flex align-items-center"><i class="bi bi-cart3 fs-4" aria-hidden="true"></i><span class="ms-1 sidebar-label fw-semibold">Compras</span></span>
+            <i class="bi bi-chevron-down small sidebar-label" aria-hidden="true"></i>
+          </button>
+          <div class="collapse {% if '/shopping/' in request.path %}show{% endif %} w-100" id="sidebarShoppingGroup">
+            <ul class="nav flex-column align-items-start w-100 ms-3 ps-2 border-start border-secondary border-opacity-25">
+              {% if perms.shopping.view_shoppinglist %}<li class="w-100"><a href="{% url 'shopping_list' %}" class="nav-link sidebar-nav-link px-0 align-middle" hx-get="{% url 'shopping_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true"><i class="bi bi-list-check fs-5" aria-hidden="true"></i><span class="ms-1 sidebar-label">Itens da feira</span></a></li>{% endif %}
+              {% if perms.shopping.view_shoppinglist and perms.shopping.view_shoppingsession %}<li class="w-100"><a href="{% url 'shopping_start' %}" class="nav-link sidebar-nav-link px-0 align-middle" hx-get="{% url 'shopping_start' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true"><i class="bi bi-cart3 fs-5" aria-hidden="true"></i><span class="ms-1 sidebar-label">Fazer feira</span></a></li>{% endif %}
+              {% if perms.shopping.view_shoppingsession %}<li class="w-100"><a href="{% url 'shopping_history' %}" class="nav-link sidebar-nav-link px-0 align-middle" hx-get="{% url 'shopping_history' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true"><i class="bi bi-clock-history fs-5" aria-hidden="true"></i><span class="ms-1 sidebar-label">Histórico</span></a></li>{% endif %}
+            </ul>
+          </div>
+        </li>
+        {% endif %}
+
         {% if user.is_authenticated %}
         <li class="nav-item">
           <form action="{% url 'logout' %}" method="post" id="logout-form" class="nav-link px-0 align-middle">

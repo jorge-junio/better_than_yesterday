@@ -10,4 +10,6 @@ TENANT_APPS = [
     'english_words',
     'evaluations',
     'tasks',
+    'workouts',
+    'shopping',
 ]

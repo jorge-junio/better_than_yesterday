@@ -1,0 +1,16 @@
+<div data-page-title="{{ page_title }}" data-shopping-section="{{ shopping_section }}" hx-target="#page-content" hx-swap="innerHTML">
+  <div class="mx-auto" style="max-width: 640px;">
+    <h1 class="h3 mb-4">{{ heading }}</h1>
+    {% if description %}<p>{{ description }}</p>{% endif %}
+    <div class="card shadow-sm"><div class="card-body">
+      <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-disabled-elt="find button[type='submit']">
+        {% csrf_token %}
+        {% include 'shopping/partials/fields.html' %}
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <button type="submit" class="btn btn-primary" title="{{ submit_label }}">{{ submit_label }}</button>
+          <a href="{{ cancel_url }}" class="btn btn-outline-secondary" title="Cancelar" hx-get="{{ cancel_url }}" hx-push-url="true">Cancelar</a>
+        </div>
+      </form>
+    </div></div>
+  </div>
+</div>

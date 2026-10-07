@@ -1,0 +1,30 @@
+<div data-page-title="{{ page_title }}" data-shopping-section="start" hx-target="#page-content" hx-swap="innerHTML">
+  <h1 class="h3 mb-3">Fazer feira</h1>
+  {% if current_session %}
+  <div class="alert alert-info"><p>Você tem uma compra em andamento: <strong>{{ current_session.list_name }}</strong>.</p><a href="{% url 'shopping_session' current_session.pk %}" hx-get="{% url 'shopping_session' current_session.pk %}" hx-push-url="true" class="btn btn-primary" title="Retomar compra em andamento">Continuar compras</a></div>
+  {% else %}
+  <p class="text-body-secondary">Escolha uma lista e marque os itens que pretende comprar nesta feira.</p>
+  <div class="card shadow-sm mb-4"><div class="card-body">
+    <form method="get" action="{% url 'shopping_start' %}" hx-get="{% url 'shopping_start' %}" hx-push-url="true">
+      {% include 'shopping/partials/fields.html' with form=choose_form %}
+      <button type="submit" class="btn btn-outline-primary" title="Exibir itens da lista escolhida">Selecionar lista</button>
+    </form>
+  </div></div>
+  {% if selected %}
+  <div class="card shadow-sm"><div class="card-body">
+    <h2 class="h5 text-break">{{ selected.name }}</h2>
+    {% if has_items %}
+    <form method="post" action="{% url 'shopping_start' %}" hx-post="{% url 'shopping_start' %}" hx-disabled-elt="find button[type='submit']">
+      {% csrf_token %}<input type="hidden" name="shopping_list" value="{{ selected.pk }}">
+      {% if selection_form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ selection_form.non_field_errors }}</div>{% endif %}
+      {% for error in selection_form.items.errors %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endfor %}
+      <fieldset><legend class="fs-6">Itens que você vai comprar</legend>
+        {% for checkbox in selection_form.items %}<div class="border rounded p-3 mb-2"><label class="d-flex align-items-center gap-3 text-break w-100" for="{{ checkbox.id_for_label }}">{{ checkbox.tag }} {{ checkbox.choice_label }}</label></div>{% endfor %}
+      </fieldset>
+      {% if perms.shopping.add_shoppingsession %}<button type="submit" class="btn btn-success mt-3" title="Iniciar compras com os itens selecionados">Iniciar compras</button>{% endif %}
+    </form>
+    {% else %}<div class="alert alert-info mb-0">Esta lista não tem itens ativos. Cadastre ou ative os itens antes de fazer feira.</div>{% endif %}
+  </div></div>
+  {% endif %}
+  {% endif %}
+</div>

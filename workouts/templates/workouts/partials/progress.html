@@ -1,0 +1,6 @@
+<div id="session-progress-{{ session.pk }}" class="card border-0 bg-body-tertiary mb-3" {% if oob %}hx-swap-oob="outerHTML"{% endif %}>
+  <div class="card-body" aria-live="polite">
+    <div class="d-flex flex-wrap justify-content-between gap-2 mb-2"><strong>{{ progress.saved }} de {{ progress.total }} séries registradas</strong><span>{{ progress.percentage }}%</span></div>
+    <div class="progress" style="height: 8px;"><div class="progress-bar bg-success" role="progressbar" style="width: {{ progress.percentage }}%;" aria-valuenow="{{ progress.percentage }}" aria-valuemin="0" aria-valuemax="100"></div></div>
+  </div>
+</div>

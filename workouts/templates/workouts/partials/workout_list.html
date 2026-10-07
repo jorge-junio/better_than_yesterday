@@ -1,0 +1,28 @@
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page">
+  <div class="workout-hero p-3 p-md-4 rounded-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+      <div><div class="small text-uppercase opacity-75 mb-1">Força e consistência</div><h1 class="h2 mb-2">Meus treinos</h1><p class="mb-0 opacity-75">Organize a semana e acompanhe sua evolução, série por série.</p></div>
+      {% if perms.workouts.add_workout %}<div><a href="{% url 'workout_create' %}" class="btn btn-light" title="Cadastrar treino"><i aria-hidden="true" class="bi bi-plus"></i> Novo treino</a></div>{% endif %}
+    </div>
+  </div>
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{% url 'workout_list' %}" class="btn {% if not archived %}btn-primary{% else %}btn-outline-secondary{% endif %}" title="Ver treinos disponíveis">Disponíveis</a>
+    <a href="{% url 'workout_list' %}?archived=1" class="btn {% if archived %}btn-primary{% else %}btn-outline-secondary{% endif %}" title="Ver treinos arquivados">Arquivados</a>
+    {% if perms.workouts.view_workoutsession %}<a href="{% url 'workout_train' %}" class="btn btn-outline-success" title="Acompanhar treino">Treinar</a>{% endif %}
+  </div>
+  <div class="row g-3">
+    {% for workout in workouts %}
+    <div class="col-12 col-lg-6">
+      <div class="card h-100 {% if workout.is_active %}border-success{% endif %}"><div class="card-body">
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-2"><h2 class="h5 mb-0">{{ workout.name }}</h2><span class="badge {% if workout.is_archived %}text-bg-secondary{% elif workout.is_active %}text-bg-success{% else %}text-bg-dark{% endif %}">{% if workout.is_archived %}Arquivado{% elif workout.is_active %}Ativo{% else %}Inativo{% endif %}</span></div>
+        <p class="text-body-secondary small">{{ workout.start_date|date:'d/m/Y' }}{% if workout.end_date %} a {{ workout.end_date|date:'d/m/Y' }}{% else %} · Sem data final{% endif %}</p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'workout_detail' workout.pk %}" class="btn btn-outline-info" title="Ver programação de {{ workout.name }}">Programação</a>
+          {% if perms.workouts.change_workout and not workout.is_archived %}<a href="{% url 'workout_update' workout.pk %}" class="btn btn-outline-secondary" title="Editar treino">Editar</a>{% endif %}
+        </div>
+      </div></div>
+    </div>
+    {% empty %}<div class="col-12"><div class="card"><div class="card-body py-5 text-center"><i aria-hidden="true" class="bi bi-calendar3 fs-1 text-body-secondary"></i><h2 class="h5 mt-3">{% if archived %}Nenhum treino arquivado{% else %}Nenhum treino cadastrado{% endif %}</h2><p class="text-body-secondary mb-0">{% if not archived %}Comece criando um treino e adicionando os exercícios de cada dia.{% endif %}</p></div></div></div>{% endfor %}
+  </div>
+  <div class="mt-4">{% include 'components/_pagination.html' %}</div>
+</div>

@@ -1,0 +1,13 @@
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page workout-form-shell mx-auto">
+  <h1 class="h3 mb-3">Finalizar treino</h1>
+  <div class="card"><div class="card-body">
+    <h2 class="h5">{{ session.workout_name }}</h2>
+    <p>{{ progress.saved }} de {{ progress.total }} séries registradas.</p>
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error|join:' ' }}</div>{% endif %}
+    <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-disabled-elt="find button[type='submit']">
+      {% csrf_token %}
+      {% if progress.remaining %}<div class="alert alert-warning">Faltam {{ progress.remaining }} séries. Os resultados já registrados serão preservados e a sessão ficará como parcial.</div><div class="form-check mb-3"><input id="confirm-partial" name="confirm_partial" type="checkbox" class="form-check-input" required><label class="form-check-label" for="confirm-partial">Confirmo a finalização com séries pendentes</label></div>{% else %}<p class="text-success">Todas as séries foram registradas. A sessão ficará como concluída.</p>{% endif %}
+      <div class="d-flex flex-wrap gap-2"><button type="submit" class="btn btn-success" title="Confirmar finalização">Finalizar treino</button><a href="{{ cancel_url }}" class="btn btn-outline-secondary" title="Continuar treinando">Continuar treinando</a></div>
+    </form>
+  </div></div>
+</div>

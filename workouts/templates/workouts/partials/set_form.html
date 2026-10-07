@@ -1,0 +1,15 @@
+<div id="workout-set-{{ series.pk }}" class="workout-set border rounded-3 p-3 {% if series.registered_at %}border-success{% endif %}">
+  <form method="post" action="{% url 'workout_set_record' series.pk %}" hx-post="{% url 'workout_set_record' series.pk %}" hx-target="closest .workout-set" hx-swap="outerHTML" hx-disabled-elt="find button[type='submit']" data-set-form {% if form.errors %}data-dirty="true"{% endif %}>
+    {% csrf_token %}
+    <div class="d-flex flex-wrap justify-content-between gap-2 mb-2"><strong>Série {{ series.number }}</strong><span class="small text-body-secondary">Meta: {{ item.target_repetitions }} repetições</span></div>
+    {% if form.non_field_errors %}<div class="alert alert-danger py-2" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row g-2 align-items-end">
+      <div class="col-6">{{ form.repetitions.label_tag }}{{ form.repetitions }}{% for error in form.repetitions.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+      <div class="col-6">{{ form.weight.label_tag }}{{ form.weight }}{% for error in form.weight.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+      <button type="submit" class="btn {% if series.registered_at %}btn-outline-success{% else %}btn-success{% endif %}" title="{% if series.registered_at %}Atualizar{% else %}Registrar{% endif %} série {{ series.number }}">{% if series.registered_at %}Atualizar série{% else %}Registrar série{% endif %}</button>
+      <span data-save-status class="small {% if form.errors %}text-danger{% elif series.registered_at %}text-success{% else %}text-body-secondary{% endif %}" role="status" aria-live="polite">{% if form.errors %}Não salvo. Corrija os campos e tente novamente.{% elif series.registered_at %}Salvo às {{ series.registered_at|date:'H:i' }}{% else %}Ainda não registrada{% endif %}</span>
+    </div>
+  </form>
+</div>

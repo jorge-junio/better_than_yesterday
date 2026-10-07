@@ -1,0 +1,14 @@
+<div data-page-title="{{ page_title }}" data-shopping-section="history" hx-target="#page-content" hx-swap="innerHTML">
+  <h1 class="h3 mb-3">Histórico de compras</h1>
+  <div class="card mb-4"><div class="card-body"><form method="get" action="{% url 'shopping_history' %}" hx-get="{% url 'shopping_history' %}" hx-push-url="true">
+    {% if filter_form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ filter_form.non_field_errors }}</div>{% endif %}
+    <div class="row g-3 align-items-end">{% for field in filter_form %}<div class="col-12 col-md-4">{{ field.label_tag }}{{ field }}{% for error in field.errors %}<div class="text-danger small" role="alert">{{ error }}</div>{% endfor %}</div>{% endfor %}<div class="col-12 col-md-4 d-flex flex-wrap gap-2"><button type="submit" class="btn btn-primary" title="Filtrar histórico por período">Filtrar</button><a href="{% url 'shopping_history' %}" hx-get="{% url 'shopping_history' %}" hx-push-url="true" class="btn btn-outline-secondary" title="Limpar filtros do histórico">Limpar</a></div></div>
+  </form></div></div>
+  <p><strong>{{ completed_count }}</strong> compra(s) concluída(s) · Total no período: <strong>R$ {{ total|floatformat:2 }}</strong></p>
+  <div class="row g-3 mb-4">{% for session in sessions %}<div class="col-12 col-md-6"><div class="card h-100"><div class="card-body">
+    <h2 class="h5 text-break">{{ session.list_name }}</h2><p class="text-body-secondary">{{ session.finished_at|date:'d/m/Y H:i' }} · {{ session.get_status_display }}</p>
+    {% if session.status == 'completed' %}<p class="fs-5">R$ {{ session.total|floatformat:2 }}</p>{% endif %}
+    <a href="{% url 'shopping_session' session.pk %}" hx-get="{% url 'shopping_session' session.pk %}" hx-push-url="true" class="btn btn-outline-primary" title="Consultar itens e quantidades desta compra">Ver detalhes</a>
+  </div></div></div>{% empty %}<div class="col-12"><div class="alert alert-info">Nenhuma compra encontrada neste período.</div></div>{% endfor %}</div>
+  {% include 'components/_pagination.html' %}
+</div>

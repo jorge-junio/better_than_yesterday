@@ -1,0 +1,15 @@
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page workout-form-shell mx-auto">
+  <h1 class="h3 mb-3">{{ heading }}</h1>
+  <div class="card"><div class="card-body">
+    <p>{{ description }}</p>
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error|join:' ' }}</div>{% endif %}
+    <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-disabled-elt="find button[type='submit']">
+      {% csrf_token %}
+      {% if archive_action %}<input type="hidden" name="archive_action" value="{{ archive_action }}">{% endif %}
+      <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-warning" title="{{ submit_label }}">{{ submit_label }}</button>
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary" title="Cancelar">Cancelar</a>
+      </div>
+    </form>
+  </div></div>
+</div>

@@ -1,0 +1,12 @@
+<div data-page-title="{{ page_title }}" data-shopping-section="start" hx-target="#page-content" hx-swap="innerHTML">
+  <div class="mx-auto" style="max-width: 640px;">
+    <h1 class="h3 mb-3">Finalizar compras</h1>
+    <p class="text-break">Lista: <strong>{{ session.list_name }}</strong>. Confira os itens e informe o valor total pago.</p>
+    <ul class="list-group mb-4">{% for item in session.items.all %}<li class="list-group-item d-flex flex-wrap justify-content-between gap-2"><span class="text-break">{{ item.name }}</span><strong>{% if item.quantity == 0 %}Não comprado{% else %}{{ item.quantity|floatformat:'-3' }}{% endif %}</strong></li>{% endfor %}</ul>
+    <div class="card"><div class="card-body"><form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-disabled-elt="find button[type='submit']">
+      {% csrf_token %}{% include 'shopping/partials/fields.html' %}
+      <p class="form-text">Ao confirmar, a compra será salva no histórico e ficará somente para consulta.</p>
+      <div class="d-flex flex-wrap gap-2"><button type="submit" class="btn btn-success" title="Confirmar total e salvar compra no histórico">Confirmar compra</button><a href="{% url 'shopping_session' session.pk %}" hx-get="{% url 'shopping_session' session.pk %}" hx-push-url="true" class="btn btn-outline-secondary" title="Voltar aos itens da compra">Voltar aos itens</a></div>
+    </form></div></div>
+  </div>
+</div>

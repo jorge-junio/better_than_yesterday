@@ -1,0 +1,16 @@
+<div data-page-title="{{ page_title }}" data-shopping-section="lists" hx-target="#page-content" hx-swap="innerHTML">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div><h1 class="h3 mb-1">Itens da feira</h1><p class="text-body-secondary mb-0">Organize suas listas de compras para usar como modelo em cada feira.</p></div>
+    {% if perms.shopping.add_shoppinglist %}<a href="{% url 'shopping_list_create' %}" hx-get="{% url 'shopping_list_create' %}" hx-push-url="true" class="btn btn-primary" title="Cadastrar nova lista de compras">Nova lista</a>{% endif %}
+  </div>
+  <div class="row g-3 mb-4">
+    {% for shopping_list in lists %}
+    <div class="col-12 col-md-6 col-xl-4"><div class="card h-100 shadow-sm"><div class="card-body">
+      <div class="d-flex flex-wrap justify-content-between gap-2"><h2 class="h5 text-break">{{ shopping_list.name }}</h2><span class="badge align-self-start {% if shopping_list.is_active %}text-bg-success{% else %}text-bg-secondary{% endif %}">{% if shopping_list.is_active %}Ativa{% else %}Inativa{% endif %}</span></div>
+      <p class="small text-body-secondary">Criada em {{ shopping_list.created_at|date:'d/m/Y H:i' }} · {{ shopping_list.item_count }} item(ns)</p>
+      <a href="{% url 'shopping_list_detail' shopping_list.pk %}" hx-get="{% url 'shopping_list_detail' shopping_list.pk %}" hx-push-url="true" class="btn btn-outline-primary" title="Ver itens desta lista">Ver itens</a>
+    </div></div></div>
+    {% empty %}<div class="col-12"><div class="alert alert-info">Você ainda não cadastrou uma lista de compras.</div></div>{% endfor %}
+  </div>
+  {% include 'components/_pagination.html' %}
+</div>

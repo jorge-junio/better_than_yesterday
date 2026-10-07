@@ -1,0 +1,30 @@
+{% load l10n %}
+<div data-page-title="{{ page_title }}" data-shopping-section="{{ shopping_section }}" hx-target="#page-content" hx-swap="innerHTML">
+  <h1 class="h3 mb-2 text-break">{{ session.list_name }}</h1>
+  <p class="text-body-secondary">Iniciada em {{ session.started_at|date:'d/m/Y H:i' }}{% if session.finished_at %} · Encerrada em {{ session.finished_at|date:'d/m/Y H:i' }}{% endif %}</p>
+  <span class="badge mb-3 {% if editable %}text-bg-info{% elif session.status == 'completed' %}text-bg-success{% else %}text-bg-secondary{% endif %}">{{ session.get_status_display }}</span>
+  {% if editable %}
+  <p class="text-body-secondary">Informe as quantidades compradas, inclusive decimais (ex.: 1,5). Use 0 se não comprou o item. Salve o progresso para retomar depois.</p>
+  {% if saved %}<div class="alert alert-success" role="status">Progresso salvo.</div>{% endif %}
+  <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-disabled-elt="find button[type='submit']" data-shopping-progress data-shopping-dirty="{% if form.errors %}true{% else %}false{% endif %}">
+    {% csrf_token %}
+    <div class="alert alert-danger" role="alert" data-shopping-error hidden>Não foi possível salvar. Confira sua conexão e tente novamente; as quantidades continuam nos campos.</div>
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row g-3 mb-4">
+    {% for field in form %}<div class="col-12 col-md-6"><div class="card h-100"><div class="card-body">
+      <label for="{{ field.id_for_label }}" class="form-label fw-semibold text-break">{{ field.label }}</label>{{ field }}
+      {% for error in field.errors %}<div class="text-danger small" role="alert">{{ error }}</div>{% endfor %}
+    </div></div></div>{% endfor %}
+    </div>
+    {% if perms.shopping.change_shoppingsession %}<div class="d-flex flex-wrap gap-2">
+      <button type="submit" name="action" value="save" class="btn btn-outline-primary" title="Salvar quantidades e continuar comprando">Salvar progresso</button>
+      <button type="submit" name="action" value="finish" class="btn btn-success" title="Salvar quantidades e informar o valor total">Finalizar compras</button>
+      <a href="{% url 'shopping_cancel' session.pk %}" hx-get="{% url 'shopping_cancel' session.pk %}" hx-push-url="true" class="btn btn-outline-danger" title="Cancelar esta compra">Cancelar compra</a>
+    </div>{% endif %}
+  </form>
+  {% else %}
+    {% if session.status == 'completed' %}<div class="alert alert-success fs-5">Valor total: <strong>R$ {{ session.total|floatformat:2 }}</strong></div>{% endif %}
+    <div class="vstack gap-2 mb-4">{% for item in session.items.all %}<div class="card"><div class="card-body d-flex flex-wrap justify-content-between gap-2"><strong class="text-break">{{ item.name }}</strong><span>{% if item.quantity == None %}Não informado{% elif item.quantity == 0 %}Não comprado{% else %}Quantidade: {{ item.quantity|floatformat:'-3' }}{% endif %}</span></div></div>{% endfor %}</div>
+  {% endif %}
+  <div class="mt-3"><a href="{% if editable %}{% url 'shopping_start' %}{% else %}{% url 'shopping_history' %}{% endif %}" class="btn btn-outline-secondary" title="{% if editable %}Voltar para fazer feira{% else %}Voltar ao histórico{% endif %}">Voltar</a></div>
+</div>

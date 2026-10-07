@@ -92,6 +92,9 @@
     }
   </style>
   <link rel="stylesheet" href="{% static 'app/mobile.css' %}">
+  <link rel="stylesheet" href="{% static 'workouts/workouts.css' %}">
+  <script src="{% static 'workouts/workouts.js' %}" defer></script>
+  <script src="{% static 'shopping/shopping.js' %}" defer></script>
   <script>
     function getCookie(name) {
       const cookieValue = document.cookie
@@ -268,6 +271,16 @@
 
       const groupMatchers = [
         {
+          toggle: '#sidebarShoppingToggle',
+          panel: '#sidebarShoppingGroup',
+          shouldActivate: (pathname) => pathname.startsWith('/shopping/'),
+        },
+        {
+          toggle: '#sidebarWorkoutsToggle',
+          panel: '#sidebarWorkoutsGroup',
+          shouldActivate: (pathname) => pathname.startsWith('/workouts/'),
+        },
+        {
           toggle: '#sidebarTasksToggle',
           panel: '#sidebarTasksGroup',
           shouldActivate: function (pathname) {
@@ -288,7 +301,18 @@
 
       sidebar.querySelectorAll('.sidebar-nav-link').forEach((link) => {
         const linkPath = new URL(link.getAttribute('href'), window.location.origin).pathname;
-        if (matchesPath(currentPath, linkPath) || currentPath.startsWith(linkPath)) {
+        let active = matchesPath(currentPath, linkPath) || currentPath.startsWith(linkPath);
+        if (linkPath.startsWith('/workouts/')) {
+          const section = document.querySelector('[data-workout-section]');
+          const routes = { workout: '/workouts/', train: '/workouts/train/', history: '/workouts/history/' };
+          active = currentPath.startsWith('/workouts/') && section && linkPath === routes[section.dataset.workoutSection];
+        }
+        if (linkPath.startsWith('/shopping/')) {
+          const section = document.querySelector('[data-shopping-section]');
+          const routes = { lists: '/shopping/', start: '/shopping/start/', history: '/shopping/history/' };
+          active = currentPath.startsWith('/shopping/') && section && linkPath === routes[section.dataset.shoppingSection];
+        }
+        if (active) {
           link.classList.add('active');
           link.setAttribute('aria-current', 'page');
         }

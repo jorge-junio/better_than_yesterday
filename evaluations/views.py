@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -59,7 +60,10 @@ class EvaluationDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['word_return_to_url'] = self.request.get_full_path()
+        items_page = Paginator(list(self.object.items.all()), 1).get_page(self.request.GET.get('page'))
+        detail_url = reverse('evaluation_detail', kwargs={'pk': self.object.pk})
+        context['items_page'] = items_page
+        context['word_return_to_url'] = f'{detail_url}?page={items_page.number}'
         return context
 
 

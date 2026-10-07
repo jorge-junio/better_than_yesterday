@@ -1,0 +1,50 @@
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page">
+  <div class="workout-hero rounded-4 p-3 p-md-4 mb-4"><h1 class="h2">Histórico e evolução</h1><p class="mb-0 opacity-75">Consulte sessões antigas e compare seus resultados por exercício.</p></div>
+  <div class="card mb-4"><div class="card-body">
+    <form method="get" action="{% url 'workout_history' %}" hx-get="{% url 'workout_history' %}" hx-push-url="true" class="row g-3 align-items-end">
+      {% for field in form %}<div class="col-12 col-md-6 col-xl-4">{{ field.label_tag }}{{ field }}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}
+      <div class="col-12 col-md-6 col-xl-4 d-flex flex-wrap gap-2"><button type="submit" class="btn btn-primary" title="Filtrar histórico e relatórios">Filtrar</button><a href="{% url 'workout_history' %}" class="btn btn-outline-secondary" title="Limpar filtros">Limpar</a></div>
+    </form>
+    {% if form.non_field_errors %}<div class="alert alert-danger mt-3 mb-0" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  </div></div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Concluídas</div><div class="h2 mb-0">{{ summary.completed }}</div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Parciais</div><div class="h2 mb-0">{{ summary.partial }}</div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Em andamento</div><div class="h2 mb-0">{{ summary.ongoing }}</div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Séries registradas</div><div class="h2 mb-1">{{ summary.adherence }}%</div><div class="small text-body-secondary">{{ summary.saved_sets }} de {{ summary.planned_sets }}</div></div></div></div>
+  </div>
+  <h2 class="h4 mb-3">Sessões</h2>
+  <div class="vstack gap-3">
+    {% for session in sessions %}<div class="card"><div class="card-body d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+      <div><h3 class="h5">{{ session.workout_name }}</h3><p class="small text-body-secondary mb-1">{{ session.date|date:'d/m/Y' }} · {{ session.get_scheduled_weekday_display }} · {{ session.saved_sets }}/{{ session.total_sets }} séries registradas</p><span class="badge {% if session.status == 'completed' %}text-bg-success{% elif session.status == 'partial' %}text-bg-warning{% else %}text-bg-info{% endif %}">{{ session.get_status_display }}</span></div>
+      <div><a href="{% url 'workout_session' session.pk %}" class="btn btn-outline-info" title="Ver sessão de {{ session.date|date:'d/m/Y' }}">{% if session.is_open %}Retomar{% else %}Ver detalhes{% endif %}</a></div>
+    </div></div>{% empty %}<div class="card"><div class="card-body py-4 text-center text-body-secondary">Nenhuma sessão encontrada. Inicie um treino ou ajuste os filtros.</div></div>{% endfor %}
+  </div>
+  <div class="mt-4">{% include 'components/_pagination.html' %}</div>
+  <h2 class="h4 mt-5 mb-2">Relatórios</h2>
+  <p class="small text-body-secondary">Os relatórios consideram todos os resultados dos filtros acima, além da página atual. A taxa de séries usa a programação original das sessões selecionadas.</p>
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-lg-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Sessões concluídas por semana</h3><div class="vstack gap-2">{% for week in weeks %}<div class="d-flex justify-content-between gap-2 border-top pt-2"><span>Semana de {{ week.period|date:'d/m/Y' }}</span><strong>{{ week.count }}</strong></div>{% empty %}<p class="small text-body-secondary mb-0">Ainda não há sessões concluídas.</p>{% endfor %}</div></div></div></div>
+    <div class="col-12 col-lg-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Sessões concluídas por mês</h3><div class="vstack gap-2">{% for month in months %}<div class="d-flex justify-content-between gap-2 border-top pt-2"><span>{{ month.period|date:'F/Y' }}</span><strong>{{ month.count }}</strong></div>{% empty %}<p class="small text-body-secondary mb-0">Ainda não há sessões concluídas.</p>{% endfor %}</div></div></div></div>
+  </div>
+  <div class="card mb-4"><div class="card-body">
+    <h3 class="h5">Resultados por exercício</h3>
+    <p class="small text-body-secondary">Volume registrado = soma de repetições × peso informado. Para exercícios sem carga externa, informe 0 kg.</p>
+    <div class="table-responsive"><table class="table mobile-card-table align-middle"><thead><tr><th>Exercício</th><th>Séries</th><th>Repetições</th><th>Maior carga</th><th>Volume</th></tr></thead><tbody>
+    {% for row in performance %}<tr><td data-label="Exercício">{{ row.session_exercise__exercise_name }}</td><td data-label="Séries">{{ row.series }}</td><td data-label="Repetições">{{ row.total_repetitions }}</td><td data-label="Maior carga">{{ row.max_weight }} kg</td><td data-label="Volume">{{ row.volume }} kg·rep.</td></tr>{% empty %}<tr><td colspan="5" class="text-center text-body-secondary">Nenhuma série registrada para estes filtros.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <h3 class="h5">Evolução por sessão{% if selected_exercise %}: {{ selected_exercise.name }}{% endif %}</h3>
+    {% if not selected_exercise %}<p class="text-body-secondary mb-0">Selecione um exercício no filtro para comparar a carga e as repetições entre as sessões.</p>
+    {% elif not evolution %}<p class="text-body-secondary mb-0">Nenhum resultado registrado para este exercício nos filtros selecionados.</p>
+    {% else %}
+    <p class="small text-body-secondary">Últimas 30 sessões com séries registradas. Compare a carga junto com a quantidade de repetições.</p>
+    {{ evolution_chart|json_script:'workout-evolution-data' }}
+    <div class="row g-3 mb-4"><div class="col-12 col-lg-6"><div class="workout-chart"><canvas id="workout-weight-chart" role="img" aria-label="Evolução da maior carga por sessão"></canvas></div></div><div class="col-12 col-lg-6"><div class="workout-chart"><canvas id="workout-repetitions-chart" role="img" aria-label="Evolução das repetições totais por sessão"></canvas></div></div></div>
+    <div class="table-responsive"><table class="table mobile-card-table align-middle"><thead><tr><th>Sessão</th><th>Séries</th><th>Repetições</th><th>Maior carga</th><th>Volume</th></tr></thead><tbody>
+    {% for row in evolution %}<tr><td data-label="Sessão"><a href="{% url 'workout_session' row.session_exercise__session_id %}" title="Ver sessão">{{ row.session_exercise__session__date|date:'d/m/Y' }} · #{{ row.session_exercise__session_id }}</a></td><td data-label="Séries">{{ row.series }}</td><td data-label="Repetições">{{ row.total_repetitions }}</td><td data-label="Maior carga">{{ row.max_weight }} kg</td><td data-label="Volume">{{ row.volume }} kg·rep.</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% endif %}
+  </div></div>
+</div>

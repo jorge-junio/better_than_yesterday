@@ -27,9 +27,24 @@
             <hr>
 
             <h5 class="mb-3">Itens</h5>
-            {% if object.items.all %}
+            {% if items_page.object_list %}
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <span class="fw-semibold" aria-live="polite">Item {{ items_page.number }} de {{ items_page.paginator.count }}</span>
+                <nav class="d-flex gap-2" aria-label="Navegação dos itens da avaliação">
+                    {% if items_page.has_previous %}
+                    <a href="?page={{ items_page.previous_page_number }}" class="btn btn-outline-secondary" title="Ver item anterior" hx-get="{% url 'evaluation_detail' object.id %}?page={{ items_page.previous_page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Anterior</a>
+                    {% else %}
+                    <button type="button" class="btn btn-outline-secondary" title="Você está no primeiro item" disabled>Anterior</button>
+                    {% endif %}
+                    {% if items_page.has_next %}
+                    <a href="?page={{ items_page.next_page_number }}" class="btn btn-outline-secondary" title="Ver próximo item" hx-get="{% url 'evaluation_detail' object.id %}?page={{ items_page.next_page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Próximo</a>
+                    {% else %}
+                    <button type="button" class="btn btn-outline-secondary" title="Você está no último item" disabled>Próximo</button>
+                    {% endif %}
+                </nav>
+            </div>
             <div class="vstack gap-3">
-                {% for item in object.items.all %}
+                {% for item in items_page %}
                 <div class="p-3 rounded-4 border border-1 {% if item.is_correct %}border-success bg-success-subtle{% else %}border-danger bg-danger-subtle{% endif %}">
                     <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-2">
                         <div class="d-flex flex-wrap gap-2">

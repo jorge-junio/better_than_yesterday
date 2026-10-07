@@ -1,0 +1,31 @@
+.workout-page { overflow-wrap: anywhere; }
+.workout-hero { background: linear-gradient(120deg, #0f172a, #164e63 60%, #0f766e); color: #fff; }
+.workout-form-shell { max-width: 48rem; }
+.workout-sets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+.workout-set { min-width: 0; background: var(--bs-tertiary-bg); }
+.workout-set label { font-size: .9rem; margin-bottom: .3rem; }
+.workout-chart canvas { max-width: 100%; }
+.workout-chart { position: relative; height: 18rem; min-width: 0; }
+[data-set-form][aria-busy='true'] { opacity: .75; }
+@media (max-width: 767.98px) {
+  .workout-set .btn { width: 100%; }
+  .workout-form-shell { max-width: 100%; }
+}
+
+.workout-day-toggle[aria-expanded='true'] .workout-day-expand,
+.workout-day-toggle[aria-expanded='false'] .workout-day-minimize { display: none; }
+
+.workout-rest-timer {
+  position: fixed;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  right: max(1rem, env(safe-area-inset-right));
+  width: 23rem;
+  max-width: calc(100vw - 2rem);
+  z-index: 1030;
+}
+.workout-rest-timer[hidden] { display: none !important; }
+.workout-rest-time { font-size: 2.75rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.workout-page.rest-timer-visible { padding-bottom: 14rem; }
+@media (max-width: 767.98px) {
+  .workout-rest-timer { left: max(1rem, env(safe-area-inset-left)); right: max(1rem, env(safe-area-inset-right)); width: auto; }
+}

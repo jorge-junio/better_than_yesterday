@@ -1,0 +1,28 @@
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page">
+  <div class="workout-hero p-3 p-md-4 rounded-4 mb-4"><div class="small opacity-75 mb-1">{{ today|date:'l, d/m/Y' }}</div><h1 class="h2">Treinar</h1><p class="mb-0 opacity-75">Uma série de cada vez. Registre suas repetições e a carga utilizada.</p></div>
+  {% if ongoing %}
+  <div class="card border-info mb-4"><div class="card-body"><h2 class="h5">Você tem uma sessão em andamento</h2><p>{{ ongoing.workout_name }} · iniciada em {{ ongoing.started_at|date:'d/m/Y H:i' }}</p><a href="{% url 'workout_session' ongoing.pk %}" class="btn btn-info" title="Retomar sessão">Retomar treino</a></div></div>
+  {% elif not active %}
+  <div class="alert alert-info">Você ainda não tem um treino ativo. Cadastre ou ative um treino para começar.</div>
+  {% if perms.workouts.view_workout %}<a href="{% url 'workout_list' %}" class="btn btn-primary" title="Gerenciar treinos">Meus treinos</a>{% endif %}
+  {% else %}
+  <div class="row g-4">
+    <div class="col-12 col-lg-5">
+      <div class="card"><div class="card-body">
+        <h2 class="h5">{{ active.name }}</h2><p class="text-body-secondary small">Válido de {{ active.start_date|date:'d/m/Y' }}{% if active.end_date %} a {{ active.end_date|date:'d/m/Y' }}{% else %} · Sem data final{% endif %}</p>
+        <p class="small text-body-secondary">{% if active.rest_seconds %}Descanso entre séries: {{ active.rest_seconds }} segundos{% else %}Descanso automático desativado{% endif %}</p>
+        {% if not valid %}<div class="alert alert-warning">Este treino está fora do período de validade. Ajuste as datas para iniciar uma nova sessão.</div>{% endif %}
+        <form method="post" action="{% url 'workout_train' %}" hx-post="{% url 'workout_train' %}" hx-disabled-elt="find button[type='submit']">
+          {% csrf_token %}{{ form.request_id }}
+          {% if form.errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}{{ form.weekday.errors }}{{ form.request_id.errors }}</div>{% endif %}
+          <div class="mb-3">{{ form.weekday.label_tag }}{{ form.weekday }}<div class="form-text">Hoje é o padrão. Você pode executar a programação de outro dia; a sessão será registrada na data de hoje.</div></div>
+          {% if valid and perms.workouts.add_workoutsession %}<button type="submit" class="btn btn-success w-100" title="Iniciar sessão de treino"><i aria-hidden="true" class="bi bi-play-fill"></i> Iniciar treino</button>{% endif %}
+        </form>
+      </div></div>
+    </div>
+    <div class="col-12 col-lg-7"><div class="vstack gap-3">
+      {% for day in days %}<div class="card"><div class="card-body"><h3 class="h6">{{ day.label }}</h3>{% for entry in day.exercises %}<div class="d-flex flex-wrap justify-content-between gap-2 border-top py-2"><span>{{ entry.exercise.name }}</span><span class="text-body-secondary small">{{ entry.sets_count }} × {{ entry.repetitions }}</span></div>{% empty %}<p class="text-body-secondary small mb-0">Descanso</p>{% endfor %}</div></div>{% endfor %}
+    </div></div>
+  </div>
+  {% endif %}
+</div>

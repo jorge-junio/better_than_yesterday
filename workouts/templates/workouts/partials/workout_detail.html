@@ -1,0 +1,51 @@
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page">
+  <div class="workout-hero rounded-4 p-3 p-md-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+      <div><h1 class="h2">{{ workout.name }}</h1><p class="mb-2 opacity-75">{{ workout.start_date|date:'d/m/Y' }}{% if workout.end_date %} a {{ workout.end_date|date:'d/m/Y' }}{% else %} · Sem data final{% endif %}</p><p class="small opacity-75 mb-2">{% if workout.rest_seconds %}Descanso entre séries: {{ workout.rest_seconds }} segundos{% else %}Descanso automático desativado{% endif %}</p><span class="badge text-bg-light">{% if workout.is_archived %}Arquivado{% elif workout.is_active %}Ativo{% else %}Inativo{% endif %}</span></div>
+      <div class="d-flex flex-wrap gap-2 align-items-start">
+        {% if perms.workouts.change_workout %}
+          {% if not workout.is_archived %}<a href="{% url 'workout_update' workout.pk %}" class="btn btn-light" title="Editar treino">Editar treino</a>{% endif %}
+          <a href="{% url 'workout_archive' workout.pk %}" class="btn btn-outline-light" title="{% if workout.is_archived %}Restaurar{% else %}Arquivar{% endif %} treino">{% if workout.is_archived %}Restaurar{% else %}Arquivar{% endif %}</a>
+        {% endif %}
+        <a href="{% url 'workout_list' %}" class="btn btn-outline-light" title="Voltar aos treinos">Voltar</a>
+      </div>
+    </div>
+  </div>
+  <p class="text-body-secondary small">Alterações na programação valem para novas sessões. Seu histórico e as sessões em andamento são preservados.</p>
+  <div class="row g-3">
+    {% for day in days %}
+    <div class="col-12 col-xl-6">
+      <section class="card"><div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <h2 class="h5 mb-0">{{ day.label }}</h2>
+          <div class="d-flex flex-wrap gap-2">
+            {% if day.exercises %}
+            <button type="button" class="btn btn-outline-secondary btn-sm workout-day-toggle" data-bs-toggle="collapse" data-bs-target="#workout-{{ workout.pk }}-day-{{ day.number }}" aria-expanded="false" aria-controls="workout-{{ workout.pk }}-day-{{ day.number }}" title="Minimizar ou expandir exercícios de {{ day.label }}">
+              <span class="workout-day-minimize"><i aria-hidden="true" class="bi bi-chevron-up"></i> Minimizar</span>
+              <span class="workout-day-expand"><i aria-hidden="true" class="bi bi-chevron-down"></i> Expandir</span>
+            </button>
+            {% endif %}
+            {% if day.exercises and perms.workouts.view_workout and perms.workouts.add_workoutexercise and not workout.is_archived %}<a href="{% url 'workout_day_copy' workout.pk day.number %}" class="btn btn-outline-info btn-sm" title="Copiar exercícios de {{ day.label }} para outro dia"><i aria-hidden="true" class="bi bi-files"></i> Copiar dia</a>{% endif %}
+            {% if perms.workouts.add_workoutexercise and not workout.is_archived %}<a href="{% url 'workout_exercise_create' workout.pk %}?weekday={{ day.number }}" class="btn btn-outline-primary btn-sm" title="Adicionar exercício para {{ day.label }}"><i aria-hidden="true" class="bi bi-plus"></i> Exercício</a>{% endif %}
+          </div>
+        </div>
+        <div id="workout-{{ workout.pk }}-day-{{ day.number }}"{% if day.exercises %} class="collapse"{% endif %}>
+        <div class="vstack gap-3 pt-3">
+          {% for entry in day.exercises %}
+          <div class="rounded-3 border p-3">
+            <h3 class="h6">{{ entry.position }}. {{ entry.exercise.name }}</h3>
+            <p class="mb-1 text-body-secondary">{{ entry.sets_count }} séries · {{ entry.repetitions }} repetições por série</p>
+            {% if entry.notes %}<p class="small text-body-secondary mb-2">{{ entry.notes|linebreaksbr }}</p>{% endif %}
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              {% if perms.workouts.change_workoutexercise and not workout.is_archived %}<a href="{% url 'workout_exercise_update' workout.pk entry.pk %}" class="btn btn-outline-secondary btn-sm" title="Editar {{ entry.exercise.name }}">Editar</a>{% endif %}
+              {% if perms.workouts.delete_workoutexercise and not workout.is_archived %}<a href="{% url 'workout_exercise_remove' entry.pk %}" class="btn btn-outline-danger btn-sm" title="Remover {{ entry.exercise.name }}">Remover</a>{% endif %}
+            </div>
+          </div>
+          {% empty %}<p class="text-body-secondary small mb-0">Sem exercícios programados. Dia de descanso.</p>{% endfor %}
+        </div>
+        </div>
+      </div></section>
+    </div>
+    {% endfor %}
+  </div>
+</div>

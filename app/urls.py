@@ -19,5 +19,7 @@ urlpatterns = [
     path('', include('english_words.urls')),
     path('', include('evaluations.urls')),
     path('', include('tasks.urls')),
+    path('', include('workouts.urls')),
+    path('', include('shopping.urls')),
     path('', include('recurring_tasks.urls')),
 ]
