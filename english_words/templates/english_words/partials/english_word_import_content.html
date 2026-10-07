@@ -1,0 +1,48 @@
+<div data-page-title="{{ page_title }}">
+    <h1 class="display-6 mb-3">Importar palavras em inglês</h1>
+    {% if import_stats %}
+    <div class="alert alert-success" role="status">
+        Importação concluída. Palavras novas: {{ import_stats.created_words }}.
+        Palavras atualizadas: {{ import_stats.updated_words }}. Significados adicionados: {{ import_stats.created_meanings }}.
+    </div>
+    {% endif %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p>Envie um arquivo CSV ou JSON de até 5 MB. Você pode importar os arquivos baixados pelos botões de exportação.</p>
+            <p>Por padrão, novas palavras e significados são acrescentados sem duplicar os existentes. Observações já preenchidas são preservadas.</p>
+            <form method="post" enctype="multipart/form-data" action="{% url 'english_word_import' %}"
+                  hx-post="{% url 'english_word_import' %}" hx-encoding="multipart/form-data"
+                  hx-target="#page-content" hx-swap="innerHTML" hx-boost="false">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="mb-3">
+                    <label for="{{ form.file.id_for_label }}" class="form-label">{{ form.file.label }}</label>
+                    {{ form.file }}
+                    {% for error in form.file.errors %}<div class="text-danger mt-1" role="alert">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="form-check mb-2">
+                    {{ form.replace }}
+                    <label for="{{ form.replace.id_for_label }}" class="form-check-label">{{ form.replace.label }}</label>
+                </div>
+                <p class="small text-body-secondary">Ao marcar essa opção, apenas as palavras presentes no arquivo terão seus significados e observações substituídos. As demais palavras serão mantidas.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-success" title="Importar as palavras do arquivo selecionado" hx-disabled-elt="this">Importar palavras</button>
+                    <a href="{% url 'english_word_list' %}" class="btn btn-secondary" title="Voltar à lista de palavras" hx-get="{% url 'english_word_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar</a>
+                </div>
+            </form>
+            <details class="mt-4">
+                <summary>Como preparar o arquivo</summary>
+                <p class="mt-2 mb-1">CSV em UTF-8, separado por vírgulas, com uma linha por significado. A coluna Observação é opcional. Use um significado vazio para uma palavra sem significados.</p>
+                <pre class="bg-body-tertiary p-3 rounded text-wrap">Palavra,Significado,Observação
+APPLE,MAÇÃ,FRUTA
+APPLE,MACIEIRA,FRUTA</pre>
+                <p>JSON com uma lista de palavras, cada uma contendo <code>word</code>, <code>note</code> (opcional) e <code>meanings</code>:</p>
+                <pre class="bg-body-tertiary p-3 rounded text-wrap">[
+  {"word": "APPLE", "note": "FRUTA", "meanings": ["MAÇÃ", "MACIEIRA"]}
+]</pre>
+            </details>
+        </div>
+    </div>
+</div>

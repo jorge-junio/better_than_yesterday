@@ -27,4 +27,4 @@ Compras concluídas ficam somente para consulta. Cada compra preserva os nomes d
 
 O módulo exige conexão com o servidor. Os dados pertencem ao usuário dentro de cada tenant. As permissões Django de `shopping` controlam visualização, cadastro e execução; conceda as permissões aos grupos desejados em **Admin → Grupos**. Superusuários já possuem acesso.
 
-Na implantação, execute `python manage.py migrate_schemas` e `python manage.py collectstatic --noinput` no ambiente configurado do servidor.
+Na implantação, execute `python manage.py migrate` e `python manage.py collectstatic --noinput` no ambiente configurado do servidor.

@@ -1,8 +1,5 @@
 from pathlib import Path
 from decouple import config
-import dj_database_url
-from app.shared_apps import SHARED_APPS
-from app.tenant_apps import TENANT_APPS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,11 +21,25 @@ ALLOWED_HOSTS = config(
 )
 
 # Application definition
-INSTALLED_APPS = SHARED_APPS + TENANT_APPS
-
-# define tenant model
-TENANT_MODEL = "tenants.Client"
-TENANT_DOMAIN_MODEL = "tenants.Domain"
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'categories',
+    'progress',
+    'projects',
+    'project_tasks',
+    'possible_tasks',
+    'recurring_tasks',
+    'english_words',
+    'evaluations',
+    'tasks',
+    'workouts',
+    'shopping',
+]
 
 # qual é o name que definimos para a rota de login
 LOGIN_URL = 'login'
@@ -38,7 +49,6 @@ LOGIN_REDIRECT_URL = '/tasks/today/'
 LOGOUT_REDIRECT_URL = '/login'
 
 MIDDLEWARE = [
-    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,17 +82,15 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django_tenants.postgresql_backend',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default='5432'),
+        'OPTIONS': {'options': '-c search_path=public'},
     }
 }
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
 
 
 # Password validation

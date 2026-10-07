@@ -9,17 +9,31 @@
                 <div class="text-uppercase small fw-semibold opacity-75 mb-2">Vocabulário</div>
                 <h1 class="display-6 mb-2">Palavras em inglês</h1>
                 <p class="mb-0 opacity-75">Salve palavras, uma lista de significados e observações para consultar quando precisar.</p>
+                <div class="mt-3"><span class="badge bg-white text-primary">Total de palavras cadastradas: {{ paginator.count }}</span></div>
             </div>
         </div>
     </div>
 
-    {% if perms.english_words.add_englishword %}
-    <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
+    <div class="col-lg-4 d-flex flex-wrap gap-2 align-items-start justify-content-lg-end mt-3 mt-lg-0">
+        {% if perms.english_words.add_englishword %}
         <a href="{% url 'english_word_create' %}" class="btn btn-success" title="Nova palavra em inglês" hx-get="{% url 'english_word_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
             <i class="bi bi-plus"></i> Nova palavra
         </a>
+        {% endif %}
+        {% if perms.english_words.view_englishword %}
+        <a href="{% url 'english_word_export' %}?format=csv" class="btn btn-outline-primary" title="Exportar todas as palavras em CSV" hx-boost="false">
+            <i class="bi bi-download"></i> Exportar CSV
+        </a>
+        <a href="{% url 'english_word_export' %}?format=json" class="btn btn-outline-primary" title="Exportar todas as palavras em JSON" hx-boost="false">
+            <i class="bi bi-download"></i> Exportar JSON
+        </a>
+        {% endif %}
+        {% if perms.english_words.add_englishword and perms.english_words.change_englishword %}
+        <a href="{% url 'english_word_import' %}" class="btn btn-outline-success" title="Importar palavras de um arquivo CSV ou JSON" hx-get="{% url 'english_word_import' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+            <i class="bi bi-upload"></i> Importar
+        </a>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
 <div class="card shadow-sm">

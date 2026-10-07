@@ -34,6 +34,12 @@ O sistema deve permitir a configuração de regras para geração automática de
 - **RNF02 - Persistência:** Uma tarefa gerada por recorrência, uma vez concluída, deve manter seu estado mesmo se a regra de recorrência original for alterada.
 - **RNF03 - Interface Responsiva:** O sistema deve ser acessível via desktop e dispositivos móveis.
 
+### 4.1. Banco de dados
+
+- Um único banco PostgreSQL, com as tabelas da aplicação no schema `public`.
+- Sem tenants ou seleção de schema por domínio. Os hosts permitidos acessam a mesma aplicação.
+- O isolamento por usuário existente nos módulos é mantido.
+
 ## 5. Fluxo de Usuário (User Flow)
 1. O usuário acessa o menu **"Recorrências"** e cadastra "Academia" para Segundas e Quartas.
 2. O sistema verifica a data atual. Se for uma Segunda-feira, ao abrir a **"Agenda do Dia"**, a tarefa "Academia" já estará listada.
@@ -51,7 +57,7 @@ O sistema deve permitir a configuração de regras para geração automática de
 
 ### 7.1. Navegação e escopo
 - Grupo **Treinos**, com itens **Treino**, **Histórico** e **Treinar**.
-- Dados isolados por usuário dentro do tenant. As permissões Django controlam cadastro, consulta e execução.
+- Dados isolados por usuário. As permissões Django controlam cadastro, consulta e execução.
 - Interface em português, com campos numéricos, cartões e botões adequados ao celular.
 
 ### 7.2. Programação
@@ -84,7 +90,7 @@ O sistema deve permitir a configuração de regras para geração automática de
 - Mostrar a última execução registrada do exercício como referência durante o treino.
 
 ### 7.5. Aceite
-- Isolamento entre usuários e tenants em todas as consultas e alterações.
+- Isolamento entre usuários em todas as consultas e alterações.
 - Restrição de único treino ativo e única sessão aberta, inclusive com requisições concorrentes.
 - Retomada dos dados salvos após fechar a página, sem duplicações ao reenviar.
 - Mudanças e remoções na programação não alteram sessões existentes.
@@ -101,7 +107,7 @@ O sistema deve permitir a configuração de regras para geração automática de
 ## 9. Compras e feira
 
 - Grupo **Compras**, com **Itens da feira**, **Fazer feira** e **Histórico**, com ícones compatíveis com a interface.
-- Listas reutilizáveis por usuário dentro do tenant, com nome, criação automática e situação ativa/inativa. Várias listas podem estar ativas.
+- Listas reutilizáveis por usuário, com nome, criação automática e situação ativa/inativa. Várias listas podem estar ativas.
 - Cada lista tem seus próprios itens com nome e situação ativa/inativa, sem nomes duplicados na mesma lista (ignorando maiúsculas/minúsculas).
 - Escolher uma lista ativa e pré-selecionar pelo menos um dos seus itens ativos antes de iniciar a compra.
 - Uma compra em andamento por usuário, com possibilidade de retomar ou cancelar mediante confirmação.
@@ -110,3 +116,13 @@ O sistema deve permitir a configuração de regras para geração automática de
 - Finalização exige quantidade informada para todos os itens, ao menos um item com quantidade positiva e valor total em reais não negativo com até duas casas decimais. Confirmar o total encerra a compra e torna seus dados somente para consulta.
 - Histórico com data, situação, nome da lista, itens, quantidades e valor total. Filtrar por período de finalização e somar o gasto das compras concluídas em todo o período filtrado.
 - Permissões Django e isolamento por usuário em todas as consultas e gravações; proteção contra criação duplicada e finalização repetida. Layout adequado ao celular e fluxo completo validado sem arquivos de teste no repositório.
+
+## 10. Importação e exportação de vocabulário
+
+- Exportar todas as palavras, seus significados e observações em CSV ou JSON pela lista de palavras, independentemente da paginação.
+- Importar os mesmos formatos pela interface, com arquivo UTF-8 de até 5 MB e validação integral antes de gravar. Arquivos inválidos não devem causar importação parcial.
+- CSV com colunas `Palavra`, `Significado` e `Observação` opcional, uma linha por significado. JSON com uma lista de objetos contendo `word`, `note` opcional e a lista `meanings`.
+- Converter palavras, significados e observações importados para maiúsculas, tanto em CSV quanto em JSON. Ao mesclar, normalizar também os textos existentes das palavras presentes no arquivo, preservando IDs e vínculos.
+- Identificar palavras e significados existentes sem diferenciar maiúsculas e minúsculas. Por padrão, acrescentar significados ausentes, preencher observações vazias e preservar observações existentes.
+- Oferecer substituição explícita dos significados e observações apenas das palavras contidas no arquivo, preservando as demais palavras e os vínculos com avaliações.
+- Exportação exige permissão de consulta; importação exige permissões de cadastro e alteração de palavras. Exibir totais após a importação e botões com `title`, adequados ao celular e à navegação HTMX.

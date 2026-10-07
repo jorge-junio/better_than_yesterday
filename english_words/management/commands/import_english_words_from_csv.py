@@ -3,14 +3,13 @@ import re
 from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connection, transaction
-from django_tenants.utils import get_public_schema_name
+from django.db import transaction
 
 from english_words.models import EnglishMeaning, EnglishWord
 
 
 class Command(BaseCommand):
-    help = 'Importa palavras e traduções do arquivo docs/palavras.csv no schema atual.'
+    help = 'Importa palavras e traduções do arquivo docs/palavras.csv no banco de dados.'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -25,12 +24,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if connection.schema_name == get_public_schema_name():
-            raise CommandError(
-                'Execute este comando dentro de um schema de tenant, por exemplo com '
-                '`tenant_command import_english_words_from_csv -s jjsistemas`.'
-            )
-
         csv_path = Path(options['csv_path']) if options['csv_path'] else Path(__file__).resolve().parents[3] / 'docs' / 'palavras.csv'
         if not csv_path.exists():
             raise CommandError(f'Arquivo não encontrado: {csv_path}')
@@ -41,7 +34,7 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 (
-                    f'Importação concluída em "{connection.schema_name}". '
+                    'Importação concluída. '
                     f'Palavras novas: {stats["created_words"]}. '
                     f'Significados novos: {stats["created_meanings"]}. '
                     f'Palavras atualizadas: {stats["updated_words"]}.'

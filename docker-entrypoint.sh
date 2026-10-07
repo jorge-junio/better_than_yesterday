@@ -24,6 +24,6 @@ while True:
 PY
 
 # Aplica as migrações no boot da aplicação.
-python manage.py migrate_schemas --noinput
+python manage.py migrate --noinput
 
 exec "$@"

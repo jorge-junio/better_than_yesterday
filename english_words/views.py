@@ -1,13 +1,58 @@
+import csv
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import ValidationError
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView, View
 from urllib.parse import urlencode
 
 from app.utils import HtmxTemplateMixin, PageTitleMixin, htmx_redirect, is_htmx_request
 
-from . import forms, models
+from . import forms, models, services
+
+
+class EnglishWordExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'english_words.view_englishword'
+
+    def get(self, request, *args, **kwargs):
+        file_format = request.GET.get('format', 'csv')
+        if file_format not in {'csv', 'json'}:
+            return HttpResponseBadRequest('Formato inválido. Use csv ou json.')
+        records = services.export_word_records()
+        if file_format == 'json':
+            response = HttpResponse(
+                json.dumps(records, ensure_ascii=False, indent=2), content_type='application/json; charset=utf-8',
+            )
+        else:
+            response = HttpResponse(content_type='text/csv; charset=utf-8')
+            response.write('\ufeff')
+            writer = csv.writer(response)
+            writer.writerow(['Palavra', 'Significado', 'Observação'])
+            for record in records:
+                for meaning in record['meanings'] or ['']:
+                    writer.writerow([record['word'], meaning, record['note']])
+        response['Content-Disposition'] = f'attachment; filename="palavras-ingles.{file_format}"'
+        return response
+
+
+class EnglishWordImportView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    template_name = 'english_word_import.html'
+    htmx_template_name = 'english_words/partials/english_word_import_content.html'
+    page_title = 'BTY - Importar palavras em inglês'
+    form_class = forms.EnglishWordImportForm
+    permission_required = ('english_words.add_englishword', 'english_words.change_englishword')
+
+    def form_valid(self, form):
+        try:
+            stats = services.import_word_records(form.records, replace=form.cleaned_data['replace'])
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        return self.render_to_response(self.get_context_data(form=self.form_class(), import_stats=stats))
 
 
 def get_safe_return_to_url(request):

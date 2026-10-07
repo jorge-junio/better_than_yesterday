@@ -43,10 +43,10 @@ O volume é a soma de peso × repetições, conforme a carga informada pelo usu�
 
 ## Instalação e permissões
 
-O app `workouts` está em `TENANT_APPS`. Aplique as migrações em cada ambiente:
+O app `workouts` está em `INSTALLED_APPS`. Aplique as migrações em cada ambiente:
 
 ```sh
-python manage.py migrate_schemas --noinput
+python manage.py migrate --noinput
 python manage.py check
 ```
 

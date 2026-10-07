@@ -1,6 +1,24 @@
 from django import forms
 
 from . import models
+from .services import parse_word_import
+
+
+class EnglishWordImportForm(forms.Form):
+    file = forms.FileField(
+        label='Arquivo CSV ou JSON',
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.csv,.json'}),
+    )
+    replace = forms.BooleanField(
+        required=False,
+        label='Substituir significados e observações das palavras existentes',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+    )
+
+    def clean_file(self):
+        upload = self.cleaned_data['file']
+        self.records = parse_word_import(upload)
+        return upload
 
 
 class EnglishWordLookupForm(forms.Form):
