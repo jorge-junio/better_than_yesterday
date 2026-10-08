@@ -20,6 +20,17 @@ ALLOWED_HOSTS = config(
     cast=lambda value: [host.strip() for host in value.split(',') if host.strip()],
 )
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://bty.jjsistema.com',
+    'http://bty.jjsistema.com',
+]
+
+# dá um nome para o cookie do csrf de modo que cada aplicação tenha seu cookie
+CSRF_COOKIE_NAME = config('CSRF_COOKIE_NAME', default='bty_csrftoken')
+
+# adiciona o protocolo que o nginx usa via docker
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -144,3 +155,5 @@ STORAGES = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
