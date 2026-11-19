@@ -1,0 +1,10 @@
+{% load static %}
+<section class="character-card panel" id="character" aria-labelledby="character-title">
+    <div class="avatar" data-avatar data-state="idle"><img src="{% static 'app/avatars/chibi.png' %}" alt="Seu personagem chibi de cabelos cacheados e óculos" width="1199" height="1312"><span class="avatar-level">Nv. {{ mission.level }}</span></div>
+    <div class="character-info"><p class="eyebrow">Seu personagem</p><h2 id="character-title">{% firstof user.first_name user.username %}</h2><p class="character-class">{{ mission.rank_name }}</p><p class="level-label">Nível {{ mission.level }} <span>· {{ mission.total_xp }} XP total</span></p>
+      <label class="xp-label" for="character-xp"><span>Experiência</span><strong>{{ mission.xp_in_level }} / 100 XP</strong></label>
+      <progress id="character-xp" value="{{ mission.xp_in_level }}" max="100">{{ mission.xp_in_level }}%</progress>
+      <p class="xp-hint">{{ mission.xp_to_next_level }} XP para o próximo nível</p>
+      <span class="streak">{% include 'life_rpg/icon.html' with name='fire' %} {{ mission.streak_days }} dia{{ mission.streak_days|pluralize }} de sequência</span>
+    </div>
+  </section>

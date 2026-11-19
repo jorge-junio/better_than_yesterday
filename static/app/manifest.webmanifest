@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "Life RPG — Better Than Yesterday",
+  "short_name": "Life RPG",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#10131e",
+  "theme_color": "#10131e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

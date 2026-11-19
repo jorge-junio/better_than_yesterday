@@ -31,19 +31,6 @@ body {
   align-self: stretch;
 }
 @media (max-width: 991.98px) {
-  #sidebar-column,
-  body.sidebar-collapsed #sidebar-column {
-    width: min(20rem, 90vw);
-    --bs-offcanvas-width: min(20rem, 90vw);
-  }
-  #sidebar-column .sidebar-shell {
-    overflow-y: auto;
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-  #sidebar-column .sidebar-nav-link,
-  #sidebar-column .sidebar-group-toggle {
-    min-height: 48px;
-  }
   .navbar > .container-fluid > .d-flex {
     width: 100%;
     min-width: 0;

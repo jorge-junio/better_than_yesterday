@@ -1,0 +1,15 @@
+<section class="skills-section" aria-labelledby="skills-title">
+  <div class="section-heading"><div><p class="eyebrow">Desenvolva suas habilidades</p><h2 id="skills-title">Suas skills</h2></div></div>
+  <p class="muted small mb-3">Escolha uma skill em cada tarefa. Cada missão concluída concede 15 XP à habilidade selecionada.</p>
+  <div class="skill-grid">
+    {% for skill in skills %}
+    <article class="skill-card panel">
+      <div class="skill-heading"><span class="skill-icon">{% include 'life_rpg/icon.html' with name=skill.icon %}</span><h3>{{ skill.label }}</h3><span class="badge text-bg-primary">Nv. {{ skill.level }}</span></div>
+      <p class="muted small mb-3">{{ skill.description }}</p>
+      <div class="xp-label"><label for="skill-{{ skill.key }}">{{ skill.total_xp }} XP acumulados</label><strong>{{ skill.xp_in_level }} / 100 XP</strong></div>
+      <progress id="skill-{{ skill.key }}" value="{{ skill.xp_in_level }}" max="100" aria-label="Progresso de {{ skill.label }} no nível {{ skill.level }}">{{ skill.xp_in_level }}%</progress>
+      <p class="muted small mt-2">{{ skill.completed }} tarefa{{ skill.completed|pluralize }} concluída{{ skill.completed|pluralize }} · Faltam {{ skill.xp_to_next_level }} XP para o próximo nível.</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>

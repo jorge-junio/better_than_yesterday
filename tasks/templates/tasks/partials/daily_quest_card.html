@@ -1,0 +1,12 @@
+<article class="quest-card{% if task.completed_at %} is-completed{% elif task.skipped_in %} is-skipped{% endif %}">
+        <span class="quest-icon">{% include 'life_rpg/icon.html' with name='quest' %}</span>
+        <div class="quest-info"><a class="quest-title" href="{% url 'task_detail' task.pk %}">{{ task.title }}</a><p>{% if task.category %}{{ task.category.name }}{% else %}Sem categoria{% endif %} · {{ task.get_priority_display }}{% if task.scheduled_time %} · {{ task.scheduled_time|time:"H:i" }}{% endif %}</p>{% if task.skill %}<span class="quest-skill">{{ task.get_skill_display }}</span>{% endif %}<span class="quest-xp">{% if task.skipped_in and not task.completed_at %}Não realizada{% else %}{% if task.completed_at %}Concluída · {% endif %}+15 XP{% endif %}</span></div>
+        {% if task.completed_at %}<span class="quest-status" aria-label="Concluída">{% include 'life_rpg/icon.html' with name='check' %}</span>
+        {% elif task.skipped_in %}<span class="quest-status quest-not-done" aria-label="Não realizada neste dia">{% include 'life_rpg/icon.html' with name='close' %}</span>
+        {% elif perms.tasks.change_task %}
+        <div class="dashboard-quest-actions">
+          <form method="post" action="{% url 'task_today_complete' task.pk %}" data-complete-quest>{% csrf_token %}<input type="hidden" name="return_to" value="{{ return_to }}"><input type="hidden" name="category" value="{{ selected_category_id }}"><input type="hidden" name="scheduled_date" value="{{ task.scheduled_date|date:'Y-m-d' }}"><button class="quest-complete" title="Concluir {{ task.title }}" aria-label="Concluir {{ task.title }}">{% include 'life_rpg/icon.html' with name='check' %}</button></form>
+          <form method="post" action="{% url 'task_today_skip' task.pk %}" data-skip-quest>{% csrf_token %}<input type="hidden" name="return_to" value="{{ return_to }}"><input type="hidden" name="category" value="{{ selected_category_id }}"><input type="hidden" name="scheduled_date" value="{{ task.scheduled_date|date:'Y-m-d' }}"><button class="quest-complete quest-cancel" title="Marcar {{ task.title }} como não realizada neste dia" aria-label="Marcar {{ task.title }} como não realizada neste dia">{% include 'life_rpg/icon.html' with name='close' %}</button></form>
+        </div>
+        {% endif %}
+      </article>

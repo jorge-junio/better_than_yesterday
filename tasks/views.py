@@ -1,5 +1,6 @@
 from datetime import datetime
 from urllib.parse import urlencode
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,6 +14,7 @@ from app.utils import HtmxTemplateMixin, PageTitleMixin, build_querystring, htmx
 from possible_tasks import services as possible_task_services
 
 from . import forms, models, services
+from .presentation import get_daily_category_context
 
 
 def get_today_reference_date(request):
@@ -127,6 +129,39 @@ class TaskTodayView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permi
             category_id=get_today_category_id(self.request),
         ))
         context['selected_date'] = reference_date
+        status = self.request.GET.get('status', 'pending')
+        category = get_today_category_id(self.request)
+        quests = context['all_tasks']
+        if category == 'none':
+            quests = quests.filter(category__isnull=True)
+        elif category:
+            quests = quests.filter(category_id=category)
+        if status == 'completed':
+            quests = quests.filter(completed_at__isnull=False)
+        elif status == 'skipped':
+            quests = quests.filter(completed_at__isnull=True, skipped_in__isnull=False)
+        elif status != 'all':
+            status = 'pending'
+            quests = context['pending_tasks']
+        context['mission_tasks'] = quests.order_by(*services.get_today_mission_ordering())
+        context['selected_status'] = status
+        return context
+
+
+class TaskTodayAllView(PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    template_name = 'tasks/today_all.html'
+    page_title = 'BTY - Todas as missões de hoje'
+    permission_required = 'tasks.view_task'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mission = services.get_today_mission_context()
+        category_context, tasks = get_daily_category_context(mission, self.request.GET)
+        context.update(category_context)
+        tasks = tasks.order_by('-priority', 'title')
+        context['pending_tasks'] = tasks.filter(completed_at__isnull=True, skipped_in__isnull=True)
+        context['completed_tasks'] = tasks.filter(completed_at__isnull=False)
+        context['cancelled_tasks'] = tasks.filter(completed_at__isnull=True, skipped_in__isnull=False)
         return context
 
 
@@ -271,12 +306,20 @@ class TaskTodayCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
         services.complete_task(task)
 
+        return_to = request.POST.get('return_to')
+        if return_to in {'dashboard', 'task_today_all'}:
+            params = {'completed': '1'}
+            if category_id:
+                params['category'] = category_id
+            return redirect(f"{reverse_lazy(return_to)}?{urlencode(params)}")
+
         if is_htmx_request(request):
             context = services.get_today_mission_context(reference_date=reference_date, category_id=category_id)
             context['page_title'] = 'BTY - Missão do Dia'
             context['selected_date'] = reference_date
             return render(request, 'tasks/partials/today_mission_content.html', context)
 
+        messages.success(request, 'Missão concluída. Seu progresso foi atualizado!', fail_silently=True)
         return redirect(build_task_today_url(reference_date, category_id))
 
 
@@ -288,6 +331,14 @@ class TaskTodaySkipView(LoginRequiredMixin, PermissionRequiredMixin, View):
         category_id = get_today_category_id(request)
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
         services.skip_task_for_today(task)
+
+        return_to = request.POST.get('return_to')
+        if return_to in {'dashboard', 'task_today_all'}:
+            messages.info(request, 'Tarefa marcada como não realizada neste dia.', fail_silently=True)
+            url = str(reverse_lazy(return_to))
+            if category_id:
+                url += f"?{urlencode({'category': category_id})}"
+            return redirect(url)
 
         if is_htmx_request(request):
             context = services.get_today_mission_context(reference_date=reference_date, category_id=category_id)

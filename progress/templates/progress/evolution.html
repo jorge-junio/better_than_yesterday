@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Evolução · Life RPG{% endblock %}
+{% block scripts %}<script src="{% static 'app/life-rpg.js' %}" defer></script>{% endblock %}
+{% block content %}
+<p class="eyebrow">Sua jornada em números</p><h1>Evolução</h1>
+{% include 'life_rpg/skill_progress.html' %}
+{% include 'progress/partials/evolution_content.html' %}
+{{ completion_chart_data|json_script:"completion-chart-data" }}
+{{ range_status_chart_data|json_script:"range-status-chart-data" }}
+{% endblock %}

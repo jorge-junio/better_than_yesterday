@@ -32,12 +32,12 @@
                 <span class="fw-semibold" aria-live="polite">Item {{ items_page.number }} de {{ items_page.paginator.count }}</span>
                 <nav class="d-flex gap-2" aria-label="Navegação dos itens da avaliação">
                     {% if items_page.has_previous %}
-                    <a href="?page={{ items_page.previous_page_number }}" class="btn btn-outline-secondary" title="Ver item anterior" hx-get="{% url 'evaluation_detail' object.id %}?page={{ items_page.previous_page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Anterior</a>
+                    <a href="?page={{ items_page.previous_page_number }}" class="btn btn-outline-secondary" title="Ver item anterior">Anterior</a>
                     {% else %}
                     <button type="button" class="btn btn-outline-secondary" title="Você está no primeiro item" disabled>Anterior</button>
                     {% endif %}
                     {% if items_page.has_next %}
-                    <a href="?page={{ items_page.next_page_number }}" class="btn btn-outline-secondary" title="Ver próximo item" hx-get="{% url 'evaluation_detail' object.id %}?page={{ items_page.next_page_number }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Próximo</a>
+                    <a href="?page={{ items_page.next_page_number }}" class="btn btn-outline-secondary" title="Ver próximo item">Próximo</a>
                     {% else %}
                     <button type="button" class="btn btn-outline-secondary" title="Você está no último item" disabled>Próximo</button>
                     {% endif %}
@@ -54,8 +54,8 @@
                             </span>
                         </div>
                         {% if perms.english_words.change_englishword %}
-                        <a href="{% url 'english_word_update' item.word.id %}?return_to={{ word_return_to_url|urlencode }}" class="btn {% if item.is_correct %}btn-outline-success{% else %}btn-outline-danger{% endif %} btn-sm" title="Editar palavra" hx-get="{% url 'english_word_update' item.word.id %}?return_to={{ word_return_to_url|urlencode }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-pencil-square"></i> Editar palavra
+                        <a href="{% url 'english_word_update' item.word.id %}?return_to={{ word_return_to_url|urlencode }}" class="btn {% if item.is_correct %}btn-outline-success{% else %}btn-outline-danger{% endif %} btn-sm" title="Editar palavra">
+                            {% include 'life_rpg/icon.html' with name='edit' %} Editar palavra
                         </a>
                         {% endif %}
                     </div>
@@ -72,11 +72,11 @@
         </div>
     </div>
     <div class="mt-3 d-flex gap-2 flex-wrap">
-        <a href="{% url 'evaluation_list' %}" class="btn btn-secondary" title="Voltar para a lista" hx-get="{% url 'evaluation_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar para a lista</a>
+        <a href="{% url 'evaluation_list' %}" class="btn btn-secondary" title="Voltar para a lista">Voltar para a lista</a>
         {% if not object.is_completed %}
-        <a href="{% url 'evaluation_quiz' object.id %}" class="btn btn-success" title="Continuar quiz" hx-get="{% url 'evaluation_quiz' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Continuar quiz</a>
+        <a href="{% url 'evaluation_quiz' object.id %}" class="btn btn-success" title="Continuar quiz">Continuar quiz</a>
         {% endif %}
-        <a href="{% url 'evaluation_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'evaluation_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Editar</a>
+        <a href="{% url 'evaluation_update' object.id %}" class="btn btn-warning" title="Editar">Editar</a>
     </div>
 </div>
 </div>

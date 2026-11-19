@@ -1,0 +1,22 @@
+<section id="evolution" class="evolution-section" aria-labelledby="evolution-title">
+    <div class="section-heading"><div><p class="eyebrow">Consistência que vira resultado</p><h2 id="evolution-title">Sua evolução</h2></div></div>
+    <div class="panel report-panel">
+      <h3>Resultados por período</h3>
+      <details class="mission-filters" data-filter-panel {% if filter_form.errors %}open{% endif %}><summary>Filtros</summary>
+<form method="get" action="{% url 'evolution' %}#evolution" class="date-filters">
+        <div><label for="{{ filter_form.start_date.id_for_label }}">Data inicial</label>{{ filter_form.start_date }}{% for error in filter_form.start_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
+        <div><label for="{{ filter_form.end_date.id_for_label }}">Data final</label>{{ filter_form.end_date }}{% for error in filter_form.end_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
+        <button class="primary-button" title="Atualizar período">Atualizar</button>
+      </form>
+</details>
+      {% if filter_form.non_field_errors %}<div class="field-error" role="alert">{{ filter_form.non_field_errors }}</div>{% endif %}
+      <p class="muted report-dates">{{ range_summary.start_date|date:"d/m/Y" }} a {{ range_summary.end_date|date:"d/m/Y" }}</p>
+      <dl class="report-summary"><div><dt>Total</dt><dd>{{ range_summary.total }}</dd></div><div><dt>Concluídas</dt><dd>{{ range_summary.completed }}</dd></div><div><dt>Pendentes abertas</dt><dd>{{ range_summary.pending }}</dd></div><div><dt>Não concluídas</dt><dd>{{ range_summary.not_completed }}</dd></div></dl>
+      <div class="report-charts">
+        <div><h3>Distribuição de hoje</h3><div class="distribution" data-chart="today" role="img" aria-label="Hoje: {{ today_summary.completed }} concluídas, {{ today_summary.pending }} pendentes, {{ today_summary.not_completed }} não concluídas"></div></div>
+        <div><h3>Distribuição do período</h3><div class="distribution" data-chart="range" role="img" aria-label="Período: {{ range_summary.completed }} concluídas, {{ range_summary.pending }} pendentes, {{ range_summary.not_completed }} não concluídas"></div></div>
+      </div>
+      <h3>Produtividade por dia</h3><div class="weekday-chart">{% for day in range_summary.weekday_productivity %}<div class="weekday-row"><span>{{ day.label }}</span><progress value="{{ day.rate }}" max="100" aria-label="{{ day.label }}: {{ day.rate }}%">{{ day.rate }}%</progress><strong>{{ day.rate }}%</strong></div>{% endfor %}</div>
+      <details class="pending-details"><summary>Tarefas pendentes no período <span>{{ range_summary.pending }}</span></summary><div class="pending-list">{% for task in range_summary.pending_tasks %}<article><h4>{{ task.title }}</h4><p class="muted">{{ task.category.name|default:"Sem categoria" }} · {{ task.scheduled_date|date:"d/m/Y" }} · {{ task.scheduled_time|default:"Sem horário" }} · {{ task.get_source_type_display }}</p></article>{% empty %}<p class="muted">Nenhuma pendência no intervalo selecionado.</p>{% endfor %}</div></details>
+    </div>
+  </section>

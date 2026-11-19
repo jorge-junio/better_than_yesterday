@@ -33,6 +33,9 @@
                 <dt class="col-sm-3">Não cumprida hoje</dt>
                 <dd class="col-sm-9">{% if object.is_skipped %}Sim{% else %}Não{% endif %}</dd>
 
+                <dt class="col-sm-3">Skill desenvolvida</dt>
+                <dd class="col-sm-9">{% if object.skill %}{{ object.get_skill_display }} · 15 XP por conclusão{% else %}Sem skill{% endif %}</dd>
+
                 <dt class="col-sm-3">Prioridade</dt>
                 <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
 
@@ -56,10 +59,10 @@
         </div>
     </div>
     <div class="mt-3 d-flex gap-2 flex-wrap">
-        <a href="{% url 'task_list' %}" class="btn btn-secondary" title="Voltar para a agenda" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary" title="Voltar para a agenda">
             Voltar para a agenda
         </a>
-        <a href="{% url 'task_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'task_update' object.id %}" class="btn btn-warning" title="Editar">
             Editar
         </a>
     </div>

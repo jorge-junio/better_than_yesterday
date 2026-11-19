@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Personagem · Life RPG{% endblock %}
+{% block content %}
+<div class="character-page">
+  <p class="eyebrow">Cada missão conta</p><h1>Seu personagem</h1>
+  {% include 'life_rpg/avatar_card.html' %}
+  {% include 'life_rpg/skill_progress.html' %}
+  <section aria-labelledby="achievements-title"><h2 id="achievements-title" class="mb-3">Conquistas da jornada</h2><div class="achievement-list">
+    {% for badge in mission.badges %}<article class="achievement"><div class="d-flex align-items-center gap-2 mb-2"><span class="text-primary">{% include 'life_rpg/icon.html' with name='trophy' %}</span><h3>{{ badge.label }}</h3></div><p class="muted small">{{ badge.description }}</p></article>{% endfor %}
+  </div></section>
+  <a class="primary-button mt-4" href="{% url 'evolution' %}" title="Acompanhar evolução">{% include 'life_rpg/icon.html' with name='growth' %} Acompanhar evolução</a>
+</div>
+{% endblock %}

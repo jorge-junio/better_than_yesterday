@@ -1,0 +1,7 @@
+<details class="profile-menu" data-profile-menu>
+  <summary class="icon-button" title="Abrir menu do perfil" aria-label="Abrir menu do perfil" aria-controls="profile-menu-options">{% include 'life_rpg/icon.html' with name='person' %}</summary>
+  <nav id="profile-menu-options" class="profile-menu-panel" aria-label="Opções do perfil">
+    <a href="{% url 'profile' %}" title="Abrir perfil" {% if request.resolver_match.url_name == 'profile' %}aria-current="page"{% endif %}>{% include 'life_rpg/icon.html' with name='person' %}<span>Perfil</span></a>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" title="Sair da conta">{% include 'life_rpg/icon.html' with name='logout' %}<span>Sair</span></button></form>
+  </nav>
+</details>

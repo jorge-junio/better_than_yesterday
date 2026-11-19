@@ -2,6 +2,7 @@ from unittest import mock
 from types import SimpleNamespace
 
 from django.template.loader import render_to_string
+from django.core.paginator import Paginator
 from django.test import RequestFactory, SimpleTestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -153,6 +154,7 @@ class EvaluationDetailContentTests(SimpleTestCase):
                 'page_title': 'BTY - Avaliações',
                 'object': evaluation,
                 'word_return_to_url': '/evaluations/3/detail/',
+                'items_page': Paginator(evaluation.items.all(), 1).get_page(1),
             },
             request=request,
         )

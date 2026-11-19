@@ -1,9 +1,9 @@
-<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page workout-form-shell mx-auto">
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" class="workout-page workout-form-shell mx-auto">
   <h1 class="h3 mb-3">{{ heading }}</h1>
   <div class="card"><div class="card-body">
     <p>{{ description }}</p>
     {% if error %}<div class="alert alert-danger" role="alert">{{ error|join:' ' }}</div>{% endif %}
-    <form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-disabled-elt="find button[type='submit']">
+    <form method="post" action="{{ request.path }}">
       {% csrf_token %}
       {% if archive_action %}<input type="hidden" name="archive_action" value="{{ archive_action }}">{% endif %}
       <div class="d-flex flex-wrap gap-2">

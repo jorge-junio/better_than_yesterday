@@ -126,3 +126,14 @@ O sistema deve permitir a configuração de regras para geração automática de
 - Identificar palavras e significados existentes sem diferenciar maiúsculas e minúsculas. Por padrão, acrescentar significados ausentes, preencher observações vazias e preservar observações existentes.
 - Oferecer substituição explícita dos significados e observações apenas das palavras contidas no arquivo, preservando as demais palavras e os vínculos com avaliações.
 - Exportação exige permissão de consulta; importação exige permissões de cadastro e alteração de palavras. Exibir totais após a importação e botões com `title`, adequados ao celular e à navegação HTMX.
+
+## 11. Skills por tarefa
+
+- A skill é escolhida individualmente no cadastro/edição da tarefa da agenda (`Task`), sem associação automática à categoria.
+- Opções iniciais: Inteligência, Força, Disciplina, Sabedoria e Carisma. A escolha é opcional; tarefas antigas começam sem skill.
+- Concluir uma tarefa com skill concede 15 XP à habilidade escolhida, mantendo os 15 XP gerais já existentes. O XP geral não é somado novamente por ter skill.
+- Cada skill começa no nível 1 e avança a cada 100 XP, exibindo XP total, progresso no nível e XP até o próximo nível.
+- Pontos derivados das tarefas com `completed_at` preenchido. Reenvios não duplicam pontos; reabertura/exclusão removem a contribuição. Editar a skill de uma tarefa concluída redistribui seus 15 XP para a nova skill. Retirar a skill mantém apenas a contribuição geral.
+- O formulário de tarefa e as ações rápidas usam `completed_at` como fonte de conclusão, inclusive quando a tarefa é salva já concluída.
+- Personagem e Evolução apresentam as cinco skills com dados reais. Missões, agenda, dashboard e detalhes mostram a skill escolhida.
+- Tarefas recorrentes já geradas permitem escolher a skill em cada ocorrência pela edição da tarefa. Não há classificação automática dos modelos de recorrência, das tarefas de projeto ou das sessões de treino nesta etapa.

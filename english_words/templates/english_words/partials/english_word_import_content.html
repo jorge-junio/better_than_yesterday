@@ -10,9 +10,7 @@
         <div class="card-body">
             <p>Envie um arquivo CSV ou JSON de até 5 MB. Você pode importar os arquivos baixados pelos botões de exportação.</p>
             <p>Por padrão, novas palavras e significados são acrescentados sem duplicar os existentes. Observações já preenchidas são preservadas.</p>
-            <form method="post" enctype="multipart/form-data" action="{% url 'english_word_import' %}"
-                  hx-post="{% url 'english_word_import' %}" hx-encoding="multipart/form-data"
-                  hx-target="#page-content" hx-swap="innerHTML" hx-boost="false">
+            <form method="post" enctype="multipart/form-data" action="{% url 'english_word_import' %}">
                 {% csrf_token %}
                 {% if form.non_field_errors %}
                 <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
@@ -28,8 +26,8 @@
                 </div>
                 <p class="small text-body-secondary">Ao marcar essa opção, apenas as palavras presentes no arquivo terão seus significados e observações substituídos. As demais palavras serão mantidas.</p>
                 <div class="d-flex flex-wrap gap-2">
-                    <button type="submit" class="btn btn-success" title="Importar as palavras do arquivo selecionado" hx-disabled-elt="this">Importar palavras</button>
-                    <a href="{% url 'english_word_list' %}" class="btn btn-secondary" title="Voltar à lista de palavras" hx-get="{% url 'english_word_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">Voltar</a>
+                    <button type="submit" class="btn btn-success" title="Importar as palavras do arquivo selecionado">Importar palavras</button>
+                    <a href="{% url 'english_word_list' %}" class="btn btn-secondary" title="Voltar à lista de palavras">Voltar</a>
                 </div>
             </form>
             <details class="mt-4">

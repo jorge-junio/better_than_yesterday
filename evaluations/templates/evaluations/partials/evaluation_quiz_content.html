@@ -3,7 +3,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card border-0 shadow-lg overflow-hidden">
-                <div class="card-header p-4 text-white border-0" style="background: linear-gradient(135deg, #111827 0%, #2563eb 55%, #0f766e 100%);">
+                <div class="card-header p-4 text-white border-0" style="background: var(--bg-secondary);">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                         <span class="badge text-bg-light text-dark">Pergunta {{ question_number }} de {{ total_questions }}</span>
                         <span class="badge text-bg-info">{{ progress_percentage }}%</span>
@@ -16,7 +16,7 @@
                     <p class="mb-0 opacity-75">Digite a tradução em português desta palavra.</p>
                 </div>
                 <div class="card-body p-4">
-                    <form method="post" action="{{ request.get_full_path }}" hx-post="{{ request.get_full_path }}" hx-target="#page-content" hx-swap="innerHTML">
+                    <form method="post" action="{{ request.get_full_path }}">
                         {% csrf_token %}
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">
@@ -39,7 +39,7 @@
                             <button type="submit" class="btn btn-success btn-lg" title="Responder">
                                 Responder
                             </button>
-                            <a href="{{ cancel_url }}" class="btn btn-outline-secondary btn-lg" title="Cancelar" hx-get="{{ cancel_url }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                            <a href="{{ cancel_url }}" class="btn btn-outline-secondary btn-lg" title="Cancelar">
                                 Cancelar
                             </a>
                         </div>

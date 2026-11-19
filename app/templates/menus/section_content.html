@@ -1,0 +1,16 @@
+<section class="section-menu" data-page-title="{{ page_title }}">
+  <header class="mb-4">
+    <p class="text-secondary small mb-2">Better Than Yesterday</p>
+    <h1 class="h2 fw-bold">{{ section.label }}</h1>
+    <p class="text-secondary mb-0">Escolha o que deseja fazer.</p>
+  </header>
+  <div class="section-options">
+    {% for option in section.options %}
+    <a class="section-option" href="{% url option.route %}" title="Abrir {{ option.label }}">
+      {% include 'life_rpg/icon.html' with name=option.icon %}
+      <span>{{ option.label }}</span>
+      {% include 'life_rpg/icon.html' with name='right' %}
+    </a>
+    {% endfor %}
+  </div>
+</section>

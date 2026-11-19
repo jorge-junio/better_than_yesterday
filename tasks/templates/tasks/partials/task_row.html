@@ -6,6 +6,7 @@
         {% endif %}
         <div class="mt-1">
             <span class="badge text-bg-dark">{{ task.get_priority_display }}</span>
+            {% if task.skill %}<span class="badge text-bg-primary">{{ task.get_skill_display }} · +15 XP</span>{% endif %}
         </div>
     </td>
     <td data-label="Categoria">
@@ -29,24 +30,24 @@
         {% endif %}
     </td>
     <td class="d-flex gap-1 flex-wrap" data-label="Ações">
-        <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm" title="Ver detalhes" hx-get="{% url 'task_detail' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-eye"></i>
+        <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm" title="Ver detalhes">
+            {% include 'life_rpg/icon.html' with name='eye' %}
         </a>
-        <a href="{% url 'task_update' task.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'task_update' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-pencil"></i>
+        <a href="{% url 'task_update' task.id %}" class="btn btn-warning btn-sm" title="Editar">
+            {% include 'life_rpg/icon.html' with name='edit' %}
         </a>
-        <form method="post" action="{% url 'task_toggle_complete' task.id %}" hx-post="{% url 'task_toggle_complete' task.id %}" hx-target="#task-row-{{ task.id }}" hx-swap="outerHTML">
+        <form method="post" action="{% url 'task_toggle_complete' task.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-{% if task.completed_at %}secondary{% else %}success{% endif %} btn-sm" aria-label="{% if task.completed_at %}Reabrir tarefa{% else %}Concluir tarefa{% endif %}" title="{% if task.completed_at %}Reabrir tarefa{% else %}Concluir tarefa{% endif %}">
                 {% if task.completed_at %}
-                    <i class="bi bi-arrow-counterclockwise"></i>
+                    {% include 'life_rpg/icon.html' with name='undo' %}
                 {% else %}
-                    <i class="bi bi-check2-circle"></i>
+                    {% include 'life_rpg/icon.html' with name='check' %}
                 {% endif %}
             </button>
         </form>
         {% if not task.recurring_task %}
-        <form method="post" action="{% url 'task_postpone' task.id %}" hx-post="{% url 'task_postpone' task.id %}" hx-target="#task-row-{{ task.id }}" hx-swap="outerHTML">
+        <form method="post" action="{% url 'task_postpone' task.id %}">
             {% csrf_token %}
             <input type="hidden" name="days" value="1">
             <button type="submit" class="btn btn-outline-primary btn-sm" title="Adiar 1 dia">
@@ -54,8 +55,8 @@
             </button>
         </form>
         {% endif %}
-        <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'task_delete' task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-trash"></i>
+        <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm" title="Excluir">
+            {% include 'life_rpg/icon.html' with name='trash' %}
         </a>
     </td>
 </tr>

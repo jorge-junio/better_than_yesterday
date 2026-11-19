@@ -10,6 +10,10 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
     path('', views.home, name="home"),
+    path('character/', views.character, name='character'),
+    path('profile/', views.profile, name='profile'),
+    path('areas/', views.areas, name='areas'),
+    path('menu/<slug:section>/', views.menu_section, name='menu_section'),
 
     path('', include('progress.urls')),
     path('', include('projects.urls')),

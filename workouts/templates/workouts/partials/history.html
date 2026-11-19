@@ -1,10 +1,12 @@
-<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page">
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" class="workout-page">
   <div class="workout-hero rounded-4 p-3 p-md-4 mb-4"><h1 class="h2">Histórico e evolução</h1><p class="mb-0 opacity-75">Consulte sessões antigas e compare seus resultados por exercício.</p></div>
   <div class="card mb-4"><div class="card-body">
-    <form method="get" action="{% url 'workout_history' %}" hx-get="{% url 'workout_history' %}" hx-push-url="true" class="row g-3 align-items-end">
+    <details class="mission-filters" data-filter-panel {% if form.errors %}open{% endif %}><summary>Filtros</summary>
+<form method="get" action="{% url 'workout_history' %}" class="row g-3 align-items-end">
       {% for field in form %}<div class="col-12 col-md-6 col-xl-4">{{ field.label_tag }}{{ field }}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}
       <div class="col-12 col-md-6 col-xl-4 d-flex flex-wrap gap-2"><button type="submit" class="btn btn-primary" title="Filtrar histórico e relatórios">Filtrar</button><a href="{% url 'workout_history' %}" class="btn btn-outline-secondary" title="Limpar filtros">Limpar</a></div>
     </form>
+</details>
     {% if form.non_field_errors %}<div class="alert alert-danger mt-3 mb-0" role="alert">{{ form.non_field_errors }}</div>{% endif %}
   </div></div>
   <div class="row g-3 mb-4">
@@ -41,7 +43,7 @@
     {% else %}
     <p class="small text-body-secondary">Últimas 30 sessões com séries registradas. Compare a carga junto com a quantidade de repetições.</p>
     {{ evolution_chart|json_script:'workout-evolution-data' }}
-    <div class="row g-3 mb-4"><div class="col-12 col-lg-6"><div class="workout-chart"><canvas id="workout-weight-chart" role="img" aria-label="Evolução da maior carga por sessão"></canvas></div></div><div class="col-12 col-lg-6"><div class="workout-chart"><canvas id="workout-repetitions-chart" role="img" aria-label="Evolução das repetições totais por sessão"></canvas></div></div></div>
+    <div class="row g-3 mb-4"><div class="col-12 col-lg-6"><div class="workout-chart"><div id="workout-weight-chart" aria-label="Evolução da maior carga por sessão"></div></div></div><div class="col-12 col-lg-6"><div class="workout-chart"><div id="workout-repetitions-chart" aria-label="Evolução das repetições totais por sessão"></div></div></div></div>
     <div class="table-responsive"><table class="table mobile-card-table align-middle"><thead><tr><th>Sessão</th><th>Séries</th><th>Repetições</th><th>Maior carga</th><th>Volume</th></tr></thead><tbody>
     {% for row in evolution %}<tr><td data-label="Sessão"><a href="{% url 'workout_session' row.session_exercise__session_id %}" title="Ver sessão">{{ row.session_exercise__session__date|date:'d/m/Y' }} · #{{ row.session_exercise__session_id }}</a></td><td data-label="Séries">{{ row.series }}</td><td data-label="Repetições">{{ row.total_repetitions }}</td><td data-label="Maior carga">{{ row.max_weight }} kg</td><td data-label="Volume">{{ row.volume }} kg·rep.</td></tr>{% endfor %}
     </tbody></table></div>

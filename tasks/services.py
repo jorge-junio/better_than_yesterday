@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.db import transaction
-from django.db.models import F
+from django.db.models import Count, F
 from django.utils import timezone
 
 from categories.models import Category
@@ -212,3 +212,39 @@ def get_today_mission_context(reference_date=None, category_id=None):
         'badges': badges,
         'today_xp': completed_tasks * 15,
     }
+
+
+def get_skill_progress():
+    """Derive skill XP from current completed tasks, without increment counters."""
+    counts = dict(
+        Task.objects.filter(completed_at__isnull=False)
+        .exclude(skill='')
+        .values('skill')
+        .annotate(completed=Count('pk'))
+        .values_list('skill', 'completed')
+    )
+    icons = {
+        Task.Skill.INTELLIGENCE: 'quest',
+        Task.Skill.STRENGTH: 'trophy',
+        Task.Skill.DISCIPLINE: 'check',
+        Task.Skill.WISDOM: 'spark',
+        Task.Skill.CHARISMA: 'person',
+    }
+    descriptions = {
+        Task.Skill.STRENGTH: 'Exercícios, musculação e atividades físicas',
+        Task.Skill.INTELLIGENCE: 'Estudos, cursos e aprendizado técnico',
+        Task.Skill.DISCIPLINE: 'Rotinas, hábitos e compromissos cumpridos',
+        Task.Skill.WISDOM: 'Leitura, reflexão e desenvolvimento pessoal',
+        Task.Skill.CHARISMA: 'Socialização, comunicação e relacionamentos',
+    }
+    progress = []
+    for skill, label in Task.Skill.choices:
+        completed = counts.get(skill, 0)
+        xp = completed * 15
+        progress.append({
+            'key': skill, 'label': label, 'icon': icons[skill],
+            'description': descriptions[skill],
+            'completed': completed, 'total_xp': xp, 'level': xp // 100 + 1,
+            'xp_in_level': xp % 100, 'xp_to_next_level': 100 - xp % 100,
+        })
+    return progress

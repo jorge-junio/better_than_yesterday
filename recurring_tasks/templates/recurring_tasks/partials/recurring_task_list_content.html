@@ -1,12 +1,14 @@
 <div data-page-title="{{ page_title }}">
 <div class="row mb-3">
     <div class="col-md-8">
-        <form method="get" action="{% url 'recurring_task_list' %}" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2">
+        <details class="panel card-body mission-filters">
+            <summary>Filtros</summary>
+        <form method="get" action="{% url 'recurring_task_list' %}" class="row g-2">
             <div class="col-md-4">
-                <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}">
+                <input type="text" class="form-control" name="name" aria-label="Nome da tarefa recorrente" placeholder="Nome" value="{{ request.GET.name }}">
             </div>
             <div class="col-md-3">
-                <select name="recurrence_type" class="form-select">
+                <select aria-label="Tipo de recorrência" name="recurrence_type" class="form-select">
                     <option value="">Tipo de recorrência</option>
                     <option value="weekdays" {% if request.GET.recurrence_type == 'weekdays' %}selected{% endif %}>Dias da semana</option>
                     <option value="date_range" {% if request.GET.recurrence_type == 'date_range' %}selected{% endif %}>Intervalo de datas</option>
@@ -14,7 +16,7 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <select name="category" class="form-select">
+                <select aria-label="Categoria" name="category" class="form-select">
                     <option value="">Categoria</option>
                     {% for category in categories %}
                         <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>
@@ -24,7 +26,7 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <select name="is_active" class="form-select">
+                <select aria-label="Status" name="is_active" class="form-select">
                     <option value="">Status</option>
                     <option value="1" {% if request.GET.is_active == '1' %}selected{% endif %}>Ativo</option>
                     <option value="0" {% if request.GET.is_active == '0' %}selected{% endif %}>Inativo</option>
@@ -32,48 +34,31 @@
             </div>
             <div class="col-md-12">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
-                    <i class="bi bi-search"></i> Filtrar
+                    {% include 'life_rpg/icon.html' with name='search' %} Filtrar
                 </button>
-                <a href="{% url 'recurring_task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <a href="{% url 'recurring_task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros">
                     Limpar
                 </a>
             </div>
         </form>
+        </details>
     </div>
 
     {% if perms.recurring_tasks.add_recurringtask %}
     <div class="col-md-4">
-        <a href="{% url 'recurring_task_create' %}" class="btn btn-success float-end" title="Nova tarefa recorrente" hx-get="{% url 'recurring_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-plus"></i>Nova Tarefa Recorrente
+        <a href="{% url 'recurring_task_create' %}" class="btn btn-success float-end" title="Nova tarefa recorrente">
+            {% include 'life_rpg/icon.html' with name='plus' %}Nova Tarefa Recorrente
         </a>
     </div>
     {% endif %}
 </div>
 
-<div class="table-responsive">
-    <table class="table mobile-card-table table-striped table-bordered align-middle">
-        <thead class="thead-dark">
-            <tr>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Prioridade</th>
-                <th>Tempo estimado</th>
-                <th>Tipo</th>
-                <th>Resumo</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for recurring_task in recurring_tasks %}
-                {% include 'recurring_tasks/partials/recurring_task_row.html' %}
-            {% empty %}
-            <tr>
-                <td colspan="8" class="text-center">Nenhuma tarefa recorrente encontrada.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="recurring-task-list">
+    {% for recurring_task in recurring_tasks %}
+        {% include 'recurring_tasks/partials/recurring_task_row.html' %}
+    {% empty %}
+        <div class="empty-state">Nenhuma tarefa recorrente encontrada.</div>
+    {% endfor %}
 </div>
 
 {% include 'components/_pagination.html' %}

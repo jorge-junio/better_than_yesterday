@@ -1,0 +1,5 @@
+<section class="daily-stats" aria-label="Resumo diário">
+    <article class="stat-card">{% include 'life_rpg/icon.html' with name='check' %}<strong>{{ mission.completed_tasks }}<small> / {{ mission.total_tasks }}</small></strong><span>Missões concluídas</span></article>
+    <article class="stat-card">{% include 'life_rpg/icon.html' with name='spark' %}<strong>{{ mission.today_xp }}<small> XP</small></strong><span>Conquistado hoje</span></article>
+    <article class="stat-card">{% include 'life_rpg/icon.html' with name='growth' %}<strong>{{ mission.completion_rate }}<small>%</small></strong><span>Progresso diário</span></article>
+  </section>

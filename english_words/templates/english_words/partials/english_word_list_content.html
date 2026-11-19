@@ -1,9 +1,9 @@
 <div data-page-title="{{ page_title }}">
 <div class="row mb-3">
     <div class="col-lg-8">
-        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0f766e 100%);">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: var(--bg-secondary);">
             <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
-                <i class="bi bi-translate"></i>
+                {% include 'life_rpg/icon.html' with name='translate' %}
             </div>
             <div class="position-relative">
                 <div class="text-uppercase small fw-semibold opacity-75 mb-2">Vocabulário</div>
@@ -16,21 +16,21 @@
 
     <div class="col-lg-4 d-flex flex-wrap gap-2 align-items-start justify-content-lg-end mt-3 mt-lg-0">
         {% if perms.english_words.add_englishword %}
-        <a href="{% url 'english_word_create' %}" class="btn btn-success" title="Nova palavra em inglês" hx-get="{% url 'english_word_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-plus"></i> Nova palavra
+        <a href="{% url 'english_word_create' %}" class="btn btn-success" title="Nova palavra em inglês">
+            {% include 'life_rpg/icon.html' with name='plus' %} Nova palavra
         </a>
         {% endif %}
         {% if perms.english_words.view_englishword %}
-        <a href="{% url 'english_word_export' %}?format=csv" class="btn btn-outline-primary" title="Exportar todas as palavras em CSV" hx-boost="false">
-            <i class="bi bi-download"></i> Exportar CSV
+        <a href="{% url 'english_word_export' %}?format=csv" class="btn btn-outline-primary" title="Exportar todas as palavras em CSV">
+            {% include 'life_rpg/icon.html' with name='download' %} Exportar CSV
         </a>
-        <a href="{% url 'english_word_export' %}?format=json" class="btn btn-outline-primary" title="Exportar todas as palavras em JSON" hx-boost="false">
-            <i class="bi bi-download"></i> Exportar JSON
+        <a href="{% url 'english_word_export' %}?format=json" class="btn btn-outline-primary" title="Exportar todas as palavras em JSON">
+            {% include 'life_rpg/icon.html' with name='download' %} Exportar JSON
         </a>
         {% endif %}
         {% if perms.english_words.add_englishword and perms.english_words.change_englishword %}
-        <a href="{% url 'english_word_import' %}" class="btn btn-outline-success" title="Importar palavras de um arquivo CSV ou JSON" hx-get="{% url 'english_word_import' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-upload"></i> Importar
+        <a href="{% url 'english_word_import' %}" class="btn btn-outline-success" title="Importar palavras de um arquivo CSV ou JSON">
+            {% include 'life_rpg/icon.html' with name='upload' %} Importar
         </a>
         {% endif %}
     </div>
@@ -58,26 +58,26 @@
                     </div>
                     <div class="d-flex gap-2 align-items-start position-relative z-2 flex-wrap">
                         {% if perms.english_words.change_englishword %}
-                        <a href="{% url 'english_word_update' english_word.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'english_word_update' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-pencil"></i>
+                        <a href="{% url 'english_word_update' english_word.id %}" class="btn btn-warning btn-sm" title="Editar">
+                            {% include 'life_rpg/icon.html' with name='edit' %}
                         </a>
                         {% endif %}
                         {% if perms.english_words.delete_englishword %}
-                        <a href="{% url 'english_word_delete' english_word.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'english_word_delete' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-trash"></i>
+                        <a href="{% url 'english_word_delete' english_word.id %}" class="btn btn-danger btn-sm" title="Excluir">
+                            {% include 'life_rpg/icon.html' with name='trash' %}
                         </a>
                         {% endif %}
                     </div>
                 </div>
                 {% if perms.english_words.view_englishword %}
-                <a href="{% url 'english_word_detail' english_word.id %}" class="stretched-link" title="Ver detalhes" hx-get="{% url 'english_word_detail' english_word.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Ver detalhes da palavra {{ english_word.word }}"></a>
+                <a href="{% url 'english_word_detail' english_word.id %}" class="stretched-link" title="Ver detalhes" aria-label="Ver detalhes da palavra {{ english_word.word }}"></a>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
         {% else %}
         <div class="text-center py-5">
-            <div class="display-3 mb-3 text-muted"><i class="bi bi-translate"></i></div>
+            <div class="display-3 mb-3 text-muted">{% include 'life_rpg/icon.html' with name='translate' %}</div>
             <h4 class="mb-2">Nenhuma palavra ainda</h4>
             <p class="text-muted mb-0">Cadastre sua primeira palavra em inglês para começar sua lista.</p>
         </div>

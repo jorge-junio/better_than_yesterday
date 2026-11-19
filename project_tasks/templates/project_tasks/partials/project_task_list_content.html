@@ -1,9 +1,9 @@
 <div data-page-title="{{ page_title }}">
 <div class="row mb-3">
     <div class="col-lg-8">
-        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #1f2937 0%, #2563eb 55%, #14b8a6 100%);">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: var(--bg-secondary);">
             <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
-                <i class="bi bi-list-task"></i>
+                {% include 'life_rpg/icon.html' with name='quest' %}
             </div>
             <div class="position-relative">
                 <div class="text-uppercase small fw-semibold opacity-75 mb-2">Execução por projeto</div>
@@ -15,8 +15,8 @@
 
     {% if perms.project_tasks.add_projecttask %}
     <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
-        <a href="{% url 'project_task_create' %}" class="btn btn-success" title="Nova tarefa de projeto" hx-get="{% url 'project_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-plus"></i> Nova tarefa de projeto
+        <a href="{% url 'project_task_create' %}" class="btn btn-success" title="Nova tarefa de projeto">
+            {% include 'life_rpg/icon.html' with name='plus' %} Nova tarefa de projeto
         </a>
     </div>
     {% endif %}
@@ -24,7 +24,8 @@
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <form method="get" action="{% url 'project_task_list' %}" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2 align-items-end">
+        <details class="panel card-body mission-filters" data-filter-panel><summary>Filtros</summary>
+<form method="get" action="{% url 'project_task_list' %}" class="row g-2 align-items-end">
             <div class="col-md-8 col-lg-6">
                 <label class="form-label" for="project-task-project-filter">Projeto</label>
                 <select id="project-task-project-filter" name="project" class="form-select">
@@ -36,13 +37,14 @@
             </div>
             <div class="col-md-4 col-lg-3 d-flex gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
-                    <i class="bi bi-search"></i> Filtrar
+                    {% include 'life_rpg/icon.html' with name='search' %} Filtrar
                 </button>
-                <a href="{% url 'project_task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'project_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <a href="{% url 'project_task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros">
                     Limpar
                 </a>
             </div>
         </form>
+</details>
     </div>
 </div>
 
@@ -56,7 +58,7 @@
         </div>
         {% else %}
         <div class="text-center py-5">
-            <div class="display-3 mb-3 text-muted"><i class="bi bi-list-task"></i></div>
+            <div class="display-3 mb-3 text-muted">{% include 'life_rpg/icon.html' with name='quest' %}</div>
             {% if request.GET.project %}
             <h4 class="mb-2">Nenhuma tarefa encontrada</h4>
             <p class="text-muted mb-0">Tente outro projeto ou limpe o filtro para ver todas as tarefas.</p>

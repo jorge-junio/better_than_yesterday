@@ -1,7 +1,10 @@
 <div data-page-title="{{ page_title }}">
+<div class="section-heading"><div><p class="eyebrow">Organize seus próximos passos</p><h1 class="mb-0">Agenda de missões</h1></div>{% if perms.tasks.add_task %}<a class="btn btn-primary" href="{% url 'task_create' %}" title="Nova missão">{% include 'life_rpg/icon.html' with name='plus' %} Nova missão</a>{% endif %}</div>
+<nav class="mission-tabs" aria-label="Visualização de missões"><a href="{% url 'task_today' %}">Do dia</a><a href="{% url 'task_list' %}" aria-current="page">Agenda</a>{% if perms.recurring_tasks.view_recurringtask %}<a href="{% url 'recurring_task_list' %}">Recorrentes</a>{% endif %}</nav>
 <div class="row mb-3">
     <div class="col-lg-8">
-        <form method="get" action="{% url 'task_list' %}" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2 align-items-end">
+        <details class="panel card-body mission-filters" data-filter-panel {% if filter_form.errors %}open{% endif %}><summary>Filtros</summary>
+<form method="get" action="{% url 'task_list' %}" class="row g-2 align-items-end">
             <div class="col-md-3">
                 <label class="form-label">{{ filter_form.title.label }}</label>
                 {{ filter_form.title }}
@@ -24,13 +27,14 @@
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
-                    <i class="bi bi-filter"></i> Filtrar
+                    {% include 'life_rpg/icon.html' with name='filter' %} Filtrar
                 </button>
-                <a href="{% url 'task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <a href="{% url 'task_list' %}" class="btn btn-outline-secondary" title="Limpar filtros">
                     Hoje
                 </a>
             </div>
         </form>
+</details>
     </div>
 </div>
 

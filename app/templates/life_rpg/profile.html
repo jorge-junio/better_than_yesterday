@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Perfil · Life RPG{% endblock %}
+{% block content %}
+<p class="eyebrow">Seu espaço de organização</p><h1>Perfil</h1>
+<section class="panel card-body mb-4" aria-labelledby="profile-title">
+  <div class="d-flex align-items-center gap-3 mb-3"><span class="brand-emblem">{% include 'life_rpg/icon.html' with name='person' %}</span><div><h2 id="profile-title">{% firstof user.get_full_name user.username %}</h2><p class="muted small">@{{ user.username }}</p></div></div>
+  <dl class="profile-facts"><div><dt>E-mail</dt><dd>{{ user.email|default:'Não informado' }}</dd></div><div><dt>Último acesso</dt><dd>{{ user.last_login|date:'d/m/Y H:i'|default:'Primeiro acesso' }}</dd></div></dl>
+</section>
+
+{% if perms.english_words.view_englishword %}<section class="panel card-body mt-4"><h2 class="mb-3">Seus dados de vocabulário</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-primary" href="{% url 'english_word_export' %}?format=csv" title="Exportar palavras em CSV">{% include 'life_rpg/icon.html' with name='download' %} CSV</a><a class="btn btn-outline-primary" href="{% url 'english_word_export' %}?format=json" title="Exportar palavras em JSON">JSON</a>{% if perms.english_words.add_englishword and perms.english_words.change_englishword %}<a class="btn" href="{% url 'english_word_import' %}" title="Importar vocabulário">Importar palavras</a>{% endif %}</div></section>{% endif %}
+<section class="panel card-body mt-4"><h2 class="mb-2">Sobre o aplicativo</h2><p class="muted small">Life RPG · Better Than Yesterday. Organize suas tarefas e acompanhe sua evolução com foco e consistência.</p><p class="muted small">Aparência escura · Roxo e lavanda</p></section>
+<form method="post" action="{% url 'logout' %}" class="mt-4">{% csrf_token %}<button class="btn btn-outline-danger w-100" title="Sair da conta">{% include 'life_rpg/icon.html' with name='logout' %} Sair da conta</button></form>
+{% endblock %}

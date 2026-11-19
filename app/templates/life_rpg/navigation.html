@@ -1,0 +1,7 @@
+<nav class="life-navigation" aria-label="Navegação principal">
+  <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %} title="Início">{% include 'life_rpg/icon.html' with name='home' %}<span>Início</span></a>
+  {% if perms.tasks.view_task %}<a href="{% url 'task_today' %}" {% if '/tasks/' in request.path or '/recurring-tasks/' in request.path %}aria-current="page"{% endif %} title="Missões">{% include 'life_rpg/icon.html' with name='quest' %}<span>Missões</span></a>{% endif %}
+  <a href="{% url 'character' %}" {% if request.resolver_match.url_name == 'character' %}aria-current="page"{% endif %} title="Personagem">{% include 'life_rpg/icon.html' with name='person' %}<span>Personagem</span></a>
+  <a href="{% url 'evolution' %}" {% if request.resolver_match.url_name == 'evolution' %}aria-current="page"{% endif %} title="Evolução">{% include 'life_rpg/icon.html' with name='growth' %}<span>Evolução</span></a>
+  <a href="{% url 'areas' %}" {% if request.resolver_match.url_name == 'areas' or '/menu/' in request.path or '/shopping/' in request.path or '/workouts/' in request.path or '/projects/' in request.path or '/project-tasks/' in request.path or '/possible-tasks/' in request.path or '/english-words/' in request.path or '/evaluations/' in request.path or '/categories/' in request.path %}aria-current="page"{% endif %} title="Áreas">{% include 'life_rpg/icon.html' with name='projects' %}<span>Áreas</span></a>
+</nav>

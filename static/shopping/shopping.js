@@ -8,15 +8,9 @@
     if (form) form.dataset.shoppingDirty = 'true';
   });
 
-  document.addEventListener('submit', function (event) {
-    if (event.target.matches('form[data-shopping-progress]')) {
-      event.target.dataset.shoppingDirty = 'false';
-    }
-  }, true);
-
-  document.addEventListener('htmx:afterRequest', function (event) {
-    const form = event.detail.elt;
-    if (form.matches && form.matches('form[data-shopping-progress]') && !event.detail.successful) {
+  document.addEventListener('app:save-failed', function (event) {
+    const form = event.detail.form;
+    if (form.matches('[data-shopping-progress]')) {
       form.dataset.shoppingDirty = 'true';
       const feedback = form.querySelector('[data-shopping-error]');
       if (feedback) feedback.hidden = false;

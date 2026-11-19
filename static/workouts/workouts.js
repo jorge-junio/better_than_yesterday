@@ -1,5 +1,4 @@
 (() => {
-  const charts = [];
   const setStatus = (form, message, failed = false) => {
     const status = form && form.querySelector('[data-save-status]');
     if (!status) return;
@@ -14,30 +13,24 @@
     form.dataset.dirty = 'true';
     setStatus(form, 'Alteração ainda não salva');
   });
-  document.addEventListener('htmx:beforeRequest', (event) => {
-    const form = event.detail.elt.closest('[data-set-form]');
-    if (!form) return;
-    form.setAttribute('aria-busy', 'true');
-    setStatus(form, 'Salvando…');
+  document.addEventListener('app:save-started', (event) => {
+    const form = event.detail.form;
+    if (form.matches('[data-set-form]')) setStatus(form, 'Salvando…');
   });
-  document.addEventListener('htmx:afterRequest', (event) => {
-    const form = event.detail.elt.closest('[data-set-form]');
-    if (!form) return;
-    form.removeAttribute('aria-busy');
-    if (!event.detail.successful) {
+  document.addEventListener('app:save-failed', (event) => {
+    const form = event.detail.form;
+    if (form.matches('[data-set-form]')) {
       form.dataset.dirty = 'true';
       setStatus(form, 'Falha ao salvar. Verifique a conexão e tente novamente.', true);
     }
   });
-  document.addEventListener('htmx:confirm', (event) => {
-    const form = event.detail.elt.closest('[data-set-form]');
-    if (form || !dirtyForms().length) return;
-    event.preventDefault();
-    if (window.confirm('Há séries com alterações ainda não salvas. Deseja sair sem registrar essas alterações?')) {
-      dirtyForms().forEach((item) => delete item.dataset.dirty);
-      event.detail.issueRequest(true);
-    }
-  });
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link || link.getAttribute('href').startsWith('#') || !dirtyForms().length) return;
+    if (!window.confirm('Há séries com alterações ainda não salvas. Deseja sair sem registrar essas alterações?')) {
+      event.preventDefault(); event.stopImmediatePropagation();
+    } else dirtyForms().forEach((form) => delete form.dataset.dirty);
+  }, true);
   window.addEventListener('beforeunload', (event) => {
     if (!dirtyForms().length) return;
     event.preventDefault();
@@ -110,25 +103,30 @@
   });
   document.addEventListener('visibilitychange', renderRestTimer);
   document.addEventListener('DOMContentLoaded', initializeRestTimer);
-  document.addEventListener('htmx:afterSwap', (event) => {
-    if (event.detail.target.id === 'page-content') initializeRestTimer();
-  });
+  document.addEventListener('app:ready', initializeRestTimer);
   const renderCharts = () => {
-    charts.splice(0).forEach((chart) => chart.destroy());
     const source = document.getElementById('workout-evolution-data');
-    if (!source || !window.Chart) return;
+    if (!source) return;
     const data = JSON.parse(source.textContent);
-    [['workout-weight-chart', 'Maior carga (kg)', data.weights, '#14b8a6'], ['workout-repetitions-chart', 'Repetições totais', data.repetitions, '#60a5fa']].forEach(([id, label, values, color]) => {
-      const canvas = document.getElementById(id);
-      if (!canvas) return;
-      charts.push(new Chart(canvas, {
-        type: 'line', data: { labels: data.labels, datasets: [{ label, data: values, borderColor: color, backgroundColor: color, tension: .2 }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,.08)' } }, y: { beginAtZero: true, ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,.08)' } } }, plugins: { legend: { labels: { color: '#cbd5e1' } } } },
-      }));
+    const ns = 'http://www.w3.org/2000/svg';
+    const element = (name, attrs = {}) => { const node = document.createElementNS(ns, name); Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value)); return node; };
+    [['workout-weight-chart', 'Maior carga (kg)', data.weights], ['workout-repetitions-chart', 'Repetições totais', data.repetitions]].forEach(([id, label, values]) => {
+      const target = document.getElementById(id);
+      if (!target) return;
+      const svg = element('svg', { viewBox: '0 0 440 220', role: 'img', 'aria-label': label, class: 'svg-chart' });
+      const max = Math.max(1, ...values.map(Number));
+      const points = values.map((value, index) => [40 + index / Math.max(values.length - 1, 1) * 380, 180 - Number(value) / max * 150]);
+      for (let n = 0; n <= 3; n++) {
+        const y = 180 - n * 50;
+        svg.append(element('line', { x1: 40, y1: y, x2: 420, y2: y, class: 'chart-grid' }));
+        const text = element('text', { x: 3, y: y + 4 }); text.textContent = String(Math.round(max * n / 3 * 10) / 10); svg.append(text);
+      }
+      svg.append(element('polyline', { points: points.map(p => p.join(',')).join(' '), fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }));
+      points.forEach(([x, y], index) => { const dot = element('circle', { cx:x, cy:y, r:4, fill:'currentColor' }); const title = element('title'); title.textContent = `${data.labels[index]}: ${values[index]}`; dot.append(title); svg.append(dot); });
+      if (data.labels.length) { for (const [x, index] of [[40,0],[420,data.labels.length - 1]]) { const text = element('text', {x, y:205, 'text-anchor': x === 40 ? 'start' : 'end'}); text.textContent = data.labels[index]; svg.append(text); } }
+      const caption = document.createElement('p'); caption.className='chart-caption'; caption.textContent=label;
+      target.replaceChildren(caption, svg);
     });
   };
   document.addEventListener('DOMContentLoaded', renderCharts);
-  document.addEventListener('htmx:afterSwap', (event) => {
-    if (event.detail.target.id === 'page-content') renderCharts();
-  });
 })();

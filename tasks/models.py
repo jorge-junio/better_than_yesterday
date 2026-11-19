@@ -13,6 +13,22 @@ class Task(models.Model):
         MANUAL = 'manual', 'Manual'
         RECURRENT = 'recurrent', 'Recorrente'
 
+    class Skill(models.TextChoices):
+        INTELLIGENCE = 'intelligence', 'Inteligência'
+        STRENGTH = 'strength', 'Força'
+        DISCIPLINE = 'discipline', 'Disciplina'
+        WISDOM = 'wisdom', 'Sabedoria'
+        CHARISMA = 'charisma', 'Carisma'
+
+    skill = models.CharField(
+        max_length=20,
+        choices=Skill.choices,
+        blank=True,
+        default='',
+        verbose_name='skill desenvolvida',
+        help_text='Escolha a skill que esta tarefa desenvolve. A conclusão concede 15 XP à skill selecionada.',
+    )
+
     title = models.CharField(max_length=500, verbose_name='título')
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
     estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')

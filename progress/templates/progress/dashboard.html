@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
-
-{% block title %}
-BTY - Dashboard
-{% endblock %}
-
-{% block content %}
-{% include 'progress/partials/dashboard_content.html' %}
-{% endblock %}
+{% load static %}
+{% block title %}Início · Life RPG{% endblock %}
+{% block scripts %}<script src="{% static 'app/life-rpg.js' %}" defer></script>{% endblock %}
+{% block content %}{% include 'progress/partials/dashboard_content.html' %}{% endblock %}

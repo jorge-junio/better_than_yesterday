@@ -1,0 +1,31 @@
+/* Scoped to the dashboard, including its HTMX partial. */
+.dashboard-page {
+  max-width: 1200px;
+  margin-inline: auto;
+  overflow-wrap: anywhere;
+}
+.dashboard-hero { padding: 1.5rem; }
+.dashboard-hero h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 700; letter-spacing: -.04em; }
+.dashboard-today { border-top: 1px solid #ffffff30; padding-top: 1rem; }
+.dashboard-page .card { border-radius: 1.25rem; }
+.dashboard-page .card-body { padding: 1.25rem; }
+.dashboard-metrics .card-body { display: flex; flex-direction: column; gap: .5rem; }
+.dashboard-metrics .text-muted { font-size: .85rem; }
+.dashboard-metrics .display-6 { font-weight: 700; font-size: clamp(1.75rem, 5vw, 2.5rem); }
+.dashboard-filters .form-control, .dashboard-filters .btn { min-height: 48px; font-size: 1rem; }
+.dashboard-filters .btn { width: 100%; }
+.dashboard-chart { position: relative; height: 260px; min-width: 0; }
+@media (min-width: 992px) {
+  .dashboard-hero { padding: 2rem; }
+  .dashboard-today { border: 0; padding-top: 0; flex-shrink: 0; }
+}
+@media (max-width: 991.98px) {
+  .dashboard-page { max-width: 640px; }
+}
+@media (max-width: 767.98px) {
+  .dashboard-page .card-body { padding: 1rem; }
+  .dashboard-page .mobile-card-table tr:last-child { margin-bottom: 0; }
+  .dashboard-page .mobile-card-table td[data-label="Título"] { font-weight: 650; }
+  .dashboard-page .mobile-card-table td { padding: .5rem .75rem; }
+  .dashboard-chart { height: 240px; }
+}

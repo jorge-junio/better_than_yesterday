@@ -1,9 +1,9 @@
 <div data-page-title="{{ page_title }}">
 <div class="row mb-3">
     <div class="col-lg-8">
-        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #111827 0%, #4f46e5 55%, #0f766e 100%);">
+        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: var(--bg-secondary);">
             <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
-                <i class="bi bi-lightbulb-fill"></i>
+                {% include 'life_rpg/icon.html' with name='spark' %}
             </div>
             <div class="position-relative">
                 <div class="text-uppercase small fw-semibold opacity-75 mb-2">Backlog de ideias</div>
@@ -15,8 +15,8 @@
 
     {% if perms.possible_tasks.add_possibletask %}
     <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
-        <a href="{% url 'possible_task_create' %}" class="btn btn-success" title="Nova possível tarefa" hx-get="{% url 'possible_task_create' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            <i class="bi bi-plus"></i> Nova possível tarefa
+        <a href="{% url 'possible_task_create' %}" class="btn btn-success" title="Nova possível tarefa">
+            {% include 'life_rpg/icon.html' with name='plus' %} Nova possível tarefa
         </a>
     </div>
     {% endif %}
@@ -24,7 +24,8 @@
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <form method="get" action="{% url 'possible_task_list' %}" hx-get="{% url 'possible_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" class="row g-2 align-items-end">
+        <details class="panel card-body mission-filters" data-filter-panel><summary>Filtros</summary>
+<form method="get" action="{% url 'possible_task_list' %}" class="row g-2 align-items-end">
             <div class="col-md-8 col-lg-6">
                 <label class="form-label" for="possible-task-project-filter">Projeto</label>
                 <select id="possible-task-project-filter" name="project" class="form-select">
@@ -44,13 +45,14 @@
             </div>
             <div class="col-md-4 col-lg-2 d-flex gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
-                    <i class="bi bi-search"></i> Filtrar
+                    {% include 'life_rpg/icon.html' with name='search' %} Filtrar
                 </button>
-                <a href="{% url 'possible_task_list' %}?conversion=not_converted" class="btn btn-outline-secondary" title="Limpar filtros" hx-get="{% url 'possible_task_list' %}?conversion=not_converted" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+                <a href="{% url 'possible_task_list' %}?conversion=not_converted" class="btn btn-outline-secondary" title="Limpar filtros">
                     Limpar
                 </a>
             </div>
         </form>
+</details>
     </div>
 </div>
 
@@ -100,42 +102,42 @@
                         </span>
                         {% else %}
                             {% if perms.tasks.add_task %}
-                            <a href="{{ create_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-primary btn-sm" title="Virar tarefa" hx-get="{{ create_task_base_url }}?possible_task={{ possible_task.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Virar tarefa">
-                                <i class="bi bi-arrow-right-circle"></i>
+                            <a href="{{ create_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-primary btn-sm" title="Virar tarefa" aria-label="Virar tarefa">
+                                {% include 'life_rpg/icon.html' with name='right' %}
                             </a>
                             {% endif %}
                             {% if perms.recurring_tasks.add_recurringtask %}
-                            <a href="{{ create_recurring_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-outline-info btn-sm" title="Virar recorrente" hx-get="{{ create_recurring_task_base_url }}?possible_task={{ possible_task.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Virar recorrente">
-                                <i class="bi bi-arrow-repeat"></i>
+                            <a href="{{ create_recurring_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-outline-info btn-sm" title="Virar recorrente" aria-label="Virar recorrente">
+                                {% include 'life_rpg/icon.html' with name='repeat' %}
                             </a>
                             {% endif %}
                             {% if perms.project_tasks.add_projecttask %}
-                            <a href="{{ create_project_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-outline-primary btn-sm" title="Virar tarefa de projeto" hx-get="{{ create_project_task_base_url }}?possible_task={{ possible_task.id }}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Virar tarefa de projeto">
-                                <i class="bi bi-kanban"></i>
+                            <a href="{{ create_project_task_base_url }}?possible_task={{ possible_task.id }}" class="btn btn-outline-primary btn-sm" title="Virar tarefa de projeto" aria-label="Virar tarefa de projeto">
+                                {% include 'life_rpg/icon.html' with name='projects' %}
                             </a>
                             {% endif %}
                         {% endif %}
                         {% if perms.possible_tasks.change_possibletask %}
-                        <a href="{% url 'possible_task_update' possible_task.id %}" class="btn btn-warning btn-sm" title="Editar" hx-get="{% url 'possible_task_update' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-pencil"></i>
+                        <a href="{% url 'possible_task_update' possible_task.id %}" class="btn btn-warning btn-sm" title="Editar">
+                            {% include 'life_rpg/icon.html' with name='edit' %}
                         </a>
                         {% endif %}
                         {% if perms.possible_tasks.delete_possibletask %}
-                        <a href="{% url 'possible_task_delete' possible_task.id %}" class="btn btn-danger btn-sm" title="Excluir" hx-get="{% url 'possible_task_delete' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-                            <i class="bi bi-trash"></i>
+                        <a href="{% url 'possible_task_delete' possible_task.id %}" class="btn btn-danger btn-sm" title="Excluir">
+                            {% include 'life_rpg/icon.html' with name='trash' %}
                         </a>
                         {% endif %}
                     </div>
                 </div>
                 {% if perms.possible_tasks.view_possibletask %}
-                <a href="{% url 'possible_task_detail' possible_task.id %}" class="stretched-link" title="Ver detalhes" hx-get="{% url 'possible_task_detail' possible_task.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true" aria-label="Ver detalhes da possível tarefa {{ possible_task.title }}"></a>
+                <a href="{% url 'possible_task_detail' possible_task.id %}" class="stretched-link" title="Ver detalhes" aria-label="Ver detalhes da possível tarefa {{ possible_task.title }}"></a>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
         {% else %}
         <div class="text-center py-5">
-            <div class="display-3 mb-3 text-muted"><i class="bi bi-lightbulb"></i></div>
+            <div class="display-3 mb-3 text-muted">{% include 'life_rpg/icon.html' with name='spark' %}</div>
             {% if request.GET.project or request.GET.conversion %}
             <h4 class="mb-2">Nenhuma possível tarefa encontrada</h4>
             <p class="text-muted mb-0">Tente outro filtro ou limpe a seleção.</p>

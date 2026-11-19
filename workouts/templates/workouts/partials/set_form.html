@@ -1,5 +1,5 @@
 <div id="workout-set-{{ series.pk }}" class="workout-set border rounded-3 p-3 {% if series.registered_at %}border-success{% endif %}">
-  <form method="post" action="{% url 'workout_set_record' series.pk %}" hx-post="{% url 'workout_set_record' series.pk %}" hx-target="closest .workout-set" hx-swap="outerHTML" hx-disabled-elt="find button[type='submit']" data-set-form {% if form.errors %}data-dirty="true"{% endif %}>
+  <form method="post" action="{% url 'workout_set_record' series.pk %}" data-set-form {% if form.errors %}data-dirty="true"{% endif %}>
     {% csrf_token %}
     <div class="d-flex flex-wrap justify-content-between gap-2 mb-2"><strong>Série {{ series.number }}</strong><span class="small text-body-secondary">Meta: {{ item.target_repetitions }} repetições</span></div>
     {% if form.non_field_errors %}<div class="alert alert-danger py-2" role="alert">{{ form.non_field_errors }}</div>{% endif %}

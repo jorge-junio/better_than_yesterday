@@ -1,0 +1,11 @@
+<details class="panel card-body mission-filters mb-4" data-filter-panel {% if daily_category_form.errors %}open{% endif %}><summary>Filtros</summary>
+<form method="get" action="{{ request.path }}" class="daily-category-filter">
+  <div class="daily-category-field">
+    {{ daily_category_form.category.label_tag }}
+    {{ daily_category_form.category }}
+    {% for error in daily_category_form.category.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
+  </div>
+  <button type="submit" class="btn btn-primary" title="Filtrar missões por categoria">{% include 'life_rpg/icon.html' with name='filter' %} Filtrar</button>
+  {% if request.GET.category %}<a class="btn" href="{{ request.path }}" title="Mostrar todas as categorias">Limpar</a>{% endif %}
+</form>
+</details>

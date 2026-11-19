@@ -1,4 +1,4 @@
-<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" hx-target="#page-content" hx-swap="innerHTML" class="workout-page">
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" class="workout-page">
   <div class="workout-hero p-3 p-md-4 rounded-4 mb-4"><div class="small opacity-75 mb-1">{{ today|date:'l, d/m/Y' }}</div><h1 class="h2">Treinar</h1><p class="mb-0 opacity-75">Uma série de cada vez. Registre suas repetições e a carga utilizada.</p></div>
   {% if ongoing %}
   <div class="card border-info mb-4"><div class="card-body"><h2 class="h5">Você tem uma sessão em andamento</h2><p>{{ ongoing.workout_name }} · iniciada em {{ ongoing.started_at|date:'d/m/Y H:i' }}</p><a href="{% url 'workout_session' ongoing.pk %}" class="btn btn-info" title="Retomar sessão">Retomar treino</a></div></div>
@@ -12,11 +12,11 @@
         <h2 class="h5">{{ active.name }}</h2><p class="text-body-secondary small">Válido de {{ active.start_date|date:'d/m/Y' }}{% if active.end_date %} a {{ active.end_date|date:'d/m/Y' }}{% else %} · Sem data final{% endif %}</p>
         <p class="small text-body-secondary">{% if active.rest_seconds %}Descanso entre séries: {{ active.rest_seconds }} segundos{% else %}Descanso automático desativado{% endif %}</p>
         {% if not valid %}<div class="alert alert-warning">Este treino está fora do período de validade. Ajuste as datas para iniciar uma nova sessão.</div>{% endif %}
-        <form method="post" action="{% url 'workout_train' %}" hx-post="{% url 'workout_train' %}" hx-disabled-elt="find button[type='submit']">
+        <form method="post" action="{% url 'workout_train' %}">
           {% csrf_token %}{{ form.request_id }}
           {% if form.errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}{{ form.weekday.errors }}{{ form.request_id.errors }}</div>{% endif %}
           <div class="mb-3">{{ form.weekday.label_tag }}{{ form.weekday }}<div class="form-text">Hoje é o padrão. Você pode executar a programação de outro dia; a sessão será registrada na data de hoje.</div></div>
-          {% if valid and perms.workouts.add_workoutsession %}<button type="submit" class="btn btn-success w-100" title="Iniciar sessão de treino"><i aria-hidden="true" class="bi bi-play-fill"></i> Iniciar treino</button>{% endif %}
+          {% if valid and perms.workouts.add_workoutsession %}<button type="submit" class="btn btn-success w-100" title="Iniciar sessão de treino">{% include 'life_rpg/icon.html' with name='play' %} Iniciar treino</button>{% endif %}
         </form>
       </div></div>
     </div>

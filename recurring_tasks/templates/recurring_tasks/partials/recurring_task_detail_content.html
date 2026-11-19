@@ -24,6 +24,9 @@
                 <dt class="col-sm-3">Tempo estimado</dt>
                 <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
 
+                <dt class="col-sm-3">Prioridade</dt>
+                <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
+
                 {% if object.origin_possible_task %}
                 <dt class="col-sm-3">Possível tarefa</dt>
                 <dd class="col-sm-9">{{ object.origin_possible_task.title }}</dd>
@@ -49,12 +52,19 @@
         </div>
     </div>
     <div class="mt-3 d-flex gap-2 flex-wrap">
-        <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary" title="Voltar para a lista" hx-get="{% url 'recurring_task_list' %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
+        <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary" title="Voltar para a lista">
             Voltar para a lista
         </a>
-        <a href="{% url 'recurring_task_update' object.id %}" class="btn btn-warning" title="Editar" hx-get="{% url 'recurring_task_update' object.id %}" hx-target="#page-content" hx-swap="innerHTML" hx-push-url="true">
-            Editar
+        {% if perms.recurring_tasks.change_recurringtask %}
+        <a href="{% url 'recurring_task_update' object.id %}" class="btn btn-warning" title="Editar tarefa recorrente">
+            {% include 'life_rpg/icon.html' with name='edit' %} Editar
         </a>
+        {% endif %}
+        {% if perms.recurring_tasks.delete_recurringtask %}
+        <a href="{% url 'recurring_task_delete' object.id %}" class="btn btn-danger" title="Excluir tarefa recorrente">
+            {% include 'life_rpg/icon.html' with name='trash' %} Excluir
+        </a>
+        {% endif %}
     </div>
 </div>
 </div>

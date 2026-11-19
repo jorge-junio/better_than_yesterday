@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from django.db import models as db_models
 
 from categories.models import Category
@@ -16,6 +17,7 @@ class TaskForm(forms.ModelForm):
             'scheduled_date',
             'scheduled_time',
             'priority',
+            'skill',
             'is_completed',
         ]
         widgets = {
@@ -26,6 +28,7 @@ class TaskForm(forms.ModelForm):
             ),
             'scheduled_date': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
             'scheduled_time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'skill': forms.Select(attrs={'class': 'form-select'}),
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'is_completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -38,6 +41,23 @@ class TaskForm(forms.ModelForm):
             'priority': 'Prioridade',
             'is_completed': 'Concluída',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['skill'].choices = [('', 'Sem skill')] + list(models.Task.Skill.choices)
+
+    def save(self, commit=True):
+        task = super().save(commit=False)
+        # Form completion and quick completion must use the same source of truth.
+        if task.is_completed:
+            task.completed_at = task.completed_at or timezone.now()
+            task.skipped_in = None
+        else:
+            task.completed_at = None
+        if commit:
+            task.save()
+            self.save_m2m()
+        return task
 
 
 class TaskFilterForm(forms.Form):
@@ -75,3 +95,16 @@ class TaskFilterForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-select'}),
         label='Categoria',
     )
+
+
+class DailyCategoryFilterForm(forms.Form):
+    category = forms.ChoiceField(
+        label='Categoria', required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
+    def __init__(self, *args, categories, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].choices = [
+            ('', 'Todas as categorias'), ('none', 'Sem categoria'),
+        ] + [(str(category.pk), category.name) for category in categories]
