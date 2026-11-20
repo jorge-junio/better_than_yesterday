@@ -1,6 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.contrib import messages
+from django.http import Http404, HttpResponse
+from django.views.decorators.http import require_http_methods, require_safe
+
+from profiles.forms import ProfilePhotoForm
+from profiles.models import ProfilePhoto
 from django.shortcuts import redirect, render
 
 from .navigation import MENU_SECTIONS, get_menu_sections
@@ -33,10 +38,36 @@ def character(request):
 
 
 @login_required(login_url='login')
+@require_http_methods(['GET', 'POST'])
 def profile(request):
-    return render(request, 'life_rpg/profile.html', {'page_title': 'BTY - Perfil'})
+    form = ProfilePhotoForm(request.POST if request.method == 'POST' else None, request.FILES or None)
+    if request.method == 'POST' and form.is_valid():
+        if form.cleaned_data['remove_photo']:
+            ProfilePhoto.objects.filter(user=request.user).delete()
+            messages.success(request, 'Foto removida.')
+        elif form.cleaned_data['photo']:
+            ProfilePhoto.objects.update_or_create(user=request.user, defaults={'image': form.cleaned_data['photo']})
+            messages.success(request, 'Foto atualizada.')
+        return redirect('profile')
+    return render(request, 'life_rpg/profile.html', {'page_title': 'BTY - Perfil', 'photo_form': form})
+
+
+@login_required(login_url='login')
+@require_safe
+def profile_photo(request):
+    photo = ProfilePhoto.objects.filter(user=request.user).first()
+    if photo:
+        response = HttpResponse(bytes(photo.image), content_type='image/jpeg')
+    else:
+        response = HttpResponse('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="64" fill="#292435"/><g fill="none" stroke="#c4b5fd" stroke-width="6"><circle cx="64" cy="45" r="20"/><path d="M26 108v-9a38 38 0 0 1 76 0v9"/></g></svg>', content_type='image/svg+xml')
+    response['Cache-Control'] = 'private, no-store'
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 @login_required(login_url='login')
 def areas(request):
-    return render(request, 'life_rpg/areas.html', {'page_title': 'BTY - Áreas'})
+    area_order = ('workouts', 'english', 'shopping', 'projects')
+    available_sections = {section['slug']: section for section in get_menu_sections(request.user)}
+    sections = [available_sections[slug] for slug in area_order if slug in available_sections]
+    return render(request, 'life_rpg/areas.html', {'page_title': 'BTY - Áreas', 'area_sections': sections})

@@ -146,6 +146,7 @@
         const progress = doc.querySelector('[data-session-progress]');
         if (progress) document.getElementById(progress.id)?.replaceWith(progress);
         initialize(content);
+        document.dispatchEvent(new CustomEvent('workout:set-updated', { detail: { element: content } }));
         if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
         else content.querySelector('button')?.focus({ preventScroll: true });
       } else {

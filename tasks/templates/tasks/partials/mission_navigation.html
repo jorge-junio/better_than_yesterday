@@ -1,0 +1,7 @@
+<div class="mission-navigation">
+  <nav class="mission-tabs" aria-label="Visualização de missões">
+    {% if perms.tasks.view_task %}<a href="{% url 'task_today' %}" {% if active_tab == 'today' %}aria-current="page"{% endif %}>Do dia</a><a href="{% url 'task_list' %}" {% if active_tab == 'agenda' %}aria-current="page"{% endif %}>Agenda</a>{% endif %}
+    {% if perms.recurring_tasks.view_recurringtask %}<a href="{% url 'recurring_task_list' %}" {% if active_tab == 'recurring' %}aria-current="page"{% endif %}>Recorrentes</a>{% endif %}
+  </nav>
+  {% if perms.categories.view_category %}<a class="btn mission-categories" href="{% url 'category_list' %}" title="Gerenciar categorias">{% include 'life_rpg/icon.html' with name='tag' %} Categorias</a>{% endif %}
+</div>

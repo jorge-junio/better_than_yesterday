@@ -1,5 +1,5 @@
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
@@ -41,6 +41,22 @@ def build_task_today_url(scheduled_date=None, category_id=None):
     if not params:
         return str(base_url)
     return f"{base_url}?{urlencode(params)}"
+
+
+def get_task_back_url(request):
+    candidate = request.POST.get('back') or request.GET.get('back') or ''
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return str(reverse_lazy('task_list'))
+    allowed = {str(reverse_lazy(name)) for name in ('task_today', 'task_list', 'dashboard', 'task_today_all')}
+    if not parts.scheme and not parts.netloc and parts.path in allowed:
+        return candidate
+    return str(reverse_lazy('task_list'))
+
+
+def build_task_detail_url(request, task):
+    return f"{reverse_lazy('task_detail', args=[task.pk])}?{urlencode({'back': get_task_back_url(request)})}"
 
 
 class TaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -158,7 +174,7 @@ class TaskTodayAllView(PageTitleMixin, LoginRequiredMixin, PermissionRequiredMix
         mission = services.get_today_mission_context()
         category_context, tasks = get_daily_category_context(mission, self.request.GET)
         context.update(category_context)
-        tasks = tasks.order_by('-priority', 'title')
+        tasks = tasks.order_by(*services.get_today_mission_ordering())
         context['pending_tasks'] = tasks.filter(completed_at__isnull=True, skipped_in__isnull=True)
         context['completed_tasks'] = tasks.filter(completed_at__isnull=False)
         context['cancelled_tasks'] = tasks.filter(completed_at__isnull=True, skipped_in__isnull=False)
@@ -214,6 +230,11 @@ class TaskDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
     htmx_template_name = 'tasks/partials/task_detail_content.html'
     page_title = 'BTY - Detalhe da Tarefa'
     permission_required = 'tasks.view_task'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['back_url'] = get_task_back_url(self.request)
+        return context
 
 
 class TaskUpdateView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -272,6 +293,8 @@ class TaskToggleCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
             services.reopen_task(task)
         else:
             services.complete_task(task)
+        if request.POST.get('return_to') == 'task_detail':
+            return redirect(build_task_detail_url(request, task))
         if is_htmx_request(request):
             return render(request, 'tasks/partials/task_row.html', {'task': task})
         return redirect(self.get_success_url(task))
@@ -292,6 +315,8 @@ class TaskPostponeView(LoginRequiredMixin, PermissionRequiredMixin, View):
             raise Http404('Número de dias inválido.') from exc
 
         services.postpone_task(task, days=days_int)
+        if request.POST.get('return_to') == 'task_detail':
+            return redirect(build_task_detail_url(request, task))
         if is_htmx_request(request):
             return render(request, 'tasks/partials/task_row.html', {'task': task})
         return redirect(f"{reverse_lazy('task_list')}?scheduled_date={task.scheduled_date.isoformat()}")
@@ -311,6 +336,9 @@ class TaskTodayCompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
             params = {'completed': '1'}
             if category_id:
                 params['category'] = category_id
+            skill = request.GET.get('skill') or request.POST.get('skill')
+            if skill:
+                params['skill'] = skill
             return redirect(f"{reverse_lazy(return_to)}?{urlencode(params)}")
 
         if is_htmx_request(request):
@@ -332,12 +360,22 @@ class TaskTodaySkipView(LoginRequiredMixin, PermissionRequiredMixin, View):
         task = get_object_or_404(models.Task, pk=pk, scheduled_date=reference_date)
         services.skip_task_for_today(task)
 
+        if request.POST.get('return_to') == 'task_detail':
+            messages.info(request, 'Tarefa marcada como não realizada neste dia.', fail_silently=True)
+            return redirect(build_task_detail_url(request, task))
+
         return_to = request.POST.get('return_to')
         if return_to in {'dashboard', 'task_today_all'}:
             messages.info(request, 'Tarefa marcada como não realizada neste dia.', fail_silently=True)
             url = str(reverse_lazy(return_to))
+            params = {}
             if category_id:
-                url += f"?{urlencode({'category': category_id})}"
+                params['category'] = category_id
+            skill = request.GET.get('skill') or request.POST.get('skill')
+            if skill:
+                params['skill'] = skill
+            if params:
+                url += f"?{urlencode(params)}"
             return redirect(url)
 
         if is_htmx_request(request):

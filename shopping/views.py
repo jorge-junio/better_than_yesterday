@@ -2,10 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, Sum
+from django.db.models import Case, Count, IntegerField, Sum, Value, When
+from django.db.models.functions import Lower
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
+from urllib.parse import urlsplit
 from django.views import View
 from django import forms as django_forms
 
@@ -24,6 +27,25 @@ class ShoppingView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def display(self, request, partial, context=None):
         context = {'page_title': self.page_title, 'shopping_section': self.shopping_section, 'content_template': f'shopping/partials/{partial}.html', **(context or {})}
+        fallback = context.get('cancel_url')
+        if not fallback:
+            if partial in {'lists', 'history', 'purchase_wishes'}:
+                fallback = reverse('areas')
+            elif partial == 'purchase_wish_delete':
+                fallback = reverse('purchase_wish_list')
+            elif partial == 'finish':
+                fallback = reverse('shopping_session', args=[context['session'].pk])
+            elif partial == 'start' and context.get('selected'):
+                fallback = reverse('shopping_list_detail', args=[context['selected'].pk])
+            else:
+                fallback = reverse('shopping_list')
+        previous = request.META.get('HTTP_REFERER', '')
+        previous_url = urlsplit(previous)
+        if (previous and url_has_allowed_host_and_scheme(previous, allowed_hosts={request.get_host()}, require_https=request.is_secure())
+                and previous_url.path != request.path):
+            context['shopping_back_url'] = previous
+        else:
+            context['shopping_back_url'] = fallback
         return render(request, context['content_template'] if is_htmx_request(request) else 'shopping/page.html', context)
 
 
@@ -241,3 +263,88 @@ class HistoryView(ShoppingView):
         total = completed.aggregate(total=Sum('total'))['total'] or 0
         page = Paginator(queryset, 20).get_page(request.GET.get('page'))
         return self.display(request, 'history', {'sessions': page, 'page_obj': page, 'filter_form': filter_form, 'total': total, 'completed_count': completed.count(), 'query_string': build_querystring(request, exclude={'page'})})
+
+
+class PurchaseWishListView(ShoppingView):
+    permission_required = 'shopping.view_purchasewish'
+    page_title = 'BTY - Desejo comprar'
+    shopping_section = 'wishes'
+
+    def get(self, request):
+        data = request.GET.copy()
+        if 'is_purchased' not in data:
+            data['is_purchased'] = 'false'
+        form = forms.PurchaseWishFilterForm(data)
+        queryset = models.PurchaseWish.objects.filter(owner=request.user).order_by(
+            Case(When(purchase_type=models.PurchaseWish.Type.NEED, then=Value(0)), default=Value(1), output_field=IntegerField()),
+            Lower('name'), 'id',
+        )
+        if form.is_valid():
+            filters = form.cleaned_data
+            if filters['name']:
+                queryset = queryset.filter(name__icontains=filters['name'])
+            if filters['purchase_type']:
+                queryset = queryset.filter(purchase_type=filters['purchase_type'])
+            if filters['is_purchased'] != 'all':
+                queryset = queryset.filter(is_purchased=filters['is_purchased'] == 'true')
+        else:
+            queryset = queryset.none()
+        page = Paginator(queryset, 20).get_page(request.GET.get('page'))
+        return self.display(request, 'purchase_wishes', {
+            'wishes': page, 'page_obj': page, 'filter_form': form,
+            'query_string': build_querystring(request, exclude={'page'}),
+        })
+
+
+class PurchaseWishFormView(ShoppingView):
+    page_title = 'BTY - Desejo comprar'
+    shopping_section = 'wishes'
+
+    def get_permission_required(self):
+        return ('shopping.change_purchasewish' if self.kwargs.get('pk') else 'shopping.add_purchasewish',)
+
+    def get_instance(self, request, pk):
+        return get_object_or_404(models.PurchaseWish, pk=pk, owner=request.user) if pk else models.PurchaseWish(owner=request.user)
+
+    def display_form(self, request, form):
+        return self.display(request, 'form', {
+            'form': form, 'heading': 'Editar compra desejada' if form.instance.pk else 'Desejo comprar',
+            'submit_label': 'Salvar', 'cancel_url': reverse('purchase_wish_list'),
+        })
+
+    def get(self, request, pk=None):
+        return self.display_form(request, forms.PurchaseWishForm(instance=self.get_instance(request, pk)))
+
+    def post(self, request, pk=None):
+        form = forms.PurchaseWishForm(request.POST, instance=self.get_instance(request, pk))
+        if form.is_valid():
+            form.save()
+            return navigate(request, 'purchase_wish_list')
+        return self.display_form(request, form)
+
+
+class PurchaseWishDeleteView(ShoppingView):
+    permission_required = 'shopping.delete_purchasewish'
+    page_title = 'BTY - Excluir compra desejada'
+    shopping_section = 'wishes'
+
+    def get(self, request, pk):
+        wish = get_object_or_404(models.PurchaseWish, pk=pk, owner=request.user)
+        return self.display(request, 'purchase_wish_delete', {'wish': wish})
+
+    def post(self, request, pk):
+        wish = get_object_or_404(models.PurchaseWish, pk=pk, owner=request.user)
+        wish.delete()
+        return navigate(request, 'purchase_wish_list')
+
+
+class PurchaseWishConfirmView(ShoppingView):
+    permission_required = 'shopping.change_purchasewish'
+    http_method_names = ['post']
+
+    def post(self, request, pk):
+        wish = get_object_or_404(models.PurchaseWish, pk=pk, owner=request.user)
+        models.PurchaseWish.objects.filter(pk=wish.pk, owner=request.user).update(is_purchased=True)
+        query = build_querystring(request, exclude={'page'})
+        url = reverse('purchase_wish_list') + (f'?{query}' if query else '')
+        return htmx_redirect(url) if is_htmx_request(request) else redirect(url)

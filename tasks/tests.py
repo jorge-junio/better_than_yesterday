@@ -161,12 +161,14 @@ class RecurrenceGenerationTests(SimpleTestCase):
         self.assertTrue(hasattr(recurring_task, 'occurs_on'))
         self.assertTrue(callable(ensure_tasks_for_date))
 
-    def test_today_mission_orders_by_priority_title(self):
+    def test_today_mission_orders_by_time_priority_title(self):
         ordering = get_today_mission_ordering()
 
-        self.assertEqual(len(ordering), 2)
-        self.assertEqual(str(ordering[0]), 'OrderBy(F(priority), descending=True)')
-        self.assertEqual(ordering[1], 'title')
+        self.assertEqual(len(ordering), 3)
+        self.assertEqual(str(ordering[0]), 'OrderBy(F(scheduled_time), descending=False)')
+        self.assertTrue(ordering[0].nulls_last)
+        self.assertEqual(str(ordering[1]), 'OrderBy(F(priority), descending=True)')
+        self.assertEqual(ordering[2], 'title')
 
 
 class TaskCreateViewTests(SimpleTestCase):

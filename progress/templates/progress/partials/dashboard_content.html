@@ -14,7 +14,7 @@
     {% if perms.tasks.view_task %}
       {% for task in daily_tasks %}
         {% include 'tasks/partials/daily_quest_card.html' with return_to='dashboard' %}
-      {% empty %}<div class="empty-state">{% include 'life_rpg/icon.html' with name='quest' %}<h3>{% if selected_category_id %}Nenhuma missão nesta categoria{% else %}Nenhuma missão para exibir hoje{% endif %}</h3><p>Consulte a agenda ou adicione uma nova missão.</p></div>{% endfor %}
+      {% empty %}<div class="empty-state">{% include 'life_rpg/icon.html' with name='quest' %}<h3>{% if selected_category_id or selected_skill %}Nenhuma missão para estes filtros{% else %}Nenhuma missão para exibir hoje{% endif %}</h3><p>Consulte a agenda ou adicione uma nova missão.</p></div>{% endfor %}
     {% else %}<p class="empty-state">Você não tem permissão para consultar missões.</p>{% endif %}
     </div>
     {% if perms.tasks.add_task %}<a class="primary-button add-quest" href="{% url 'task_create' %}" title="Adicionar nova missão">{% include 'life_rpg/icon.html' with name='plus' %} Nova missão</a>{% endif %}

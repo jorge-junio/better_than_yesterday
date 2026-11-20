@@ -26,6 +26,7 @@ class RecurringTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixi
         recurrence_type = self.request.GET.get('recurrence_type')
         is_active = self.request.GET.get('is_active')
         category_id = self.request.GET.get('category')
+        skill = self.request.GET.get('skill')
 
         if name:
             queryset = queryset.filter(name__icontains=name)
@@ -39,10 +40,16 @@ class RecurringTaskListView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixi
         if category_id:
             queryset = queryset.filter(category_id=category_id)
 
+        if skill == 'none':
+            queryset = queryset.filter(skill='')
+        elif skill:
+            queryset = queryset.filter(skill=skill)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['skill_choices'] = models.RecurringTask._meta.get_field('skill').choices
         context['categories'] = Category.objects.order_by('name')
         context['query_string'] = build_querystring(self.request, exclude={'page'})
         return context

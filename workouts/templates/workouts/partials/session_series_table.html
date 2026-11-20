@@ -1,0 +1,22 @@
+<div class="session-series-wrapper">
+  <table class="session-series-table" aria-label="Séries de {{ item.exercise_name }}">
+    <thead>
+      <tr>
+        <th scope="col">Série</th>
+        <th scope="col">Meta</th>
+        <th scope="col">Realizadas</th>
+        <th scope="col">Peso</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for series in item.sets.all %}
+      <tr>
+        <td>{{ series.number }}</td>
+        <td>{{ item.target_repetitions }} rep.</td>
+        <td>{% if series.registered_at %}{{ series.repetitions }} rep.{% else %}Não registrada{% endif %}</td>
+        <td>{% if series.registered_at %}{{ series.weight }} kg{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

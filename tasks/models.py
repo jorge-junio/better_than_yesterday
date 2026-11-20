@@ -19,6 +19,20 @@ class Task(models.Model):
         DISCIPLINE = 'discipline', 'Disciplina'
         WISDOM = 'wisdom', 'Sabedoria'
         CHARISMA = 'charisma', 'Carisma'
+        HEALTH = 'health', 'Saúde'
+
+    SKILL_ICONS = {
+        Skill.INTELLIGENCE: 'quest',
+        Skill.STRENGTH: 'trophy',
+        Skill.DISCIPLINE: 'check',
+        Skill.WISDOM: 'spark',
+        Skill.CHARISMA: 'person',
+        Skill.HEALTH: 'heart',
+    }
+
+    @property
+    def skill_icon(self):
+        return self.SKILL_ICONS.get(self.skill, 'lock')
 
     skill = models.CharField(
         max_length=20,

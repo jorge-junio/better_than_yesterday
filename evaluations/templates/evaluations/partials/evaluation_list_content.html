@@ -50,11 +50,6 @@
                             {% include 'life_rpg/icon.html' with name='play' %} Continuar quiz
                         </a>
                         {% endif %}
-                        {% if perms.evaluations.change_evaluation %}
-                        <a href="{% url 'evaluation_update' evaluation.id %}" class="btn btn-warning btn-sm" title="Editar">
-                            {% include 'life_rpg/icon.html' with name='edit' %}
-                        </a>
-                        {% endif %}
                         {% if perms.evaluations.delete_evaluation %}
                         <a href="{% url 'evaluation_delete' evaluation.id %}" class="btn btn-danger btn-sm" title="Excluir">
                             {% include 'life_rpg/icon.html' with name='trash' %}

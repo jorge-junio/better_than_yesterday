@@ -78,3 +78,22 @@ class ShoppingSessionItem(models.Model):
         verbose_name = 'Item comprado'
         verbose_name_plural = 'Itens comprados'
         constraints = [models.CheckConstraint(condition=models.Q(quantity__isnull=True) | models.Q(quantity__gte=0), name='shopping_nonnegative_quantity')]
+
+
+class PurchaseWish(models.Model):
+    class Type(models.TextChoices):
+        DESIRE = 'desire', 'DESEJO'
+        NEED = 'need', 'NECESSIDADE'
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='purchase_wishes')
+    name = models.CharField('Nome', max_length=160)
+    purchase_type = models.CharField('Tipo', max_length=10, choices=Type.choices)
+    is_purchased = models.BooleanField('Comprado', default=False)
+
+    class Meta:
+        ordering = ['name', 'id']
+        verbose_name = 'Desejo comprar'
+        verbose_name_plural = 'Desejo comprar'
+
+    def __str__(self):
+        return self.name

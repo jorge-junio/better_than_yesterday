@@ -7,12 +7,11 @@
 
             <form method="post" action="{% url 'recurring_task_delete' object.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger mt-3" title="Deletar">Deletar</button>
+                <div class="d-flex flex-nowrap justify-content-between mt-3">
+                    <button type="submit" class="btn btn-danger" style="flex: 0 0 49%;" title="Excluir">Excluir</button>
+                    <a href="{{ cancel_url }}" class="btn btn-secondary" style="flex: 0 0 49%;" title="Cancelar">Cancelar</a>
+                </div>
             </form>
-
-            <a href="{{ cancel_url }}" class="btn btn-secondary mt-3" title="Cancelar">
-                Cancelar e voltar para a lista
-            </a>
         </div>
     </div>
 </div>

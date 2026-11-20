@@ -5,7 +5,12 @@
     {{ daily_category_form.category }}
     {% for error in daily_category_form.category.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
   </div>
-  <button type="submit" class="btn btn-primary" title="Filtrar missões por categoria">{% include 'life_rpg/icon.html' with name='filter' %} Filtrar</button>
-  {% if request.GET.category %}<a class="btn" href="{{ request.path }}" title="Mostrar todas as categorias">Limpar</a>{% endif %}
+  <div class="daily-category-field">
+    {{ daily_category_form.skill.label_tag }}
+    {{ daily_category_form.skill }}
+    {% for error in daily_category_form.skill.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
+  </div>
+  <button type="submit" class="btn btn-primary" title="Filtrar missões por categoria e skill">{% include 'life_rpg/icon.html' with name='filter' %} Filtrar</button>
+  {% if request.GET.category or request.GET.skill %}<a class="btn" href="{{ request.path }}" title="Limpar filtros de categoria e skill">Limpar</a>{% endif %}
 </form>
 </details>

@@ -147,6 +147,8 @@ class RecurringTaskSyncTests(SimpleTestCase):
             estimated_time=None,
             priority=RecurringTask.Priority.HIGH,
             category=None,
+            skill='discipline',
+            scheduled_time=None,
             generated_tasks=MagicMock(),
         )
 
@@ -172,6 +174,8 @@ class RecurringTaskSyncTests(SimpleTestCase):
             estimated_time=None,
             priority=RecurringTask.Priority.HIGH,
             category=None,
+            skill='discipline',
+            scheduled_time=None,
             generated_tasks=MagicMock(),
         )
 

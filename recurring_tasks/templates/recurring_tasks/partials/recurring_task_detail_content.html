@@ -1,70 +1,36 @@
-<div data-page-title="{{ page_title }}">
-<div class="container mt-4">
-    <h3 class="display-6">Detalhes da Tarefa Recorrente</h3>
-    <div class="card">
-        <div class="card-body">
-            <h3 class="card-title">{{ object.name }}</h3>
-            <p class="card-text">{{ object.description }}</p>
-            <dl class="row">
-                <dt class="col-sm-3">Tipo de recorrência</dt>
-                <dd class="col-sm-9">{{ object.get_recurrence_type_display }}</dd>
+<div class="recurring-detail" data-page-title="{{ page_title }}">
+  <a class="text-link recurring-detail-back" href="{% url 'recurring_task_list' %}" title="Voltar às tarefas recorrentes">← Voltar</a>
+  <header class="recurring-detail-heading">
+    <div><p class="eyebrow">Tarefa recorrente</p><h1>{{ object.name }}</h1></div>
+    <span class="badge {% if object.is_active %}text-bg-success{% else %}text-bg-secondary{% endif %}">{% if object.is_active %}Ativa{% else %}Inativa{% endif %}</span>
+  </header>
 
-                <dt class="col-sm-3">Categoria</dt>
-                <dd class="col-sm-9">
-                    {% if object.category %}
-                        <span class="badge text-bg-light text-dark border border-1">
-                            <span class="me-1 d-inline-block align-middle" style="width: .55rem; height: .55rem; border-radius: 50%; background-color: {{ object.category.color }};"></span>
-                            {{ object.category.name }}
-                        </span>
-                    {% else %}
-                        -
-                    {% endif %}
-                </dd>
+  <section class="panel recurring-detail-panel" aria-label="Informações da recorrência">
+    <dl class="recurring-detail-grid">
+      <div><dt>Recorrência</dt><dd>{{ object.get_recurrence_type_display }}</dd></div>
+      <div><dt>Categoria</dt><dd>{{ object.category.name|default:'Sem categoria' }}</dd></div>
+      <div><dt>Skill</dt><dd>{{ object.get_skill_display|default:'Sem skill' }}</dd></div>
+      <div><dt>Horário</dt><dd>{{ object.scheduled_time|time:"H:i"|default:"Não informado" }}</dd></div>
+      <div><dt>Tempo estimado</dt><dd>{{ object.estimated_time|default:'Não informado' }}</dd></div>
+      <div><dt>Prioridade</dt><dd>{{ object.get_priority_display }}</dd></div>
 
-                <dt class="col-sm-3">Tempo estimado</dt>
-                <dd class="col-sm-9">{{ object.estimated_time|default:'-' }}</dd>
+      {% if object.recurrence_type == 'weekdays' %}
+      <div class="recurring-detail-wide"><dt>Dias da semana</dt><dd class="recurring-detail-days">{% for day in object.weekday_labels %}<abbr title="{{ day }}">{{ day|slice:':3' }}</abbr>{% empty %}Não informados{% endfor %}</dd></div>
+      {% elif object.recurrence_type == 'date_range' %}
+      <div class="recurring-detail-wide"><dt>Período</dt><dd>{{ object.start_date|date:'d/m/Y' }} a {{ object.end_date|date:'d/m/Y' }}</dd></div>
+      {% elif object.recurrence_type == 'specific_dates' %}
+      <div class="recurring-detail-wide"><dt>Datas específicas</dt><dd>{{ object.specific_dates_display|join:', ' }}</dd></div>
+      {% endif %}
 
-                <dt class="col-sm-3">Prioridade</dt>
-                <dd class="col-sm-9">{{ object.get_priority_display }}</dd>
+      {% if object.origin_possible_task %}<div class="recurring-detail-wide"><dt>Possível tarefa de origem</dt><dd>{{ object.origin_possible_task.title }}</dd></div>{% endif %}
+    </dl>
+    {% if object.description %}<details class="recurring-detail-description"><summary>Descrição</summary><p>{{ object.description|linebreaksbr }}</p></details>{% endif %}
+  </section>
 
-                {% if object.origin_possible_task %}
-                <dt class="col-sm-3">Possível tarefa</dt>
-                <dd class="col-sm-9">{{ object.origin_possible_task.title }}</dd>
-                {% endif %}
-
-                {% if object.recurrence_type == 'weekdays' %}
-                    <dt class="col-sm-3">Dias da semana</dt>
-                    <dd class="col-sm-9">{{ object.weekday_labels|join:', ' }}</dd>
-                {% elif object.recurrence_type == 'date_range' %}
-                    <dt class="col-sm-3">Intervalo</dt>
-                    <dd class="col-sm-9">{{ object.start_date }} até {{ object.end_date }}</dd>
-                {% elif object.recurrence_type == 'specific_dates' %}
-                    <dt class="col-sm-3">Datas específicas</dt>
-                    <dd class="col-sm-9">{{ object.specific_dates_display|join:', ' }}</dd>
-                {% endif %}
-
-                <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">{% if object.is_active %}Ativa{% else %}Inativa{% endif %}</dd>
-            </dl>
-            <div class="alert alert-info mb-0">
-                As tarefas geradas desta recorrência podem ser iniciadas ou concluídas diretamente.
-            </div>
-        </div>
-    </div>
-    <div class="mt-3 d-flex gap-2 flex-wrap">
-        <a href="{% url 'recurring_task_list' %}" class="btn btn-secondary" title="Voltar para a lista">
-            Voltar para a lista
-        </a>
-        {% if perms.recurring_tasks.change_recurringtask %}
-        <a href="{% url 'recurring_task_update' object.id %}" class="btn btn-warning" title="Editar tarefa recorrente">
-            {% include 'life_rpg/icon.html' with name='edit' %} Editar
-        </a>
-        {% endif %}
-        {% if perms.recurring_tasks.delete_recurringtask %}
-        <a href="{% url 'recurring_task_delete' object.id %}" class="btn btn-danger" title="Excluir tarefa recorrente">
-            {% include 'life_rpg/icon.html' with name='trash' %} Excluir
-        </a>
-        {% endif %}
-    </div>
-</div>
+  {% if perms.recurring_tasks.change_recurringtask or perms.recurring_tasks.delete_recurringtask %}
+  <div class="recurring-detail-actions">
+    {% if perms.recurring_tasks.change_recurringtask %}<a href="{% url 'recurring_task_update' object.id %}" class="btn btn-primary" title="Editar tarefa recorrente">{% include 'life_rpg/icon.html' with name='edit' %} Editar</a>{% endif %}
+    {% if perms.recurring_tasks.delete_recurringtask %}<a href="{% url 'recurring_task_delete' object.id %}" class="btn btn-outline-danger" title="Excluir tarefa recorrente">{% include 'life_rpg/icon.html' with name='trash' %} Excluir</a>{% endif %}
+  </div>
+  {% endif %}
 </div>

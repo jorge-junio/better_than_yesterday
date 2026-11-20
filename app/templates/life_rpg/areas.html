@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Áreas · Life RPG{% endblock %}
 {% block content %}
-<header class="mb-4"><p class="eyebrow">Tudo em um só lugar</p><h1 class="mb-2">Áreas</h1><p class="muted small">Escolha o que deseja fazer.</p></header>
+<header class="areas-heading"><h1>Áreas</h1></header>
 <div class="areas-page">
-  {% for section in menu_sections %}
-  <section class="area-group" aria-labelledby="area-{{ section.slug }}">
-    <h2 id="area-{{ section.slug }}" class="mb-3">{{ section.label }}</h2>
+  {% for section in area_sections %}
+  <details class="area-group area-group-{{ section.slug }}" open>
+    <summary class="area-group-title"><h2>{{ section.label }}</h2>{% include 'life_rpg/icon.html' with name='down' %}</summary>
     <div class="area-tiles">
       {% for option in section.options %}
+      {% if option.route != 'category_list' %}
       <a class="area-tile" href="{% url option.route %}" title="Abrir {{ option.label }} — {{ section.label }}">
-        <span class="area-tile-icon">{% include 'life_rpg/icon.html' with name=option.icon %}</span>
-        <span>{{ option.label }}</span>
+        <span class="area-tile-icon">{% include 'life_rpg/icon.html' with name=option.area_icon %}</span>
+        <span>{{ option.area_label }}</span>
       </a>
+      {% endif %}
       {% endfor %}
     </div>
-  </section>
+  </details>
   {% empty %}<div class="empty-state"><h2>Nenhuma área disponível</h2><p>Não há opções liberadas para sua conta.</p></div>{% endfor %}
 </div>
 {% endblock %}

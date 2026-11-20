@@ -1,8 +1,8 @@
-<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" class="workout-page">
-  <div class="workout-hero p-3 p-md-4 rounded-4 mb-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
-      <div><h1 class="h2">{{ session.workout_name }}</h1><p class="opacity-75 mb-2">{{ session.date|date:'d/m/Y' }} · Programação de {{ session.get_scheduled_weekday_display }}</p><span class="badge text-bg-light">{{ session.get_status_display }}</span></div>
-      <div class="d-flex flex-wrap align-items-start gap-2">
+<div data-page-title="{{ page_title }}" data-workout-section="{{ workout_section }}" class="workout-page workout-session-page">
+  <div class="workout-hero session-heading">
+    <div class="session-heading-content">
+      <div><h1 class="h2">{{ session.workout_name }}</h1><p class="session-subtitle">{{ session.date|date:'d/m/Y' }} · Programação de {{ session.get_scheduled_weekday_display }}</p><span class="badge text-bg-light">{{ session.get_status_display }}</span></div>
+      <div class="session-heading-actions">
         {% if editable %}<a href="{% url 'workout_session_finish' session.pk %}" class="btn btn-light" title="Finalizar sessão">Finalizar treino</a>{% endif %}
         <a href="{% url 'workout_history' %}" class="btn btn-outline-light" title="Ver histórico">Histórico</a>
       </div>
@@ -11,21 +11,25 @@
   {% include 'workouts/partials/progress.html' %}
   <p class="small text-body-secondary">{% if session.rest_seconds %}Descanso entre séries: {{ session.rest_seconds }} segundos{% else %}Descanso automático desativado{% endif %}</p>
   {% if editable %}{% include 'workouts/partials/rest_timer.html' %}{% endif %}
-  {% if session.is_open %}<p class="small text-body-secondary">Cada série é salva ao tocar em “Registrar série”. Use 0 kg para exercícios sem carga externa. Você pode sair e retomar os registros salvos.</p>{% else %}<p class="small text-body-secondary">Início: {{ session.started_at|date:'H:i' }} · Término: {{ session.finished_at|date:'d/m/Y H:i' }} · Duração: {{ session.duration_minutes }} min. Histórico preservado.</p>{% endif %}
-  <div class="vstack gap-4">
+  {% if session.is_open %}<details class="session-recording-help"><summary>Como registrar</summary><p class="small text-body-secondary">Cada série é salva ao tocar em “Registrar série”. Use 0 kg para exercícios sem carga externa. Você pode sair e retomar os registros salvos.</p></details>{% else %}<p class="small text-body-secondary">Início: {{ session.started_at|date:'H:i' }} · Término: {{ session.finished_at|date:'d/m/Y H:i' }} · Duração: {{ session.duration_minutes }} min. Histórico preservado.</p>{% endif %}
+  <div class="session-exercises">
     {% for card in cards %}{% with item=card.item %}
-    <section class="card {% if item.is_skipped %}border-secondary{% endif %}"><div class="card-body p-3 p-md-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
-        <div><h2 class="h5">{{ item.exercise_name }}</h2><p class="small text-body-secondary mb-1">{{ item.target_sets }} séries · {{ item.target_repetitions }} repetições por série</p>{% if item.notes %}<p class="small text-body-secondary mb-0">{{ item.notes|linebreaksbr }}</p>{% endif %}</div>
-        {% if editable %}<form method="post" action="{% url 'workout_session_skip' item.pk %}" class="align-self-start">{% csrf_token %}<input type="hidden" name="exercise_action" value="{% if item.is_skipped %}resume{% else %}skip{% endif %}"><button type="submit" class="btn btn-outline-secondary btn-sm" title="{% if item.is_skipped %}Retomar exercício{% else %}Marcar exercício como não realizado{% endif %}">{% if item.is_skipped %}Retomar exercício{% else %}Não realizado{% endif %}</button></form>{% endif %}
-      </div>
+    <details class="card session-exercise session-exercise-expandable session-exercise-{{ item.completion_state }} {% if item.is_skipped %}border-secondary{% endif %}" data-exercise-target="{{ item.target_sets }}" data-exercise-skipped="{{ item.is_skipped|yesno:'true,false' }}">
+      <summary class="session-exercise-toggle">
+        <span class="session-exercise-title"><span class="session-exercise-name">{{ item.exercise_name }}</span><span class="session-exercise-target" title="{{ item.target_sets }} séries de {{ item.target_repetitions }} repetições">{{ item.target_sets }} × {{ item.target_repetitions }} rep.</span></span>
+        <span class="session-exercise-completion" data-exercise-completion role="status">{% if item.completion_state == 'completed' %}Completo{% elif item.completion_state == 'partial' %}Parcial{% endif %}</span>
+        {% include 'life_rpg/icon.html' with name='down' %}
+      </summary>
+      <div class="card-body session-exercise-body">
+      {% if editable %}<div class="session-exercise-heading"><form method="post" action="{% url 'workout_session_skip' item.pk %}" class="align-self-start">{% csrf_token %}<input type="hidden" name="exercise_action" value="{% if item.is_skipped %}resume{% else %}skip{% endif %}"><button type="submit" class="btn btn-outline-secondary btn-sm" title="{% if item.is_skipped %}Retomar exercício{% else %}Marcar exercício como não realizado{% endif %}">{% if item.is_skipped %}Retomar exercício{% else %}Não realizado{% endif %}</button></form></div>{% endif %}
+      {% if item.notes %}<details class="session-exercise-notes"><summary>Observações</summary><p>{{ item.notes|linebreaksbr }}</p></details>{% endif %}
       {% if card.previous %}<details class="mb-3 small"><summary class="text-info">Última execução registrada</summary><div class="mt-2">{% for previous_set in card.previous.sets.all %}{% if previous_set.registered_at %}<span class="d-inline-block me-3 mb-1">Série {{ previous_set.number }}: {{ previous_set.repetitions }} rep. × {{ previous_set.weight }} kg</span>{% endif %}{% endfor %}</div></details>{% endif %}
       {% if item.is_skipped %}<div class="alert alert-secondary mb-0">Exercício marcado como não realizado.</div>
       {% elif editable %}<div class="workout-sets-grid">{% for row in card.rows %}{% include 'workouts/partials/set_form.html' with series=row.series form=row.form %}{% endfor %}</div>
       {% else %}
-      <div class="table-responsive"><table class="table mobile-card-table align-middle mb-0"><thead><tr><th>Série</th><th>Meta</th><th>Realizadas</th><th>Peso</th></tr></thead><tbody>{% for series in item.sets.all %}<tr><td data-label="Série">{{ series.number }}</td><td data-label="Meta">{{ item.target_repetitions }} rep.</td><td data-label="Realizadas">{% if series.registered_at %}{{ series.repetitions }} rep.{% else %}Não registrada{% endif %}</td><td data-label="Peso">{% if series.registered_at %}{{ series.weight }} kg{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+      {% include 'workouts/partials/session_series_table.html' %}
       {% endif %}
-    </div></section>
+    </div></details>
     {% endwith %}{% endfor %}
   </div>
   {% if editable %}<div class="mt-4"><a href="{% url 'workout_session_finish' session.pk %}" class="btn btn-primary" title="Finalizar sessão">Finalizar treino</a></div>{% endif %}

@@ -1,9 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Case, When, Value, IntegerField
 from django.utils import timezone
 from django.views.generic import TemplateView
 
 from tasks.presentation import get_daily_category_context
-from tasks.services import get_skill_progress, get_today_mission_context
+from tasks.services import get_skill_progress, get_today_mission_context, get_today_mission_ordering
 from app.utils import PageTitleMixin, htmx_redirect, is_htmx_request
 
 from . import forms, services
@@ -46,7 +47,10 @@ class DashboardView(PageTitleMixin, LoginRequiredMixin, TemplateView):
         context.update(dashboard_context)
         category_context, daily_tasks = get_daily_category_context(mission_context, self.request.GET)
         context.update(category_context)
-        context['daily_tasks'] = daily_tasks.filter(skipped_in__isnull=True).order_by('completed_at', '-priority', 'title')[:6]
+        context['daily_tasks'] = daily_tasks.filter(skipped_in__isnull=True).order_by(
+            Case(When(completed_at__isnull=True, then=Value(0)), default=Value(1), output_field=IntegerField()),
+            *get_today_mission_ordering(),
+        )[:6]
         hour = timezone.localtime().hour
         context['greeting'] = 'Bom dia' if hour < 12 else ('Boa tarde' if hour < 18 else 'Boa noite')
         context['filter_form'] = filter_form

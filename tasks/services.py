@@ -25,8 +25,10 @@ def ensure_tasks_for_date(target_date):
                 'title': recurring_task.name,
                 'description': recurring_task.description,
                 'estimated_time': recurring_task.estimated_time,
+                'scheduled_time': recurring_task.scheduled_time,
                 'priority': recurring_task.priority,
                 'category': recurring_task.category,
+                'skill': recurring_task.skill,
                 'source_type': Task.SourceType.RECURRENT,
             },
         )
@@ -77,6 +79,7 @@ def postpone_task(task, days=1):
 
 def get_today_mission_ordering():
     return (
+        F('scheduled_time').asc(nulls_last=True),
         F('priority').desc(nulls_last=True),
         'title',
     )
@@ -223,26 +226,20 @@ def get_skill_progress():
         .annotate(completed=Count('pk'))
         .values_list('skill', 'completed')
     )
-    icons = {
-        Task.Skill.INTELLIGENCE: 'quest',
-        Task.Skill.STRENGTH: 'trophy',
-        Task.Skill.DISCIPLINE: 'check',
-        Task.Skill.WISDOM: 'spark',
-        Task.Skill.CHARISMA: 'person',
-    }
     descriptions = {
         Task.Skill.STRENGTH: 'Exercícios, musculação e atividades físicas',
         Task.Skill.INTELLIGENCE: 'Estudos, cursos e aprendizado técnico',
         Task.Skill.DISCIPLINE: 'Rotinas, hábitos e compromissos cumpridos',
         Task.Skill.WISDOM: 'Leitura, reflexão e desenvolvimento pessoal',
         Task.Skill.CHARISMA: 'Socialização, comunicação e relacionamentos',
+        Task.Skill.HEALTH: 'Comer saudável e meditação',
     }
     progress = []
     for skill, label in Task.Skill.choices:
         completed = counts.get(skill, 0)
         xp = completed * 15
         progress.append({
-            'key': skill, 'label': label, 'icon': icons[skill],
+            'key': skill, 'label': label, 'icon': Task.SKILL_ICONS[skill],
             'description': descriptions[skill],
             'completed': completed, 'total_xp': xp, 'level': xp // 100 + 1,
             'xp_in_level': xp % 100, 'xp_to_next_level': 100 - xp % 100,

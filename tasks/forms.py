@@ -44,7 +44,8 @@ class TaskForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['skill'].choices = [('', 'Sem skill')] + list(models.Task.Skill.choices)
+        self.fields['skill'].required = True
+        self.fields['skill'].choices = [('', 'Selecione uma skill')] + list(models.Task.Skill.choices)
 
     def save(self, commit=True):
         task = super().save(commit=False)
@@ -98,6 +99,11 @@ class TaskFilterForm(forms.Form):
 
 
 class DailyCategoryFilterForm(forms.Form):
+    skill = forms.ChoiceField(
+        label='Skill', required=False,
+        choices=[('', 'Todas as skills'), ('none', 'Sem skill')] + list(models.Task.Skill.choices),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
     category = forms.ChoiceField(
         label='Categoria', required=False,
         widget=forms.Select(attrs={'class': 'form-select'}),

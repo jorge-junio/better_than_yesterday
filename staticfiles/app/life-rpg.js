@@ -42,18 +42,22 @@
     url.searchParams.delete('completed');
     history.replaceState(null, '', url);
   }
-  document.querySelectorAll('[data-complete-quest]').forEach((form) => {
+  document.querySelectorAll('[data-complete-quest], [data-skip-quest]').forEach((form) => {
     form.addEventListener('submit', () => {
       const button = form.querySelector('button');
-      button.disabled = true;
-      button.setAttribute('aria-label', 'Concluindo missão');
+      const actions = form.closest('.dashboard-quest-actions') || form;
+      actions.querySelectorAll('button').forEach((control) => { control.disabled = true; });
+      button.setAttribute('aria-label', form.hasAttribute('data-skip-quest') ? 'Registrando tarefa não realizada' : 'Concluindo missão');
     });
   });
   // Refresh real data in the background without interrupting a form or dialog.
   let filterDirty = false;
-  document.querySelector('.date-filters')?.addEventListener('input', () => { filterDirty = true; });
+  document.querySelectorAll('.date-filters, .daily-category-filter').forEach((form) => {
+    form.addEventListener('input', () => { filterDirty = true; });
+    form.addEventListener('change', () => { filterDirty = true; });
+  });
   setInterval(async () => {
-    if (location.pathname !== '/dashboard/' || document.hidden || document.querySelector('dialog[open]') || filterDirty || document.activeElement?.closest('form')) return;
+    if (!['/dashboard/', '/tasks/today/all/'].includes(location.pathname) || document.hidden || document.querySelector('dialog[open]') || filterDirty || document.activeElement?.closest('form')) return;
     try {
       const response = await fetch(location.href, { credentials: 'same-origin' });
       if (!response.ok || response.redirected) return;

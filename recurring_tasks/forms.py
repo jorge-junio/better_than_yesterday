@@ -33,8 +33,10 @@ class RecurringTaskForm(forms.ModelForm):
             'name',
             'description',
             'estimated_time',
+            'scheduled_time',
             'priority',
             'category',
+            'skill',
             'recurrence_type',
             'weekdays',
             'start_date',
@@ -48,6 +50,8 @@ class RecurringTaskForm(forms.ModelForm):
             'estimated_time': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'HH:MM:SS'}
             ),
+            'scheduled_time': forms.TimeInput(format='%H:%M', attrs={'class': 'form-control', 'type': 'time'}),
+            'skill': forms.Select(attrs={'class': 'form-select'}),
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'recurrence_type': forms.Select(attrs={'class': 'form-select'}),
             'start_date': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
@@ -58,6 +62,7 @@ class RecurringTaskForm(forms.ModelForm):
             'name': 'Nome',
             'description': 'Descrição',
             'estimated_time': 'Tempo estimado',
+            'scheduled_time': 'Horário',
             'priority': 'Prioridade',
             'category': 'Categoria',
             'recurrence_type': 'Tipo de recorrência',
@@ -68,6 +73,8 @@ class RecurringTaskForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['skill'].required = True
+        self.fields['skill'].choices = [('', 'Selecione uma skill')] + list(models.Task.Skill.choices)
         if self.instance and self.instance.pk:
             self.fields['weekdays'].initial = self.instance.weekdays
             self.initial['specific_dates'] = '\n'.join(self.instance.specific_dates_display)

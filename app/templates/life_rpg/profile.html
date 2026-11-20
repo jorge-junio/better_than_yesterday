@@ -1,13 +1,40 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block scripts %}<script src="{% static 'app/profile-photo.js' %}" defer></script>{% endblock %}
 {% block title %}Perfil · Life RPG{% endblock %}
 {% block content %}
 <p class="eyebrow">Seu espaço de organização</p><h1>Perfil</h1>
 <section class="panel card-body mb-4" aria-labelledby="profile-title">
-  <div class="d-flex align-items-center gap-3 mb-3"><span class="brand-emblem">{% include 'life_rpg/icon.html' with name='person' %}</span><div><h2 id="profile-title">{% firstof user.get_full_name user.username %}</h2><p class="muted small">@{{ user.username }}</p></div></div>
+  <div data-photo-picker>
+    <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}" class="profile-photo-form" data-photo-upload>
+      {% csrf_token %}
+      {{ photo_form.non_field_errors }}
+      <div class="profile-photo-picker">
+        <div class="profile-photo-control">
+          <button type="button" class="photo-trigger" data-photo-open title="Ampliar foto de perfil" aria-label="Ampliar foto de perfil" aria-haspopup="dialog" disabled>
+            <img class="profile-avatar" data-photo-preview src="{% url 'profile_photo' %}" alt="Sua foto de perfil" width="128" height="128">
+          </button>
+          <button type="button" class="profile-photo-edit-icon" data-photo-quick-edit title="Alterar foto" aria-label="Alterar foto de perfil" disabled>{% include 'life_rpg/icon.html' with name='edit' %}</button>
+        </div>
+        <p class="small muted" data-photo-hint hidden>Alterar foto</p>
+        <p class="small muted" id="photo-preview-status" role="status" aria-live="polite"></p>
+        <button type="button" class="btn btn-secondary photo-preview-cancel" data-photo-cancel title="Descartar seleção" hidden>Descartar seleção</button>
+      </div>
+      <div class="mb-3"><h2 id="profile-title">{% firstof user.get_full_name user.username %}</h2><p class="muted small">@{{ user.username }}</p></div>
+      {{ photo_form.photo.errors }}
+      <div data-photo-field>{{ photo_form.photo.label_tag }}{{ photo_form.photo }}<p class="muted small">JPEG ou PNG · até 5 MB</p></div>
+      <div class="profile-photo-remove" data-photo-remove-field>{{ photo_form.remove_photo.as_field_group }}</div>
+      <button type="submit" class="btn btn-primary mb-3" data-photo-save title="Salvar foto">Salvar foto</button>
+    </form>
+    <dialog class="photo-dialog" data-photo-dialog aria-labelledby="photo-dialog-title" hidden>
+      <div class="photo-dialog-heading"><h2 id="photo-dialog-title">Foto de perfil</h2><button type="button" class="btn btn-secondary" data-photo-close title="Fechar foto" autofocus>Fechar</button></div>
+      <img class="photo-expanded" data-photo-expanded alt="Visualização ampliada da foto de perfil">
+      <p class="small muted">Salve para confirmar.</p>
+      <div class="photo-dialog-actions"><button type="button" class="btn btn-primary" data-photo-edit title="Alterar foto">Alterar foto</button><button type="button" class="btn btn-outline-danger" data-photo-delete title="Remover foto">Remover foto</button></div>
+    </dialog>
+  </div>
   <dl class="profile-facts"><div><dt>E-mail</dt><dd>{{ user.email|default:'Não informado' }}</dd></div><div><dt>Último acesso</dt><dd>{{ user.last_login|date:'d/m/Y H:i'|default:'Primeiro acesso' }}</dd></div></dl>
 </section>
 
-{% if perms.english_words.view_englishword %}<section class="panel card-body mt-4"><h2 class="mb-3">Seus dados de vocabulário</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-primary" href="{% url 'english_word_export' %}?format=csv" title="Exportar palavras em CSV">{% include 'life_rpg/icon.html' with name='download' %} CSV</a><a class="btn btn-outline-primary" href="{% url 'english_word_export' %}?format=json" title="Exportar palavras em JSON">JSON</a>{% if perms.english_words.add_englishword and perms.english_words.change_englishword %}<a class="btn" href="{% url 'english_word_import' %}" title="Importar vocabulário">Importar palavras</a>{% endif %}</div></section>{% endif %}
 <section class="panel card-body mt-4"><h2 class="mb-2">Sobre o aplicativo</h2><p class="muted small">Life RPG · Better Than Yesterday. Organize suas tarefas e acompanhe sua evolução com foco e consistência.</p><p class="muted small">Aparência escura · Roxo e lavanda</p></section>
-<form method="post" action="{% url 'logout' %}" class="mt-4">{% csrf_token %}<button class="btn btn-outline-danger w-100" title="Sair da conta">{% include 'life_rpg/icon.html' with name='logout' %} Sair da conta</button></form>
 {% endblock %}

@@ -183,7 +183,13 @@ class TrainView(WorkoutView):
         active = models.Workout.objects.filter(owner=request.user, is_active=True, is_archived=False).first()
         ongoing = models.WorkoutSession.objects.filter(owner=request.user, status='in_progress').first()
         valid = active and active.is_valid_on(timezone.localdate())
-        return self.display(request, 'train', {'form': form, 'active': active, 'ongoing': ongoing, 'valid': valid, 'days': services.weekly_program(active) if active else [], 'today': timezone.localdate()})
+        try:
+            selected_weekday = int(form['weekday'].value())
+        except (TypeError, ValueError):
+            selected_weekday = timezone.localdate().weekday()
+        if selected_weekday not in range(7):
+            selected_weekday = timezone.localdate().weekday()
+        return self.display(request, 'train', {'selected_weekday': selected_weekday, 'form': form, 'active': active, 'ongoing': ongoing, 'valid': valid, 'days': services.weekly_program(active) if active else [], 'today': timezone.localdate()})
 
     def get(self, request):
         return self.display_start(request, forms.StartSessionForm())

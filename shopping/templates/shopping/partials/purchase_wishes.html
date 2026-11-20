@@ -1,0 +1,24 @@
+<div data-page-title="{{ page_title }}" data-shopping-section="wishes">
+  {% include 'shopping/partials/back_link.html' %}
+  <header class="section-heading categories-heading"><h1>Desejo comprar</h1>{% if perms.shopping.add_purchasewish %}<a class="btn btn-primary" href="{% url 'purchase_wish_create' %}" title="Adicionar compra desejada">{% include 'life_rpg/icon.html' with name='plus' %} Adicionar</a>{% endif %}</header>
+  <details class="panel card-body mission-filters mb-3" {% if filter_form.errors %}open{% endif %}>
+    <summary>Filtros</summary>
+    <form method="get" action="{% url 'purchase_wish_list' %}" class="row g-2 mt-2">
+      {% for field in filter_form %}<div class="col-12 col-md-4">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}
+      <div class="d-flex gap-2 mt-3"><button type="submit" class="btn btn-primary" title="Filtrar compras desejadas">Filtrar</button><a class="btn" href="{% url 'purchase_wish_list' %}" title="Limpar filtros">Limpar</a></div>
+    </form>
+  </details>
+  <div class="category-list">
+    {% for wish in wishes %}
+    <div class="category-row">
+      <span class="category-name">{{ wish.name }}<small class="purchase-wish-type">{{ wish.get_purchase_type_display }} · {% if wish.is_purchased %}Comprado{% else %}Não comprado{% endif %}</small></span>
+      <div class="category-actions">
+        {% if perms.shopping.change_purchasewish and not wish.is_purchased %}<form method="post" action="{% url 'purchase_wish_confirm' wish.pk %}{% if query_string %}?{{ query_string }}{% endif %}">{% csrf_token %}<button type="submit" class="purchase-wish-confirm" title="Confirmar compra de {{ wish.name }}" aria-label="Confirmar compra de {{ wish.name }}">{% include 'life_rpg/icon.html' with name='check' %}</button></form>{% endif %}
+        {% if perms.shopping.change_purchasewish %}<a href="{% url 'purchase_wish_update' wish.pk %}" title="Editar {{ wish.name }}" aria-label="Editar {{ wish.name }}">{% include 'life_rpg/icon.html' with name='edit' %}</a>{% endif %}
+        {% if perms.shopping.delete_purchasewish %}<a class="category-delete" href="{% url 'purchase_wish_delete' wish.pk %}" title="Excluir {{ wish.name }}" aria-label="Excluir {{ wish.name }}">{% include 'life_rpg/icon.html' with name='trash' %}</a>{% endif %}
+      </div>
+    </div>
+    {% empty %}<div class="empty-state"><h2>Nenhuma compra encontrada</h2><p>Adicione uma compra ou ajuste os filtros.</p></div>{% endfor %}
+  </div>
+  {% include 'components/_pagination.html' %}
+</div>

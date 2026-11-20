@@ -1,4 +1,29 @@
 (() => {
+  const updateTrainingDay = () => {
+    document.querySelectorAll('[data-training-day-picker]').forEach((picker) => {
+      const select = picker.querySelector('select[name="weekday"]');
+      if (!select) return;
+      picker.querySelectorAll('[data-training-day]').forEach((day) => {
+        day.hidden = day.dataset.trainingDay !== select.value;
+      });
+    });
+  };
+  document.addEventListener('change', (event) => {
+    if (event.target.matches('[data-training-day-picker] select[name="weekday"]')) updateTrainingDay();
+  });
+  document.addEventListener('DOMContentLoaded', updateTrainingDay);
+  document.addEventListener('app:ready', updateTrainingDay);
+  document.addEventListener('workout:set-updated', (event) => {
+    const card = event.detail.element.closest('[data-exercise-target]');
+    if (!card) return;
+    const saved = card.querySelectorAll('[data-set-registered="true"]').length;
+    const target = Number(card.dataset.exerciseTarget);
+    const state = card.dataset.exerciseSkipped === 'true' ? 'pending' : saved >= target && target > 0 ? 'completed' : saved > 0 ? 'partial' : 'pending';
+    card.classList.remove('session-exercise-pending', 'session-exercise-partial', 'session-exercise-completed');
+    card.classList.add(`session-exercise-${state}`);
+    const label = card.querySelector('[data-exercise-completion]');
+    if (label) label.textContent = state === 'completed' ? 'Completo' : state === 'partial' ? 'Parcial' : '';
+  });
   const setStatus = (form, message, failed = false) => {
     const status = form && form.querySelector('[data-save-status]');
     if (!status) return;
@@ -67,6 +92,13 @@
     const button = timer.querySelector('[data-rest-dismiss]');
     button.textContent = remaining ? 'Pular descanso' : 'Fechar';
     button.title = remaining ? 'Pular descanso' : 'Fechar contador';
+    if (!remaining && !restState.completionNotified && document.visibilityState === 'visible') {
+      restState.completionNotified = true;
+      storeRestState();
+      if (typeof navigator.vibrate === 'function') {
+        try { navigator.vibrate([200, 100, 200]); } catch (_) { /* Visual completion remains available. */ }
+      }
+    }
     if (!remaining && restInterval) {
       window.clearInterval(restInterval);
       restInterval = null;

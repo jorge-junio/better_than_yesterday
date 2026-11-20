@@ -12,7 +12,7 @@
     {% for task in pending_tasks %}
       {% include 'tasks/partials/daily_quest_card.html' with return_to='task_today_all' %}
     {% empty %}
-      <div class="empty-state">{% include 'life_rpg/icon.html' with name='check' %}<h3>Nenhuma missão pendente{% if selected_category_id %} nesta categoria{% endif %} hoje</h3><p>As concluídas e canceladas podem ser consultadas abaixo.</p></div>
+      <div class="empty-state">{% include 'life_rpg/icon.html' with name='check' %}<h3>Nenhuma missão pendente{% if selected_category_id or selected_skill %} com estes filtros{% endif %} hoje</h3><p>As concluídas e canceladas podem ser consultadas abaixo.</p></div>
     {% endfor %}
   </div>
 </section>
@@ -21,7 +21,7 @@
   <div class="quest-list">
     {% for task in completed_tasks %}
       {% include 'tasks/partials/daily_quest_card.html' with return_to='task_today_all' %}
-    {% empty %}<p class="muted small">Nenhuma missão concluída{% if selected_category_id %} nesta categoria{% endif %} hoje.</p>{% endfor %}
+    {% empty %}<p class="muted small">Nenhuma missão concluída{% if selected_category_id or selected_skill %} com estes filtros{% endif %} hoje.</p>{% endfor %}
   </div>
 </details>
 <details class="panel card-body mission-filters mt-3" data-mission-group="cancelled">
@@ -29,7 +29,7 @@
   <div class="quest-list">
     {% for task in cancelled_tasks %}
       {% include 'tasks/partials/daily_quest_card.html' with return_to='task_today_all' %}
-    {% empty %}<p class="muted small">Nenhuma missão cancelada{% if selected_category_id %} nesta categoria{% endif %} hoje.</p>{% endfor %}
+    {% empty %}<p class="muted small">Nenhuma missão cancelada{% if selected_category_id or selected_skill %} com estes filtros{% endif %} hoje.</p>{% endfor %}
   </div>
 </details>
 {% if perms.tasks.add_task %}<a class="primary-button add-quest" href="{% url 'task_create' %}" title="Adicionar nova missão">{% include 'life_rpg/icon.html' with name='plus' %} Nova missão</a>{% endif %}

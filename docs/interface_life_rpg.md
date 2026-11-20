@@ -153,3 +153,35 @@ Valores selecionados, parâmetros GET, botões de filtrar/limpar, resultados e p
 O formulário de período da Evolução foi corrigido para enviar a `/evolution/#evolution`, permanecendo na própria tela; antes enviava ao dashboard, onde os relatórios já haviam sido removidos.
 
 Verificação: 133 templates compilados, 91 testes existentes passaram, check do Django e diff sem erros. Nove telas renderizadas com formulários de filtro reais, sem consulta ao banco; confirmado que GET/action/valores e estado inicial foram preservados, inclusive abertura em erro de validação. Chrome em 320, 390 e 1280 px nas nove telas: recolhimento/expansão funcionando, sem overflow horizontal nem erros JS. Nenhum arquivo de teste foi criado no repositório.
+
+## Listagens compactas de tarefas e ações nos detalhes
+
+Nas telas `/tasks/today/` e `/tasks/list/`, cada tarefa é um único link em formato de card, com título, categoria/horário quando disponíveis e status textual. Não há ícones, badges, descrição longa ou botões de ação dentro desses cards. Filtros, resumo, paginação e os estados disponíveis continuam funcionando. O Início e `/tasks/today/all/` mantêm seus cards e ações anteriores.
+
+O detalhe concentra Concluir/Reabrir, Cancelar neste dia, Adiar 1 dia para tarefas manuais, Editar e Excluir, respeitando estado e permissões. Excluir continua abrindo confirmação. O status cancelado também é identificado corretamente no detalhe.
+
+O link dos cards informa a listagem de origem com seus filtros. Voltar usa essa origem, validada contra caminhos internos permitidos. Concluir/reabrir/cancelar/adiar feitos no detalhe retornam ao próprio detalhe; os destinos antigos dos demais fluxos foram preservados.
+
+Validação: 21 testes existentes passaram. Cenário adicional em PostgreSQL descartável verificou cards sem ações/ícones nas duas listagens, detalhes, conclusão/reabertura, cancelamento, adiamento, restrição de adiamento para recorrência, permissões de leitura/alteração, confirmação/exclusão e rejeição de URLs externas no retorno. Chrome nas três telas em 320, 390 e 1280 px: sem overflow/erros JS e alvos de toque preservados. Nenhum dado de demonstração foi criado no banco de trabalho.
+
+## Detalhe compacto de recorrência
+
+A tela `/recurring-tasks/<id>/detail/` usa o nome da tarefa como título principal, status ao lado e uma ficha compacta em duas colunas para recorrência, categoria, tempo e prioridade. A programação ocupa a largura completa; dias da semana aparecem abreviados com o nome completo disponível no atributo de título. Datas usam formato curto. A descrição fica em uma seção expansível, e as ações Editar/Excluir aparecem lado a lado, conforme permissões. O botão Voltar permanece acima do título.
+
+Foram removidos o título duplicado e o aviso explicativo genérico, mantendo os dados reais e os três formatos de recorrência. Validação: 11 testes existentes passaram; renderização dos três tipos e permissões conferidas sem acesso ao banco. Chrome em 320, 390 e 1280 px: duas colunas, descrição expansível, sem overflow; prévia mobile inspecionada visualmente.
+
+## Detalhe compacto de tarefa
+
+A tela `/tasks/<id>/detail/` passou a seguir a ficha mobile das recorrências: título único com status, Voltar no topo, dados em duas colunas, datas/horários curtos e descrição expansível. Conclusão e cancelamento apresentam sua data quando aplicáveis, evitando linhas redundantes para estados ainda não ocorridos.
+
+As ações continuam disponíveis conforme estado/permissão, agora em uma grade compacta de duas colunas com alvos de toque de pelo menos 44 px; uma última ação isolada usa a largura completa. Foram preservados POST/CSRF, retornos, confirmação de exclusão e restrição de adiamento para tarefas manuais.
+
+Validação: 21 testes existentes passaram; cenário de integração anterior em PostgreSQL descartável foi repetido e confirmou as ações, estados, permissões e retorno à lista. Prévia dos estados pendente/concluída/cancelada conferida no Chrome em 320, 390 e 1280 px, sem overflow, com descrição expansível e botões adequados ao toque. Nenhuma alteração em dados ou modelos.
+
+## Filtro de skill no Início e em todas as missões
+
+O painel Filtros das telas `/dashboard/` e `/tasks/today/all/` permite combinar categoria e skill. As opções de skill vêm de `Task.Skill.choices`, incluindo as seis habilidades atuais, além de Todas as skills e Sem skill. Limpar remove ambas as seleções.
+
+A filtragem ocorre antes do limite de cards do Início e antes da separação entre pendentes/concluídas/canceladas na tela completa. Resumo e contadores refletem a combinação. Ver todas, Voltar e os retornos de concluir/cancelar preservam ambos os parâmetros; os cards enviam a skill em campo oculto. Valores inválidos apresentam erro de validação e nenhum resultado.
+
+Verificação: 21 testes existentes de tarefas/progresso passaram. Integração em PostgreSQL descartável conferiu skill isolada, categoria + skill, Sem skill + Sem categoria, Saúde, valores inválidos, ausência de filtros e preservação na navegação/ações. Chrome em 320, 390 e 1280 px nas duas telas: seleções corretas, expansão do painel e ausência de overflow/erros JS. Nenhuma mudança em modelos ou dados de trabalho.

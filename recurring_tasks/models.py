@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from tasks.models import Task
+
 from .services import sync_generated_tasks_from_recurring_task
 
 
@@ -26,8 +28,18 @@ class RecurringTask(models.Model):
         ('sun', 'Domingo'),
     )
 
+    skill = models.CharField(
+        max_length=20,
+        choices=Task.Skill.choices,
+        blank=True,
+        default='',
+        verbose_name='skill desenvolvida',
+        help_text='Repassada às novas tarefas e às ocorrências ainda não concluídas. Cada conclusão concede 15 XP à skill selecionada.',
+    )
+
     name = models.CharField(max_length=500, verbose_name='nome')
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
+    scheduled_time = models.TimeField(null=True, blank=True, verbose_name='horário')
     estimated_time = models.DurationField(null=True, blank=True, verbose_name='tempo estimado')
     priority = models.PositiveSmallIntegerField(
         choices=Priority.choices,

@@ -61,3 +61,20 @@ class FinishForm(forms.Form):
         label='Valor total da compra (R$)', min_value=Decimal('0'), max_digits=12, decimal_places=2, localize=True,
         widget=forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': 'Ex.: 150,90', 'autocomplete': 'off'}),
     )
+
+
+class PurchaseWishForm(forms.ModelForm):
+    class Meta:
+        model = models.PurchaseWish
+        fields = ['name', 'purchase_type', 'is_purchased']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'purchase_type': forms.Select(attrs={'class': 'form-select'}),
+            'is_purchased': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class PurchaseWishFilterForm(forms.Form):
+    name = forms.CharField(label='Nome', required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}))
+    purchase_type = forms.ChoiceField(label='Tipo', required=False, choices=[('', 'TODOS'), *models.PurchaseWish.Type.choices], widget=forms.Select(attrs={'class': 'form-select'}))
+    is_purchased = forms.ChoiceField(label='Comprado', choices=[('false', 'Não'), ('true', 'Sim'), ('all', 'Todos')], widget=forms.Select(attrs={'class': 'form-select'}))

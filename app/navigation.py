@@ -21,11 +21,25 @@ MENU_SECTIONS = (
         ('Treinar', 'workout_train', 'workouts.view_workoutsession', 'play', '/workouts/'),
     )),
     ('shopping', 'Compras', 'quest', (
+        ('Desejo comprar', 'purchase_wish_list', 'shopping.view_purchasewish', 'heart', '/shopping/wishes/'),
         ('Itens da feira', 'shopping_list', 'shopping.view_shoppinglist', 'check', '/shopping/'),
         ('Fazer feira', 'shopping_start', ('shopping.view_shoppinglist', 'shopping.view_shoppingsession'), 'quest', '/shopping/'),
         ('Histórico', 'shopping_history', 'shopping.view_shoppingsession', 'undo', '/shopping/'),
     )),
 )
+
+
+AREA_SHORTCUTS = {'english_word_list': ('Palavras', 'book'),
+ 'evaluation_list': ('Avaliações', 'assessment'),
+ 'recurring_task_list': ('Recorrentes', 'repeat'),
+ 'project_task_list': ('Tarefas', 'checklist'),
+ 'possible_task_list': ('Ideias', 'bulb'),
+ 'workout_list': ('Treino', 'dumbbell'),
+ 'workout_train': ('Treinar', 'play'),
+ 'shopping_list': ('Lista da feira', 'basket'),
+ 'shopping_start': ('Fazer feira', 'cart'),
+ 'shopping_history': ('Histórico', 'history'),
+ 'workout_history': ('Histórico', 'history')}
 
 
 def get_menu_sections(user):
@@ -37,7 +51,9 @@ def get_menu_sections(user):
         for title, route, permissions, option_icon, prefix in destinations:
             permissions = (permissions,) if isinstance(permissions, str) else permissions
             if user.has_perms(permissions):
-                options.append({'label': title, 'route': route, 'icon': option_icon, 'prefix': prefix})
+                area_label, area_icon = AREA_SHORTCUTS.get(route, (title, option_icon))
+                options.append({'label': title, 'route': route, 'icon': option_icon, 'prefix': prefix,
+                                'area_label': area_label, 'area_icon': area_icon})
         if options:
             sections.append({
                 'slug': slug, 'label': label, 'icon': icon, 'options': options,

@@ -130,10 +130,28 @@ O sistema deve permitir a configuração de regras para geração automática de
 ## 11. Skills por tarefa
 
 - A skill é escolhida individualmente no cadastro/edição da tarefa da agenda (`Task`), sem associação automática à categoria.
-- Opções iniciais: Inteligência, Força, Disciplina, Sabedoria e Carisma. A escolha é opcional; tarefas antigas começam sem skill.
+- Opções iniciais: Inteligência, Força, Disciplina, Sabedoria, Carisma e Saúde (Comer saudável e meditação). A escolha é obrigatória nos formulários de cadastro e edição de tarefas e recorrências; no modelo e no banco o campo permanece opcional, preservando tarefas antigas sem skill.
 - Concluir uma tarefa com skill concede 15 XP à habilidade escolhida, mantendo os 15 XP gerais já existentes. O XP geral não é somado novamente por ter skill.
 - Cada skill começa no nível 1 e avança a cada 100 XP, exibindo XP total, progresso no nível e XP até o próximo nível.
 - Pontos derivados das tarefas com `completed_at` preenchido. Reenvios não duplicam pontos; reabertura/exclusão removem a contribuição. Editar a skill de uma tarefa concluída redistribui seus 15 XP para a nova skill. Retirar a skill mantém apenas a contribuição geral.
 - O formulário de tarefa e as ações rápidas usam `completed_at` como fonte de conclusão, inclusive quando a tarefa é salva já concluída.
-- Personagem e Evolução apresentam as cinco skills com dados reais. Missões, agenda, dashboard e detalhes mostram a skill escolhida.
-- Tarefas recorrentes já geradas permitem escolher a skill em cada ocorrência pela edição da tarefa. Não há classificação automática dos modelos de recorrência, das tarefas de projeto ou das sessões de treino nesta etapa.
+- Personagem e Evolução apresentam as seis skills com dados reais. Missões, agenda, dashboard e detalhes mostram a skill escolhida.
+- Tarefas recorrentes permitem selecionar uma skill opcional no cadastro/edição. Novas ocorrências herdam a skill; salvar a recorrência atualiza a skill das ocorrências ainda não concluídas, preservando as concluídas e seu XP. Cada ocorrência também permite edição individual da skill. Tarefas de projeto e sessões de treino não recebem classificação automática.
+
+- No dashboard e em todas as missões do dia, o ícone da tarefa corresponde ao da skill; tarefas sem skill exibem um cadeado com a indicação “Sem skill vinculada”.
+
+## 12. Foto de perfil
+
+- O usuário pode enviar, pré-visualizar, ampliar, substituir e remover sua foto em Perfil, confirmando com Salvar foto. A foto também aparece no menu do perfil.
+- Aceitar JPEG e PNG de até 5 MB, validar o conteúdo e normalizar orientação e tamanho (até 512 × 512), removendo metadados.
+- Foto individual, acessível apenas ao próprio usuário autenticado. Sem foto, apresentar ícone de pessoa. Armazenar no banco para preservar a foto junto aos dados da aplicação.
+
+## 13. Horário das recorrências e ordenação diária
+
+- Recorrências permitem informar um horário opcional, herdado por novas tarefas e atualizado nas ocorrências ainda não concluídas ao salvar o modelo. Ocorrências concluídas preservam seu horário.
+- Dashboard e todas as missões do dia ordenam por horário crescente, deixando tarefas sem horário ao final. Empates usam prioridade decrescente e título. O dashboard mantém as pendentes antes das concluídas e o limite existente de seis tarefas.
+
+## 14. Desejo comprar
+
+- A área Compras oferece o cadastro Desejo comprar, com nome e tipo obrigatórios: DESEJO ou NECESSIDADE.
+- Listar, cadastrar, editar e excluir mediante confirmação, com paginação, permissões Django próprias e registros isolados por usuário.

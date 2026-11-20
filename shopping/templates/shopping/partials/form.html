@@ -1,4 +1,5 @@
 <div data-page-title="{{ page_title }}" data-shopping-section="{{ shopping_section }}">
+  {% include 'shopping/partials/back_link.html' %}
   <div class="mx-auto" style="max-width: 640px;">
     <h1 class="h3 mb-4">{{ heading }}</h1>
     {% if description %}<p>{{ description }}</p>{% endif %}

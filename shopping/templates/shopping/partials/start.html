@@ -1,8 +1,10 @@
 <div data-page-title="{{ page_title }}" data-shopping-section="start">
+  {% include 'shopping/partials/back_link.html' %}
   <h1 class="h3 mb-3">Fazer feira</h1>
   {% if current_session %}
   <div class="alert alert-info"><p>Você tem uma compra em andamento: <strong>{{ current_session.list_name }}</strong>.</p><a href="{% url 'shopping_session' current_session.pk %}" class="btn btn-primary" title="Retomar compra em andamento">Continuar compras</a></div>
   {% else %}
+  {% if not selected %}
   <p class="text-body-secondary">Escolha uma lista e marque os itens que pretende comprar nesta feira.</p>
   <div class="card shadow-sm mb-4"><div class="card-body">
     <form method="get" action="{% url 'shopping_start' %}">
@@ -10,7 +12,9 @@
       <button type="submit" class="btn btn-outline-primary" title="Exibir itens da lista escolhida">Selecionar lista</button>
     </form>
   </div></div>
+  {% endif %}
   {% if selected %}
+  <p class="text-body-secondary mb-3">Marque os itens que pretende comprar nesta feira.</p>
   <div class="card shadow-sm"><div class="card-body">
     <h2 class="h5 text-break">{{ selected.name }}</h2>
     {% if has_items %}

@@ -1,6 +1,8 @@
 <div data-page-title="{{ page_title }}">
+<div class="section-heading"><div><p class="eyebrow">Construa sua rotina</p><h1 class="mb-0">Missões recorrentes</h1></div>{% if perms.recurring_tasks.add_recurringtask %}<a class="btn btn-primary" href="{% url 'recurring_task_create' %}" title="Nova tarefa recorrente">{% include 'life_rpg/icon.html' with name='plus' %} Nova recorrente</a>{% endif %}</div>
+{% include 'tasks/partials/mission_navigation.html' with active_tab='recurring' %}
 <div class="row mb-3">
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <details class="panel card-body mission-filters">
             <summary>Filtros</summary>
         <form method="get" action="{% url 'recurring_task_list' %}" class="row g-2">
@@ -32,7 +34,16 @@
                     <option value="0" {% if request.GET.is_active == '0' %}selected{% endif %}>Inativo</option>
                 </select>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-4">
+                <select aria-label="Skill" name="skill" class="form-select">
+                    <option value="">Todas as skills</option>
+                    <option value="none" {% if request.GET.skill == 'none' %}selected{% endif %}>Sem skill</option>
+                    {% for value, label in skill_choices %}
+                        <option value="{{ value }}" {% if request.GET.skill == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-12 d-flex flex-wrap align-items-center gap-2">
                 <button type="submit" class="btn btn-primary" title="Filtrar">
                     {% include 'life_rpg/icon.html' with name='search' %} Filtrar
                 </button>
@@ -44,13 +55,6 @@
         </details>
     </div>
 
-    {% if perms.recurring_tasks.add_recurringtask %}
-    <div class="col-md-4">
-        <a href="{% url 'recurring_task_create' %}" class="btn btn-success float-end" title="Nova tarefa recorrente">
-            {% include 'life_rpg/icon.html' with name='plus' %}Nova Tarefa Recorrente
-        </a>
-    </div>
-    {% endif %}
 </div>
 
 <div class="recurring-task-list">

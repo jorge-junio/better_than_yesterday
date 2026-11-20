@@ -3,6 +3,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('shopping/wishes/', views.PurchaseWishListView.as_view(), name='purchase_wish_list'),
+    path('shopping/wishes/<int:pk>/confirm/', views.PurchaseWishConfirmView.as_view(), name='purchase_wish_confirm'),
+    path('shopping/wishes/create/', views.PurchaseWishFormView.as_view(), name='purchase_wish_create'),
+    path('shopping/wishes/<int:pk>/edit/', views.PurchaseWishFormView.as_view(), name='purchase_wish_update'),
+    path('shopping/wishes/<int:pk>/delete/', views.PurchaseWishDeleteView.as_view(), name='purchase_wish_delete'),
     path('shopping/', views.ListView.as_view(), name='shopping_list'),
     path('shopping/lists/create/', views.ListFormView.as_view(), name='shopping_list_create'),
     path('shopping/lists/<int:pk>/', views.ListDetailView.as_view(), name='shopping_list_detail'),

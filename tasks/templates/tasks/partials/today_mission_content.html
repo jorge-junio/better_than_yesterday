@@ -1,6 +1,6 @@
 <div data-page-title="{{ page_title }}">
   <div class="section-heading"><div><p class="eyebrow">Uma missão de cada vez</p><h1 class="mb-0">Suas missões</h1></div>{% if perms.tasks.add_task %}<a class="btn btn-primary" href="{% url 'task_create' %}" title="Nova missão">{% include 'life_rpg/icon.html' with name='plus' %} Nova missão</a>{% endif %}</div>
-  <nav class="mission-tabs" aria-label="Visualização de missões"><a href="{% url 'task_today' %}" aria-current="page">Do dia</a><a href="{% url 'task_list' %}">Agenda</a>{% if perms.recurring_tasks.view_recurringtask %}<a href="{% url 'recurring_task_list' %}">Recorrentes</a>{% endif %}</nav>
+  {% include 'tasks/partials/mission_navigation.html' with active_tab='today' %}
   {% if message_error %}<div class="alert alert-danger" role="alert">{{ message_error }}</div>{% endif %}
   <div class="daily-stats">
     <article class="stat-card">{% include 'life_rpg/icon.html' with name='check' %}<strong>{{ completed_tasks }}<small> / {{ total_tasks }}</small></strong><span>Missões concluídas</span></article>
@@ -17,20 +17,10 @@
     <div class="d-flex flex-wrap gap-2 mt-3"><button class="btn btn-primary" title="Filtrar missões">Filtrar</button><a class="btn" href="{% url 'task_today' %}" title="Voltar às missões de hoje">Hoje</a></div>
     </details>
   </form>
-  <div class="quest-list">
+  <div class="compact-task-list">
     {% for task in mission_tasks %}
-    <article class="quest-card{% if task.completed_at %} is-completed{% elif task.is_skipped %} is-skipped{% endif %}">
-      <span class="quest-icon">{% include 'life_rpg/icon.html' with name='quest' %}</span>
-      <div class="quest-info"><a class="quest-title" href="{% url 'task_detail' task.pk %}">{{ task.title }}</a><p>{{ task.category.name|default:'Sem categoria' }} · {{ task.get_priority_display }} · {{ task.get_source_type_display }}{% if task.scheduled_time %} · {{ task.scheduled_time|time:'H:i' }}{% endif %}</p>{% if task.skill %}<span class="quest-skill">{{ task.get_skill_display }}</span>{% endif %}<span class="quest-xp">{% if task.completed_at %}Concluída · +15 XP{% elif task.is_skipped %}Ignorada{% else %}+15 XP{% endif %}</span>
-        <div class="quest-actions">
-          <a class="btn btn-outline-primary" href="{% url 'task_detail' task.pk %}" title="Ver detalhes de {{ task.title }}">Detalhes</a>
-          {% if perms.tasks.change_task %}<a class="btn" href="{% url 'task_update' task.pk %}" title="Editar {{ task.title }}">{% include 'life_rpg/icon.html' with name='edit' %} Editar</a>
-            {% if not task.completed_at and not task.is_skipped %}<form method="post" action="{% url 'task_today_complete' task.pk %}?scheduled_date={{ selected_date|date:'Y-m-d' }}&category={{ selected_category_id }}">{% csrf_token %}<button class="btn btn-success" title="Concluir {{ task.title }}">{% include 'life_rpg/icon.html' with name='check' %} Concluir</button></form><form method="post" action="{% url 'task_today_skip' task.pk %}?scheduled_date={{ selected_date|date:'Y-m-d' }}&category={{ selected_category_id }}">{% csrf_token %}<button class="btn btn-outline-secondary" title="Não cumprir {{ task.title }} neste dia">Ignorar</button></form>{% endif %}
-          {% endif %}
-        </div>
-      </div>
-    </article>
-    {% empty %}<div class="empty-state">{% include 'life_rpg/icon.html' with name='spark' %}<h2>Nenhuma missão neste filtro</h2><p>Escolha outro status ou adicione uma nova missão à sua jornada.</p></div>{% endfor %}
+      {% include 'tasks/partials/task_row.html' %}
+    {% empty %}<div class="empty-state">Nenhuma tarefa encontrada para os filtros informados.</div>{% endfor %}
   </div>
   <div class="panel card-body mt-4"><div class="d-flex justify-content-between align-items-center gap-2 mb-2"><h2 class="h5 mb-0">Nível {{ level }} · {{ rank_name }}</h2><span class="badge text-bg-primary">{{ total_xp }} XP</span></div><label for="mission-xp">{{ xp_in_level }}/100 XP · {{ xp_to_next_level }} XP para o próximo nível</label><progress id="mission-xp" value="{{ xp_in_level }}" max="100">{{ xp_in_level }}%</progress><p class="muted small mt-2">Sequência: {{ streak_days }} dias · Pendentes: {{ pending_count }}</p></div>
 </div>

@@ -143,6 +143,15 @@ class SessionExercise(models.Model):
         verbose_name = 'Exercício da sessão'
         verbose_name_plural = 'Exercícios da sessão'
 
+    @property
+    def completion_state(self):
+        if self.is_skipped:
+            return 'pending'
+        registered = sum(series.registered_at is not None for series in self.sets.all())
+        if registered >= self.target_sets and self.target_sets:
+            return 'completed'
+        return 'partial' if registered else 'pending'
+
 
 class SessionSet(models.Model):
     session_exercise = models.ForeignKey(SessionExercise, on_delete=models.CASCADE, related_name='sets')

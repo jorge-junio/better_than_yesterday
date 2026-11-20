@@ -1,4 +1,5 @@
 {% load l10n %}
+  {% include 'shopping/partials/back_link.html' %}
 <div data-page-title="{{ page_title }}" data-shopping-section="{{ shopping_section }}">
   <h1 class="h3 mb-2 text-break">{{ session.list_name }}</h1>
   <p class="text-body-secondary">Iniciada em {{ session.started_at|date:'d/m/Y H:i' }}{% if session.finished_at %} · Encerrada em {{ session.finished_at|date:'d/m/Y H:i' }}{% endif %}</p>

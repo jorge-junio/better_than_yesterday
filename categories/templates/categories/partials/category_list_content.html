@@ -1,71 +1,24 @@
-<div data-page-title="{{ page_title }}">
-<div class="row mb-3">
-    <div class="col-lg-8">
-        <div class="p-4 rounded-4 text-white position-relative overflow-hidden" style="background: var(--bg-secondary);">
-            <div class="position-absolute top-0 end-0 opacity-25" style="font-size: 10rem; transform: translate(20%, -10%);">
-                {% include 'life_rpg/icon.html' with name='tag' %}
-            </div>
-            <div class="position-relative">
-                <div class="text-uppercase small fw-semibold opacity-75 mb-2">Organização por contexto</div>
-                <h1 class="display-6 mb-2">Categorias</h1>
-                <p class="mb-0 opacity-75">Agrupe tarefas e recorrências por tema para filtrar e organizar o trabalho com mais clareza.</p>
-            </div>
-        </div>
-    </div>
+<div class="categories-page" data-page-title="{{ page_title }}">
+  <header class="section-heading categories-heading">
+    <h1>Categorias</h1>
+    {% if perms.categories.add_category %}<a href="{% url 'category_create' %}" class="btn btn-primary" title="Nova categoria">{% include 'life_rpg/icon.html' with name='plus' %} Nova categoria</a>{% endif %}
+  </header>
 
-    {% if perms.categories.add_category %}
-    <div class="col-lg-4 d-flex align-items-start justify-content-lg-end mt-3 mt-lg-0">
-        <a href="{% url 'category_create' %}" class="btn btn-success" title="Nova categoria">
-            {% include 'life_rpg/icon.html' with name='plus' %} Nova Categoria
-        </a>
+  <div class="category-list">
+    {% for category in categories %}
+    <div class="category-row">
+      <span class="category-color" style="background-color: {{ category.color }};" aria-hidden="true"></span>
+      <span class="category-name">{{ category.name }}</span>
+      {% if perms.categories.change_category or perms.categories.delete_category %}
+      <div class="category-actions">
+        {% if perms.categories.change_category %}<a href="{% url 'category_update' category.id %}" title="Editar {{ category.name }}" aria-label="Editar {{ category.name }}">{% include 'life_rpg/icon.html' with name='edit' %}</a>{% endif %}
+        {% if perms.categories.delete_category %}<a class="category-delete" href="{% url 'category_delete' category.id %}" title="Excluir {{ category.name }}" aria-label="Excluir {{ category.name }}">{% include 'life_rpg/icon.html' with name='trash' %}</a>{% endif %}
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
-</div>
-
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        {% if categories %}
-        <div class="vstack gap-3">
-            {% for category in categories %}
-            <div class="p-3 rounded-4 border border-3 border-info bg-body-tertiary">
-                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
-                    <div class="flex-grow-1">
-                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                            <span class="badge text-bg-light text-dark border border-1">
-                                <span class="me-1 d-inline-block align-middle" style="width: .65rem; height: .65rem; border-radius: 50%; background-color: {{ category.color }};"></span>
-                                {{ category.color }}
-                            </span>
-                        </div>
-                        <h4 class="h5 mb-0">
-                            <span class="me-2 d-inline-block align-middle" style="width: .9rem; height: .9rem; border-radius: 50%; background-color: {{ category.color }};"></span>
-                            {{ category.name }}
-                        </h4>
-                    </div>
-                    <div class="d-flex gap-1 flex-wrap">
-                        {% if perms.categories.change_category %}
-                        <a href="{% url 'category_update' category.id %}" class="btn btn-warning btn-sm" title="Editar">
-                            {% include 'life_rpg/icon.html' with name='edit' %}
-                        </a>
-                        {% endif %}
-                        {% if perms.categories.delete_category %}
-                        <a href="{% url 'category_delete' category.id %}" class="btn btn-danger btn-sm" title="Excluir">
-                            {% include 'life_rpg/icon.html' with name='trash' %}
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <div class="display-3 mb-3 text-muted">{% include 'life_rpg/icon.html' with name='tag' %}</div>
-            <h4 class="mb-2">Nenhuma categoria ainda</h4>
-            <p class="text-muted mb-0">Crie uma categoria para organizar tarefas e recorrências por assunto.</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-{% include 'components/_pagination.html' %}
+    {% empty %}
+    <div class="empty-state"><h2>Nenhuma categoria ainda</h2><p>Crie uma categoria para organizar suas tarefas.</p></div>
+    {% endfor %}
+  </div>
+  {% include 'components/_pagination.html' %}
 </div>
