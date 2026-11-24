@@ -1,5 +1,5 @@
 <div class="recurring-detail task-detail" data-page-title="{{ page_title }}">
-  <a class="text-link recurring-detail-back" href="{{ back_url }}" title="Voltar à lista de tarefas">← Voltar</a>
+  {% if not in_dialog %}<a class="text-link recurring-detail-back" href="{{ back_url }}" title="Voltar à lista de tarefas">← Voltar</a>{% endif %}
   <header class="recurring-detail-heading">
     <div><p class="eyebrow">Tarefa</p><h1>{{ object.title }}</h1></div>
     <span class="badge {% if object.completed_at %}text-bg-success{% elif object.is_skipped %}text-bg-secondary{% else %}text-bg-primary{% endif %}">{% if object.completed_at %}Concluída{% elif object.is_skipped %}Cancelada{% else %}Pendente{% endif %}</span>
@@ -20,6 +20,7 @@
     {% if object.description %}<details class="recurring-detail-description"><summary>Descrição</summary><p>{{ object.description|linebreaksbr }}</p></details>{% endif %}
   </section>
 
+  {% if not in_dialog %}
   {% if perms.tasks.change_task or perms.tasks.delete_task %}
         <div class="task-detail-actions task-detail-action-grid">
             {% if perms.tasks.change_task %}
@@ -43,5 +44,6 @@
             {% endif %}
             {% if perms.tasks.delete_task %}<a href="{% url 'task_delete' object.id %}" class="btn btn-outline-danger" title="Excluir tarefa">Excluir</a>{% endif %}
         </div>
+  {% endif %}
   {% endif %}
 </div>

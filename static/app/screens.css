@@ -444,3 +444,6 @@ label:has(+ input[type=checkbox]), label:has(+ input[type=radio]) { min-height: 
 .project-list-card > .stretched-link::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .project-list-card-actions { z-index: 2; }
 .project-list-card > .stretched-link:focus-visible::after { outline: 3px solid var(--accent-secondary); outline-offset: -3px; }
+
+.quest-details-button { flex-shrink: 0; }
+.quest-details-button:hover, .quest-details-button:active { color: var(--accent-secondary); border-color: var(--accent-primary); background: #a78bfa12; }

@@ -3,6 +3,7 @@ from django.db.models import Case, When, Value, IntegerField
 from django.utils import timezone
 from django.views.generic import TemplateView
 
+from tasks.views import TaskTodayAllView
 from tasks.presentation import get_daily_category_context
 from tasks.services import get_skill_progress, get_today_mission_context, get_today_mission_ordering
 from app.utils import PageTitleMixin, htmx_redirect, is_htmx_request
@@ -10,7 +11,7 @@ from app.utils import PageTitleMixin, htmx_redirect, is_htmx_request
 from . import forms, services
 
 
-class DashboardView(PageTitleMixin, LoginRequiredMixin, TemplateView):
+class ReportContextView(PageTitleMixin, LoginRequiredMixin, TemplateView):
     template_name = 'progress/dashboard.html'
     page_title = 'BTY - Dashboard'
 
@@ -57,7 +58,7 @@ class DashboardView(PageTitleMixin, LoginRequiredMixin, TemplateView):
         return context
 
 
-class EvolutionView(DashboardView):
+class EvolutionView(ReportContextView):
     template_name = 'progress/evolution.html'
     page_title = 'BTY - Evolução'
 
@@ -65,3 +66,13 @@ class EvolutionView(DashboardView):
         context = super().get_context_data(**kwargs)
         context['skills'] = get_skill_progress()
         return context
+
+
+class DashboardView(TaskTodayAllView):
+    page_title = 'BTY - Início'
+    mission_return_to = 'dashboard'
+
+    def get(self, request, *args, **kwargs):
+        if is_htmx_request(request):
+            return htmx_redirect(request.get_full_path())
+        return super().get(request, *args, **kwargs)

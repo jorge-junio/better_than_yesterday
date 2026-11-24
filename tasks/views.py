@@ -167,6 +167,7 @@ class TaskTodayView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Permi
 class TaskTodayAllView(PageTitleMixin, LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'tasks/today_all.html'
     page_title = 'BTY - Todas as missões de hoje'
+    mission_return_to = 'task_today_all'
     permission_required = 'tasks.view_task'
 
     def get_context_data(self, **kwargs):
@@ -175,6 +176,7 @@ class TaskTodayAllView(PageTitleMixin, LoginRequiredMixin, PermissionRequiredMix
         category_context, tasks = get_daily_category_context(mission, self.request.GET)
         context.update(category_context)
         tasks = tasks.order_by(*services.get_today_mission_ordering())
+        context['mission_return_to'] = self.mission_return_to
         context['pending_tasks'] = tasks.filter(completed_at__isnull=True, skipped_in__isnull=True)
         context['completed_tasks'] = tasks.filter(completed_at__isnull=False)
         context['cancelled_tasks'] = tasks.filter(completed_at__isnull=True, skipped_in__isnull=False)
@@ -234,6 +236,7 @@ class TaskDetailView(HtmxTemplateMixin, PageTitleMixin, LoginRequiredMixin, Perm
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['back_url'] = get_task_back_url(self.request)
+        context['in_dialog'] = self.request.GET.get('dialog') == '1'
         return context
 
 

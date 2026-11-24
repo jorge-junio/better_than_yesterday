@@ -1,0 +1,14 @@
+html.mission-details-open, body.mission-details-open { overflow: hidden; overscroll-behavior: none; }
+/* The dialog itself is the full-screen scrim; its inner window is the card. */
+dialog.mission-details-dialog { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 16px; border: 0; border-radius: 0; color: var(--text-primary, #f8fafc); background: rgb(0 0 0 / 80%); overflow: hidden; overscroll-behavior: contain; }
+dialog.mission-details-dialog:not([open]) { display: none; }
+dialog.mission-details-dialog[open] { display: grid; place-items: center; }
+dialog.mission-details-dialog::backdrop { background: transparent; }
+.mission-details-window { box-sizing: border-box; width: min(100%, 640px); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain; padding: 20px; border: 1px solid var(--border-color, #343b4f); border-radius: 24px; background: var(--bg-secondary, #1c2232); color: var(--text-primary, #f8fafc); box-shadow: 0 24px 80px #0008; }
+.mission-details-dialog[data-mission-state="completed"] .mission-details-window { border-color: #86efac40; background: linear-gradient(#86efac06, #86efac06), var(--bg-primary, #10131e); }
+.mission-details-dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--border-color, #343b4f); }
+.mission-details-dialog-heading h2 { margin: 0; font-size: 1rem; }
+.mission-details-dialog .recurring-detail-heading h1 { font-size: 1.2rem; }
+.mission-details-dialog .recurring-detail-panel { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.mission-details-dialog .recurring-detail-grid dt { color: var(--text-secondary, #aab0c0); }
+.mission-details-dialog [data-close-mission-details] { background: transparent; }

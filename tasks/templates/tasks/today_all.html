@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Todas as missões de hoje · Life RPG{% endblock %}
-{% block scripts %}<script src="{% static 'app/life-rpg.js' %}" defer></script>{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block styles %}{% if mission_return_to == 'dashboard' %}<link rel="stylesheet" href="{% static 'app/mission-details.css' %}?v=2">{% endif %}{% endblock %}
+{% block scripts %}<script src="{% static 'app/life-rpg.js' %}" defer></script>{% if mission_return_to == 'dashboard' %}<script src="{% static 'app/mission-details.js' %}?v=2" defer></script>{% endif %}{% endblock %}
 {% block content %}
-<div class="section-heading"><div><p class="eyebrow">Seu dia, uma missão de cada vez</p><h1 class="mb-2">Missões do dia</h1><p class="muted small">{{ mission.reference_date|date:"l, d \d\e F" }}</p></div><a class="btn" href="{% url 'dashboard' %}{{ daily_category_query }}" title="Voltar ao início">Voltar</a></div>
+<div class="section-heading"><div><p class="eyebrow">Seu dia, uma missão de cada vez</p><h1 class="mb-2">Missões do dia</h1><p class="muted small">{{ mission.reference_date|date:"l, d \d\e F" }}</p></div>{% if mission_return_to != 'dashboard' %}<a class="btn" href="{% url 'dashboard' %}{{ daily_category_query }}" title="Voltar ao início">Voltar</a>{% endif %}</div>
 {% include 'tasks/partials/daily_category_filter.html' %}
 {% include 'life_rpg/daily_summary.html' %}
 <section aria-labelledby="pending-missions-title">
   <div class="section-heading"><h2 id="pending-missions-title">Pendentes</h2><span class="badge text-bg-primary">{{ pending_tasks|length }}</span></div>
   <div class="quest-list">
     {% for task in pending_tasks %}
-      {% include 'tasks/partials/daily_quest_card.html' with return_to='task_today_all' %}
+      {% include 'tasks/partials/daily_quest_card.html' with return_to=mission_return_to %}
     {% empty %}
       <div class="empty-state">{% include 'life_rpg/icon.html' with name='check' %}<h3>Nenhuma missão pendente{% if selected_category_id or selected_skill %} com estes filtros{% endif %} hoje</h3><p>As concluídas e canceladas podem ser consultadas abaixo.</p></div>
     {% endfor %}
@@ -20,7 +21,7 @@
   <summary>Concluídas <span class="badge text-bg-success">{{ completed_tasks|length }}</span></summary>
   <div class="quest-list">
     {% for task in completed_tasks %}
-      {% include 'tasks/partials/daily_quest_card.html' with return_to='task_today_all' %}
+      {% include 'tasks/partials/daily_quest_card.html' with return_to=mission_return_to %}
     {% empty %}<p class="muted small">Nenhuma missão concluída{% if selected_category_id or selected_skill %} com estes filtros{% endif %} hoje.</p>{% endfor %}
   </div>
 </details>
@@ -28,9 +29,17 @@
   <summary>Canceladas <span class="badge text-bg-secondary">{{ cancelled_tasks|length }}</span></summary>
   <div class="quest-list">
     {% for task in cancelled_tasks %}
-      {% include 'tasks/partials/daily_quest_card.html' with return_to='task_today_all' %}
+      {% include 'tasks/partials/daily_quest_card.html' with return_to=mission_return_to %}
     {% empty %}<p class="muted small">Nenhuma missão cancelada{% if selected_category_id or selected_skill %} com estes filtros{% endif %} hoje.</p>{% endfor %}
   </div>
 </details>
 {% if perms.tasks.add_task %}<a class="primary-button add-quest" href="{% url 'task_create' %}" title="Adicionar nova missão">{% include 'life_rpg/icon.html' with name='plus' %} Nova missão</a>{% endif %}
+{% if mission_return_to == 'dashboard' %}
+<dialog class="mission-details-dialog" data-mission-details-dialog aria-labelledby="mission-details-title" aria-modal="true">
+  <div class="mission-details-window">
+  <header class="mission-details-dialog-heading"><h2 id="mission-details-title">Detalhes da missão</h2><button type="button" class="icon-button" data-close-mission-details title="Fechar" aria-label="Fechar" autofocus>{% include 'life_rpg/icon.html' with name='close' %}</button></header>
+  <div data-mission-details-content aria-live="polite"></div>
+  </div>
+</dialog>
+{% endif %}
 {% endblock %}

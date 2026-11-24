@@ -149,7 +149,7 @@ O sistema deve permitir a configuração de regras para geração automática de
 ## 13. Horário das recorrências e ordenação diária
 
 - Recorrências permitem informar um horário opcional, herdado por novas tarefas e atualizado nas ocorrências ainda não concluídas ao salvar o modelo. Ocorrências concluídas preservam seu horário.
-- Dashboard e todas as missões do dia ordenam por horário crescente, deixando tarefas sem horário ao final. Empates usam prioridade decrescente e título. O dashboard mantém as pendentes antes das concluídas e o limite existente de seis tarefas.
+- Dashboard e todas as missões do dia ordenam por horário crescente, deixando tarefas sem horário ao final. Empates usam prioridade decrescente e título. O dashboard apresenta todas as missões do dia, com pendentes visíveis e grupos expansíveis de concluídas e canceladas, usando a mesma tela de /tasks/today/all/, sem limite de seis tarefas.
 
 ## 14. Desejo comprar
 
